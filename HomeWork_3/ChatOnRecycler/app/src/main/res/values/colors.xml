@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="activity_background">#121212</color>
+    <color name="black_matte">#1C1C1C</color>
+    <color name="black_selected">#3A3A3A</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="reaction_count">#CCCCCC</color>
+    <color name="blue_and_green">#2A9D8F</color>
+    <color name="message_box_gradient_start">#2A9D8F</color>
+    <color name="message_box_gradient_end">#006153</color>
+    <color name="chat_text_color">#FAFAFA</color>
+
+    <color name="message_date_background">#070707</color>
+    <color name="message_date_text">#999999</color>
+</resources>

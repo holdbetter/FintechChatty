@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.holdbetter.chatonrecycler.components.FlexBoxLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/flexbox"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <com.holdbetter.chatonrecycler.components.ReactionView
+        android:id="@+id/r1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:count="1"
+        app:emojiCode="0x1F975" />
+
+</com.holdbetter.chatonrecycler.components.FlexBoxLayout>

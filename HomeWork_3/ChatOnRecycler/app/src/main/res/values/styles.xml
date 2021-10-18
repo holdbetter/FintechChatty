@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Widget.MaterialComponents.Button.TextButton.Icon.Circle">
+        <item name="android:elevation">8dp</item>
+        <item name="backgroundTint">@color/blue_and_green</item>
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetRight">0dp</item>
+        <item name="iconTint">@color/activity_background</item>
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerRadius">20dp</item>
+    </style>
+
+    <style name="MessageLayout.ViewGroup">
+        <item name="android:paddingTop">10dp</item>
+    </style>
+
+    <style name="MessageLayout.Text">
+        <item name="android:fontFamily">@font/inter_regular</item>
+    </style>
+
+    <style name="MessageLayout.Text.Username">
+        <item name="android:textColor">@color/blue_and_green</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="MessageLayout.Text.Message">
+        <item name="android:textColor">@color/chat_text_color</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:minWidth">100dp</item>
+        <item name="android:maxWidth">280dp</item>
+    </style>
+
+    <style name="MessageLayout" />
+</resources>
