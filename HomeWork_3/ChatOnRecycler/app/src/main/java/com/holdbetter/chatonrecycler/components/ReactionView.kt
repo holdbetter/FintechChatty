@@ -3,7 +3,6 @@ package com.holdbetter.chatonrecycler.components
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
-import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_DOWN
@@ -12,39 +11,41 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.holdbetter.chatonrecycler.R
+import com.holdbetter.chatonrecycler.model.Reaction
 import com.holdbetter.chatonrecycler.services.InvalidateNotNullEmoji
 import com.holdbetter.chatonrecycler.services.RequestLayoutNotNullCount
+import com.holdbetter.chatonrecycler.services.Util
 import com.holdbetter.chatonrecycler.services.Util.dpToPx
 import com.holdbetter.chatonrecycler.services.Util.spToPx
-import kotlinx.parcelize.Parcelize
 
+@SuppressLint("ViewConstructor")
 class ReactionView @JvmOverloads constructor(
+    private val reaction: Reaction,
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttrs: Int = 0,
     defStyleRes: Int = 0,
 ) : View(context, attrs, defStyleAttrs, defStyleRes) {
     companion object {
-        const val DEFAULT_EMOJI_UNICODE = 0x1F600
         const val DEFAULT_REACTION_COUNT = 0
         const val DEFAULT_TEXT_SIZE = 14f
 
-        const val DEFAULT_TEXT_COLOR = R.color.reaction_count
+        const val DEFAULT_TEXT_COLOR = R.color.text_gray
     }
 
-    private var _emojiUnicode: String
     var emojiUnicode: String by InvalidateNotNullEmoji()
 
-    private var _count: Int
     var count: Int by RequestLayoutNotNullCount()
 
-    var isDynamicallyAdded = false
+    private val content: String
+        get() = if (emojiUnicode.isNotEmpty()) {
+            "$emojiUnicode $count"
+        } else {
+            ""
+        }
 
     private val coordinates = PointF()
     private val textBounds = Rect()
-    private val content: String
-        get() = "${getEmojiByCode(emojiUnicode.substring(2).toInt(16))} $count"
-
     private val fontMetrics = Paint.FontMetrics()
     private val defaultTypeface: Typeface = if (!isInEditMode) ResourcesCompat.getFont(context,
         R.font.inter_light)!! else Typeface.DEFAULT
@@ -63,9 +64,9 @@ class ReactionView @JvmOverloads constructor(
             defStyleRes
         )
 
-        _emojiUnicode = getEmojiByCode(typedArray.getInt(R.styleable.ReactionView_emojiCode,
-            DEFAULT_EMOJI_UNICODE))
-        _count = typedArray.getInt(R.styleable.ReactionView_count, DEFAULT_REACTION_COUNT)
+        val xmlEmojiCode = typedArray.getInt(R.styleable.ReactionView_emojiCode, -1)
+        emojiUnicode = if (xmlEmojiCode != -1) xmlEmojiCode.toString() else emojiUnicode
+        count = typedArray.getInt(R.styleable.ReactionView_count, DEFAULT_REACTION_COUNT)
 
         typedArray.recycle()
 
@@ -118,57 +119,27 @@ class ReactionView @JvmOverloads constructor(
         coordinates.y = h - fontMetrics.descent - paddingBottom
     }
 
-    private fun getEmojiByCode(code: Int): String {
-        return Character.toChars(code).concatToString()
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when (event?.action) {
             ACTION_DOWN -> return true
             ACTION_UP -> {
                 isSelected = !isSelected
-                if (isSelected) count++ else count--
+                if (isSelected) {
+                    count++
+                    reaction.users_id.add(Util.currentUserId)
+                } else {
+                    count--
+                    reaction.users_id.remove(Util.currentUserId)
+                }
+
+                if (count == 0) {
+                    (this.parent as FlexBoxLayout).removeView(this)
+                }
                 performClick()
                 return true
             }
         }
         return false
     }
-
-    public override fun onSaveInstanceState(): Parcelable {
-        return ReactionSaveState(
-            super.onSaveInstanceState(),
-            this.emojiUnicode,
-            this.count,
-            this.isSelected,
-            this.isDynamicallyAdded,
-            this.tag as? String,
-        )
-    }
-
-    public override fun onRestoreInstanceState(state: Parcelable?) {
-        if (state is ReactionSaveState) {
-            emojiUnicode = state.emojiUnicode
-            count = state.count
-            isSelected = state.isSelected
-            isDynamicallyAdded = state.isDynamicallyAdded
-            tag = state.tag
-        }
-        super.onRestoreInstanceState(state)
-    }
-
-    fun incrementCount() {
-        count++
-    }
-
-    @Parcelize
-    class ReactionSaveState(
-        private val parcelable: Parcelable?, // Parcelize annotation bug
-        val emojiUnicode: String,
-        val count: Int,
-        val isSelected: Boolean,
-        val isDynamicallyAdded: Boolean,
-        val tag: String?,
-    ) : BaseSavedState(parcelable)
 }

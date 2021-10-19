@@ -1,27 +1,15 @@
 package com.holdbetter.chatonrecycler
 
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.EditText
 import android.widget.Toast
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.view.children
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.holdbetter.chatonrecycler.components.ScrollLinearLayoutManager
 import com.holdbetter.chatonrecycler.model.Message
 import com.holdbetter.chatonrecycler.services.Util
-import com.holdbetter.chatonrecycler.services.Util.calendarInstance
-import com.holdbetter.chatonrecycler.services.Util.dpToPx
-import com.holdbetter.chatonrecycler.services.Util.spToPx
 import java.util.*
 
 class ChatActivity : AppCompatActivity() {

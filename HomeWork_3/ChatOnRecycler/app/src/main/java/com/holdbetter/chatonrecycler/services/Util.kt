@@ -4,9 +4,9 @@ import android.content.Context
 import android.util.TypedValue
 import com.holdbetter.chatonrecycler.R
 import com.holdbetter.chatonrecycler.model.Message
+import com.holdbetter.chatonrecycler.model.Reaction
 import com.holdbetter.chatonrecycler.model.User
 import java.util.*
-import kotlin.collections.HashSet
 
 object Util { // aka pomoika
     val calendarInstance: Calendar = Calendar.getInstance()
@@ -30,15 +30,15 @@ object Util { // aka pomoika
         return px.toInt()
     }
 
-    val emojiUnicode = arrayOf(
-        "U+1F911", "U+1F975", "U+1F976",
-        "U+1F973", "U+1F92C", "U+1F4A9"
-    )
+    fun getEmojiByCode(code: Int): String {
+        return Character.toChars(code).concatToString()
+    }
 
-    val emojiHex = arrayOf(
-        0x1F911, 0x1F975, 0x1F976,
-        0x1F973, 0x1F92C, 0x1F4A9
-    )
+    fun getEmojiByCode(code: String): String {
+        return Character.toChars(code.substring(2).toInt(16)).concatToString()
+    }
+
+    val supportedEmojiList = (0x1F601..0x1F64F).toList()
 
     val users: TreeSet<User> = TreeSet(compareBy(User::userId))
 
@@ -57,7 +57,13 @@ object Util { // aka pomoika
             Calendar.getInstance().run {
                 set(Calendar.MONTH, 4)
                 timeInMillis
-            }
+            },
+            arrayListOf(
+                Reaction(arrayListOf(0, 1), "U+1F601"),
+                Reaction(arrayListOf(0, 1, 2), "U+1F602"),
+                Reaction(arrayListOf(1), "U+1F603"),
+                Reaction(arrayListOf(0), "U+1F604"),
+            )
         ),
         Message(
             User(1, "Alexey Korchagin", R.drawable.alexey),
@@ -65,7 +71,11 @@ object Util { // aka pomoika
             Calendar.getInstance().run {
                 set(Calendar.MONTH, 4)
                 timeInMillis
-            }
+            },
+            arrayListOf(
+                Reaction(arrayListOf(1), "U+1F607"),
+                Reaction(arrayListOf(0), "U+1F606"),
+            )
         ),
         Message(
             User(0, "Vilen Evseev", R.drawable.hades),

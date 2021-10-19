@@ -7,13 +7,10 @@ import android.graphics.Paint
 import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.content.withStyledAttributes
-import androidx.core.view.*
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
+import androidx.core.view.marginBottom
+import androidx.core.view.marginTop
 import com.holdbetter.chatonrecycler.R
 import com.holdbetter.chatonrecycler.services.Util.dpToPx
 

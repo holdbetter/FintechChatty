@@ -1,15 +1,5 @@
 <resources>
     <string name="app_name">ChatOnRecycler</string>
-    <string name="increase">increase</string>
-    <string name="random_value">random value</string>
-    <string name="random_emoji_unicode">random emoji (unicode)</string>
-    <string name="random_emoji_hex">random emoji (hex)</string>
     <string name="avatar">avatar</string>
-    <string name="reactionview_test">Здесь можно проверить работу ReactionView</string>
-    <string name="reactionview">ReactionView</string>
-    <string name="viewgroup_test">Тут мой кастомный ViewGroup, он может перемещать элементы на новую строку, если не хватило места</string>
-    <string name="flexboxlayout">FlexBoxLayout</string>
-    <string name="scrollview_test">Активити для тестирования возможностей итоговой работы. Внутри будет контейнер ScrollView, чтобы уместить анекдот.</string>
-    <string name="final_customviewgroup">Final CustomViewGroup</string>
-    <string name="input_message_hint">Написать...</string>
+    <string name="input_message_hint">Написать…</string>
 </resources>

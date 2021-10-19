@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.holdbetter.chatonrecycler.components.ForeignMessageLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/messageLayout"
     style="@style/MessageLayout.ViewGroup"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,14 +10,12 @@
     tools:ignore="RtlHardcoded,RtlSymmetry">
 
     <ImageView
-        android:id="@+id/avatar"
         android:layout_width="37dp"
         android:layout_height="37dp"
         android:contentDescription="@string/avatar"
         android:src="@drawable/avatar_placeholder" />
 
     <TextView
-        android:id="@+id/name"
         style="@style/MessageLayout.Text.Username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

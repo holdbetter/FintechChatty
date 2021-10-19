@@ -3,13 +3,20 @@ package com.holdbetter.chatonrecycler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.holdbetter.chatonrecycler.components.FlexBoxLayout
 import com.holdbetter.chatonrecycler.components.ForeignMessageLayout
 import com.holdbetter.chatonrecycler.components.MessageLayout
+import com.holdbetter.chatonrecycler.components.ReactionView
 import com.holdbetter.chatonrecycler.model.Message
+import com.holdbetter.chatonrecycler.services.Util
+import java.lang.ref.WeakReference
 
 class MessageAdapter(val messages: ArrayList<Message> = ArrayList()) :
     RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         val root = when (viewType) {
             MessageType.FOREIGN.ordinal -> LayoutInflater.from(parent.context)
@@ -27,6 +34,14 @@ class MessageAdapter(val messages: ArrayList<Message> = ArrayList()) :
             holder.messageLayout.name = message.user.name
         }
         holder.messageLayout.message = message.text
+
+        for (reaction in message.reactions) {
+            holder.flexbox.addView(ReactionView(reaction, holder.itemView.context).apply {
+                emojiUnicode = reaction.emojiCode
+                count = reaction.users_id.size
+                isSelected = reaction.users_id.any { id -> id == Util.currentUserId }
+            })
+        }
     }
 
     override fun getItemCount(): Int = messages.size
@@ -43,8 +58,19 @@ class MessageAdapter(val messages: ArrayList<Message> = ArrayList()) :
         notifyItemInserted(messages.size - 1)
     }
 
-    class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val messageLayout = itemView as MessageLayout
+        val flexbox: FlexBoxLayout = itemView.findViewById(R.id.flexbox)
+        private val messageView = itemView.findViewById<TextView>(R.id.message)
+
+        init {
+            messageView.setOnLongClickListener {
+                val emojiBottomModalFragment = EmojiBottomModalFragment(WeakReference(itemView))
+                emojiBottomModalFragment.show((it.context as FragmentActivity).supportFragmentManager,
+                    EmojiBottomModalFragment.TAG)
+                true
+            }
+        }
     }
 
     enum class MessageType {
