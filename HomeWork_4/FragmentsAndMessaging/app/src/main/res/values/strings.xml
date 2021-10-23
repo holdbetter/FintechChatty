@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">FragmentsAndMessaging</string>
+    <string name="avatar">avatar</string>
+    <string name="input_message_hint">Написать…</string>
+</resources>
