@@ -4,11 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/activity_background"
+    tools:background="@color/activity_background"
     android:clipChildren="false"
     android:clipToPadding="false"
     android:paddingBottom="16dp"
-    tools:context=".ChatActivity">
+    tools:context=".fragment.ChatFragment">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/chat_toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        >
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/chat_hashtag_title"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:navigationIconTint="@color/white"
+            app:titleTextColor="@color/white"
+            android:background="@color/blue_and_green"
+            tools:title="#general"
+            app:titleMarginStart="22dp"
+            app:titleTextAppearance="@style/TitleAppearance"
+            />
+
+        <TextView
+            android:id="@+id/topic_name"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            tools:text="Topic: Fintech Contest"
+            android:textSize="18sp"
+            android:fontFamily="@font/inter_regular"
+            android:gravity="center"
+            android:textColor="#CCCCCC"
+            />
+
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messages"
@@ -16,8 +51,9 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:paddingBottom="62dp"
+        android:layout_marginTop="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chat_toolbar"
         tools:itemCount="5"
         tools:listitem="@layout/foreign_message_instance" />
 

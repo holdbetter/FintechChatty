@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fragmentsandmessaging.services.Util
-import com.holdbetter.fragmentsandmessaging.services.Util.dpToPx
-import com.holdbetter.fragmentsandmessaging.services.Util.spToPx
+import com.holdbetter.fragmentsandmessaging.services.ContextExtesions.dpToPx
+import com.holdbetter.fragmentsandmessaging.services.ContextExtesions.spToPx
 import java.util.*
 
 class DateOnChatDecorator(context: Context) : DividerItemDecoration(context, LinearLayoutManager.VERTICAL) {

@@ -1,34 +1,16 @@
 package com.holdbetter.fragmentsandmessaging.services
 
+import android.animation.TimeInterpolator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.util.TypedValue
-import com.holdbetter.fragmentsandmessaging.R
-import com.holdbetter.fragmentsandmessaging.model.Message
-import com.holdbetter.fragmentsandmessaging.model.Reaction
-import com.holdbetter.fragmentsandmessaging.model.User
+import androidx.fragment.app.Fragment
+import com.holdbetter.fragmentsandmessaging.ChatApplication
 import java.util.*
 
-object Util { // aka pomoika
+object Util { // aka pomoika, но уже поменьше
     val calendarInstance: Calendar = Calendar.getInstance()
     var currentUserId = 0
-
-    fun Context.dpToPx(dp: Float): Int {
-        val px = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            dp,
-            this.resources.displayMetrics
-        )
-        return px.toInt()
-    }
-
-    fun Context.spToPx(sp: Float): Int {
-        val px = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_SP,
-            sp,
-            this.resources.displayMetrics
-        )
-        return px.toInt()
-    }
 
     fun getEmojiByCode(code: Int): String {
         return Character.toChars(code).concatToString()
@@ -40,60 +22,20 @@ object Util { // aka pomoika
 
     val supportedEmojiList = (0x1F601..0x1F64F).toList()
 
-    val users: TreeSet<User> = TreeSet(compareBy(User::userId))
+    // source: https://proandroiddev.com/complex-ui-animation-on-android-8f7a46f4aec4
+    inline fun getValueAnimator(
+        forward: Boolean = true, duration: Long, interpolator: TimeInterpolator,
+        crossinline updateListener: (progress: Float) -> Unit,
+    ): ValueAnimator {
+        val valueAnimator = if (forward) {
+            ValueAnimator.ofFloat(0f, 1f)
+        } else {
+            ValueAnimator.ofFloat(1f, 0f)
+        }
 
-    val defaultMessages = arrayListOf(
-        Message(
-            User(1, "Alexey Korchagin", R.drawable.alexey),
-            "Привет! Отличная новость, тебя повысили",
-            Calendar.getInstance().run {
-                set(Calendar.MONTH, 4)
-                timeInMillis
-            }
-        ),
-        Message(
-            User(0, "Vilen Evseev", R.drawable.hades),
-            "Здорово. Раньше я мыл полы, а сейчас что?",
-            Calendar.getInstance().run {
-                set(Calendar.MONTH, 4)
-                timeInMillis
-            },
-            arrayListOf(
-                Reaction(arrayListOf(0, 1), "U+1F601"),
-                Reaction(arrayListOf(0, 1, 2), "U+1F602"),
-                Reaction(arrayListOf(1), "U+1F603"),
-                Reaction(arrayListOf(0), "U+1F604"),
-            )
-        ),
-        Message(
-            User(1, "Alexey Korchagin", R.drawable.alexey),
-            "Пока не решили, но то что повысили это прям 100 процентов",
-            Calendar.getInstance().run {
-                set(Calendar.MONTH, 4)
-                timeInMillis
-            },
-            arrayListOf(
-                Reaction(arrayListOf(1), "U+1F607"),
-                Reaction(arrayListOf(0), "U+1F606"),
-            )
-        ),
-        Message(
-            User(0, "Vilen Evseev", R.drawable.hades),
-            """Кажется, мой ментор умер и чтобы было не так грустно, я оставил анекдот
-            |
-            |Анекдот:
-            |Холмс с Ватсоном отправились в поход. Ночью Холмс, проснувшись, будит Ватсона:
-            |– Ватсон, посмотрите на небо и скажите, что вы видите! – требует он.
-            |– Я вижу мириады звезд, Холмс! – восклицает Ватсон.
-            |– И что же это означает?
-            |Ватсон ненадолго задумывается:
-            |– С астрономической точки зрения это означает, что во Вселенной существуют миллионы галактик и, вероятно, миллиарды планет. С точки зрения метеорологии завтра, скорее всего, будет прекрасный день. Ну, а если рассуждать, подобно теологам, мы можем прийти к выводу, что Бог всемогущ, а мы мелки и незначительны. А вы что думаете об этом, Холмс?
-            |– Ватсон, вы идиот! У нас украли палатку!
-        """.trimMargin(),
-            Calendar.getInstance().run {
-                set(Calendar.MONTH, 4)
-                timeInMillis
-            }
-        ),
-    )
+        valueAnimator.addUpdateListener { updateListener(it.animatedValue as Float) }
+        valueAnimator.duration = duration
+        valueAnimator.interpolator = interpolator
+        return valueAnimator
+    }
 }

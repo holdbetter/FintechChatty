@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import com.holdbetter.fragmentsandmessaging.R
-import com.holdbetter.fragmentsandmessaging.services.Util.dpToPx
+import com.holdbetter.fragmentsandmessaging.services.ContextExtesions.dpToPx
 
 class MySelfMessageLayout @JvmOverloads constructor(
     context: Context,

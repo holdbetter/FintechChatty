@@ -10,8 +10,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FragmentsAndMessaging"
+        android:name=".ChatApplication"
         tools:ignore="AllowBackup">
-        <activity android:name="com.holdbetter.fragmentsandmessaging.ChatActivity">
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

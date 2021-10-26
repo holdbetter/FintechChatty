@@ -8,10 +8,16 @@
     <color name="blue_and_green">#2A9D8F</color>
     <color name="message_box_gradient_start">#2A9D8F</color>
     <color name="message_box_gradient_end">#006153</color>
+
     <color name="chat_text_color">#FAFAFA</color>
+    <color name="chat_text_color_secondary">#F5F5F5</color>
 
     <color name="message_date_background">#070707</color>
     <color name="message_date_text">#999999</color>
 
     <color name="emoji_bottom_dialog_background">#1C1C1C</color>
+
+    <color name="bottom_navigation_view_background">#1E1E1E</color>
+
+    <color name="navigation_background_toolbar">#1E1E1E</color>
 </resources>

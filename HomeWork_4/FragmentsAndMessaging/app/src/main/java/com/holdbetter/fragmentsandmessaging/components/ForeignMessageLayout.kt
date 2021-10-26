@@ -12,7 +12,7 @@ import androidx.core.view.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.holdbetter.fragmentsandmessaging.R
-import com.holdbetter.fragmentsandmessaging.services.Util.dpToPx
+import com.holdbetter.fragmentsandmessaging.services.ContextExtesions.dpToPx
 
 class ForeignMessageLayout @JvmOverloads constructor(
     context: Context,
@@ -25,7 +25,7 @@ class ForeignMessageLayout @JvmOverloads constructor(
         const val RECT_MARGIN_TOP = 10f
         const val RECT_MARGIN_BOTTOM = 10f
         const val RECT_MARGIN_LEFT = 14f
-        const val RECT_MARGIN_RIGHT = 9f
+        const val RECT_MARGIN_RIGHT = 29f
 
         const val RECT_MARGIN_RADIUS = 18f
     }
@@ -174,7 +174,7 @@ class ForeignMessageLayout @JvmOverloads constructor(
         val message = getChildAt(messageIndex) as TextView
 
         val l = username.left - context.dpToPx(RECT_MARGIN_LEFT)
-        val r = message.right + context.dpToPx(RECT_MARGIN_RIGHT)
+        val r = maxOf(username.right, message.right) + context.dpToPx(RECT_MARGIN_RIGHT)
         val t = username.top - context.dpToPx(RECT_MARGIN_TOP)
         val b = message.bottom + context.dpToPx(RECT_MARGIN_BOTTOM)
 

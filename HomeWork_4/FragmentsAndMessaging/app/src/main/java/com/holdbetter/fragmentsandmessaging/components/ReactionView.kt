@@ -15,8 +15,8 @@ import com.holdbetter.fragmentsandmessaging.model.Reaction
 import com.holdbetter.fragmentsandmessaging.services.InvalidateNotNullEmoji
 import com.holdbetter.fragmentsandmessaging.services.RequestLayoutNotNullCount
 import com.holdbetter.fragmentsandmessaging.services.Util
-import com.holdbetter.fragmentsandmessaging.services.Util.dpToPx
-import com.holdbetter.fragmentsandmessaging.services.Util.spToPx
+import com.holdbetter.fragmentsandmessaging.services.ContextExtesions.dpToPx
+import com.holdbetter.fragmentsandmessaging.services.ContextExtesions.spToPx
 
 @SuppressLint("ViewConstructor")
 class ReactionView @JvmOverloads constructor(

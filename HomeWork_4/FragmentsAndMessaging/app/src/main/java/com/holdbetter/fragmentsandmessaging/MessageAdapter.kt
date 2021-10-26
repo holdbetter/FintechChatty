@@ -30,7 +30,7 @@ class MessageAdapter(val messages: ArrayList<Message> = ArrayList()) :
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         val message = messages[position]
         if (!message.user.isItMe && holder.messageLayout is ForeignMessageLayout) {
-            holder.messageLayout.avatar = message.user.avatarId
+            holder.messageLayout.avatar = message.user.avatarResourceId
             holder.messageLayout.name = message.user.name
         }
         holder.messageLayout.message = message.text

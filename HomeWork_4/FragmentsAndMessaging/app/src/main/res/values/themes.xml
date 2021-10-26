@@ -11,5 +11,7 @@
         <!-- Customize your theme here. -->
 
         <item name="bottomSheetDialogTheme">@style/AppBottomSheetDialogTheme</item>
+
+        <item name="android:fontFamily">@font/inter_regular</item>
     </style>
 </resources>
