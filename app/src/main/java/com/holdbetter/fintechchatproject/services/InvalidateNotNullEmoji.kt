@@ -1,7 +1,7 @@
 package com.holdbetter.fintechchatproject.services
 
 import androidx.core.text.isDigitsOnly
-import com.holdbetter.fintechchatproject.components.ReactionView
+import com.holdbetter.fintechchatproject.ui.ReactionView
 import kotlin.reflect.KProperty
 
 class InvalidateNotNullEmoji {

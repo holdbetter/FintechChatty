@@ -2,7 +2,6 @@ package com.holdbetter.fintechchatproject
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.holdbetter.fintechchatproject.fragment.MainHostFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

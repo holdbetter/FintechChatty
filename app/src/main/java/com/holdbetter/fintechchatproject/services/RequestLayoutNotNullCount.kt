@@ -1,6 +1,6 @@
 package com.holdbetter.fintechchatproject.services
 
-import com.holdbetter.fintechchatproject.components.ReactionView
+import com.holdbetter.fintechchatproject.ui.ReactionView
 import kotlin.reflect.KProperty
 
 class RequestLayoutNotNullCount {

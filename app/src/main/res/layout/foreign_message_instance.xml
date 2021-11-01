@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.holdbetter.fintechchatproject.components.ForeignMessageLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.holdbetter.fintechchatproject.ui.ForeignMessageLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/MessageLayout.ViewGroup"
     android:layout_width="match_parent"
@@ -37,4 +37,4 @@
         android:layout_marginStart="9dp"
         android:layout_marginTop="8dp" />
 
-</com.holdbetter.fintechchatproject.components.ForeignMessageLayout>
+</com.holdbetter.fintechchatproject.ui.ForeignMessageLayout>
