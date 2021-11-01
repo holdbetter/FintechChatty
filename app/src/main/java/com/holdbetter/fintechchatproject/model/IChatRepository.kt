@@ -5,6 +5,7 @@ import kotlin.collections.ArrayList
 
 interface IChatRepository {
     val users: TreeSet<StupidUser>
+    val currentUser: StupidUser
     val testingMessages: ArrayList<Message>
     val bruhMessages: ArrayList<Message>
     val topics: ArrayList<Topic>

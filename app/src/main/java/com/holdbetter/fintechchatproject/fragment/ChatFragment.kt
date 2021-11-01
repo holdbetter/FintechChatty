@@ -7,10 +7,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.holdbetter.fintechchatproject.DateOnChatDecorator
+import com.holdbetter.fintechchatproject.EmojiBottomModalFragment
 import com.holdbetter.fintechchatproject.MessageAdapter
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.components.ScrollLinearLayoutManager
@@ -23,11 +26,11 @@ import com.holdbetter.fintechchatproject.view.ITopicViewer
 
 class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
     companion object {
-        const val TOPIC_ID = "topic"
+        const val TOPIC_ID_KEY = "topic"
 
         fun newInstance(topicId: Int): ChatFragment {
             val bundle = Bundle()
-            bundle.putInt(TOPIC_ID, topicId)
+            bundle.putInt(TOPIC_ID_KEY, topicId)
             return ChatFragment().apply {
                 arguments = bundle
             }
@@ -40,10 +43,27 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
     private var hashtagToolbarTitle: MaterialToolbar? = null
     private var topicSubtitle: TextView? = null
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val topicId = requireArguments().getInt(TOPIC_ID)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val topicId = requireArguments().getInt(TOPIC_ID_KEY)
         topicPresenter = TopicPresenter(topicId, this.chatRepository, this)
 
+        childFragmentManager.setFragmentResultListener(EmojiBottomModalFragment.RESULT_REQUEST_KEY,
+            this) { _, bundle ->
+            val emojiCode = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_KEY)
+            val messageId = bundle.getInt(EmojiBottomModalFragment.MESSAGE_ID_KEY)
+
+            topicPresenter!!.updateReactionsUsingDialog(messageId, emojiCode!!)
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        initViewHierarchy(view)
+        topicPresenter!!.bind()
+    }
+
+    private fun initViewHierarchy(view: View) {
         messageList = view.findViewById<RecyclerView>(R.id.messages).apply {
             layoutManager = ScrollLinearLayoutManager(view.context)
             addItemDecoration(DateOnChatDecorator(view.context))
@@ -58,7 +78,6 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
         topicSubtitle = view.findViewById(R.id.topic_name)
 
         val chatActionButton = view.findViewById<MaterialButton>(R.id.chat_action_button)
-
         val inputMessage = view.findViewById<EditText>(R.id.input_message).apply {
             doOnTextChanged { text, _, _, _ ->
                 chatActionButton.isActivated = !text.isNullOrBlank()
@@ -67,26 +86,40 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
 
         chatActionButton.setOnClickListener { sendTextButton ->
             if (sendTextButton.isActivated) {
-                (messageList!!.adapter as MessageAdapter).addMessage(
-                    Message(
-                        chatRepository.users.first(),
-                        inputMessage.text.toString(),
-                        IChatRepository.TopicId.TESTING_ID
-                    )
-                )
-                inputMessage.text = null
+                topicPresenter!!.addMessage(inputMessage.text.toString())
+                clearTextField(inputMessage)
             } else {
-                Toast.makeText(view.context,
-                    "Attaching files isn't ready yet",
-                    Toast.LENGTH_SHORT).show()
+                showNotSupportedFeatureNotification(view)
             }
         }
+    }
 
-        topicPresenter!!.bind()
+    private fun clearTextField(inputMessage: EditText) {
+        inputMessage.text = null
+    }
+
+    private fun showNotSupportedFeatureNotification(view: View) {
+        Toast.makeText(view.context,
+            "Attaching files isn't ready yet",
+            Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onReactionUpdated(isUpdated: Boolean, messageId: Int) {
+        if (isUpdated) {
+            val adapter = (messageList!!.adapter as MessageAdapter)
+            adapter.updateMessage(messageId)
+        }
+    }
+
+    override fun onMessageInserted(position: Int) {
+        messageList!!.adapter!!.notifyItemInserted(position)
     }
 
     override fun setMessages(messages: ArrayList<Message>) {
-        messageList?.adapter = MessageAdapter(messages)
+        messageList?.adapter = MessageAdapter(
+            messages,
+            topicPresenter!!::updateReaction
+        )
     }
 
     override fun setTopicName(name: String) {

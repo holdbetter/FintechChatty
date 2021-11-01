@@ -1,5 +1,5 @@
 package com.holdbetter.fintechchatproject.components
 
-interface MessageLayout {
+interface IMessageLayout {
     var message: String
 }

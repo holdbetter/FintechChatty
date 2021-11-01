@@ -3,6 +3,7 @@ package com.holdbetter.fintechchatproject.model
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.model.IChatRepository.UserId
 import com.holdbetter.fintechchatproject.model.IChatRepository.TopicId
+import com.holdbetter.fintechchatproject.services.Util
 import java.util.*
 
 class ChatRepository : IChatRepository {
@@ -23,6 +24,10 @@ class ChatRepository : IChatRepository {
             R.drawable.rocky,
             isOnline = true),
     )
+
+    override val currentUser: StupidUser by lazy {
+        this.users.find { it.id == Util.currentUserId }!!
+    }
 
     override val testingMessages = arrayListOf(
         Message(

@@ -19,7 +19,7 @@ class ForeignMessageLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0,
-) : ViewGroup(context, attrs, defStyleAttr, defStyleRes), MessageLayout {
+) : ViewGroup(context, attrs, defStyleAttr, defStyleRes), IMessageLayout {
     companion object {
 
         const val RECT_MARGIN_TOP = 10f

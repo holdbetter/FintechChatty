@@ -13,8 +13,7 @@ import com.holdbetter.fintechchatproject.services.Util
 import java.lang.ref.WeakReference
 
 class EmojiDialogAdapter(
-    val viewBoxDelivery: WeakReference<View>,
-    val emojiBottomModalFragment: EmojiBottomModalFragment,
+    val onEmojiSelectedAction: IOnEmojiSelectedListener,
 ) :
     RecyclerView.Adapter<EmojiDialogAdapter.EmojiViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmojiViewHolder {
@@ -34,40 +33,7 @@ class EmojiDialogAdapter(
 
         init {
             emoji.setOnClickListener {
-                if (emojiBottomModalFragment.showsDialog) {
-                    emojiBottomModalFragment.dismiss()
-                    if (viewBoxDelivery.get()!!.id != R.id.flexbox) {
-                        this@EmojiDialogAdapter.viewBoxDelivery.get()!!
-                            .findViewById<FlexBoxLayout>(R.id.flexbox)
-                            .let { flexbox ->
-                                flexbox.addView(
-                                    ReactionView(Reaction(arrayListOf(), "") , viewBoxDelivery.get()!!.context).apply {
-                                        emojiUnicode =
-                                            emoji.text.toString().codePointAt(0).toString()
-                                        count = 1
-                                        isSelected = true
-                                        layoutParams = FrameLayout.LayoutParams(
-                                            FrameLayout.LayoutParams.WRAP_CONTENT,
-                                            FrameLayout.LayoutParams.WRAP_CONTENT
-                                        )
-                                    }, flexbox.childCount - 1
-                                )
-                            }
-                    } else {
-                        val flexbox = viewBoxDelivery.get()!! as FlexBoxLayout
-                        flexbox.addView(
-                            ReactionView(Reaction(arrayListOf(), ""), viewBoxDelivery.get()!!.context).apply {
-                                emojiUnicode = emoji.text.toString().codePointAt(0).toString()
-                                count = 1
-                                isSelected = true
-                                layoutParams = FrameLayout.LayoutParams(
-                                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                                    FrameLayout.LayoutParams.WRAP_CONTENT
-                                )
-                            }, flexbox.childCount - 1
-                        )
-                    }
-                }
+                onEmojiSelectedAction.finish(emoji.text.toString())
             }
         }
     }

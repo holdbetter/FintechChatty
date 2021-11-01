@@ -12,4 +12,11 @@ data class Message(
     val topicId: Int,
     val dateInMillis: Long = Calendar.getInstance().timeInMillis,
     val reactions: ArrayList<Reaction> = arrayListOf(),
-) : Parcelable
+    val id: Int = MessageId.createId(),
+) : Parcelable {
+    object MessageId {
+        var count = 0
+
+        fun createId() = ++count
+    }
+}

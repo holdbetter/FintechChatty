@@ -3,18 +3,22 @@ package com.holdbetter.fintechchatproject
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fintechchatproject.components.FlexBoxLayout
 import com.holdbetter.fintechchatproject.components.ForeignMessageLayout
-import com.holdbetter.fintechchatproject.components.MessageLayout
+import com.holdbetter.fintechchatproject.components.IMessageLayout
 import com.holdbetter.fintechchatproject.components.ReactionView
 import com.holdbetter.fintechchatproject.model.Message
 import com.holdbetter.fintechchatproject.services.Util
-import java.lang.ref.WeakReference
 
-class MessageAdapter(val messages: ArrayList<Message> = ArrayList()) :
+class MessageAdapter(
+    val messages: ArrayList<Message> = ArrayList(),
+    val reactionPressedUpdater: (messageId: Int, emojiCode: String) -> Unit,
+) :
     RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
@@ -35,42 +39,49 @@ class MessageAdapter(val messages: ArrayList<Message> = ArrayList()) :
         }
         holder.messageLayout.message = message.text
 
+        holder.messageView.setOnLongClickListener {
+            val parentFragment = it.findFragment<Fragment>().childFragmentManager
+            EmojiBottomModalFragment(message.id).show(parentFragment, EmojiBottomModalFragment.TAG)
+            true
+        }
+
+        holder.flexbox.removeAllViews()
         for (reaction in message.reactions) {
-            holder.flexbox.addView(ReactionView(reaction, holder.itemView.context).apply {
+            holder.flexbox.addView(ReactionView(holder.itemView.context).apply {
                 emojiUnicode = reaction.emojiCode
-                count = reaction.users_id.size
-                isSelected = reaction.users_id.any { id -> id == Util.currentUserId }
+                count = reaction.usersId.size
+                isSelected = reaction.usersId.contains(Util.currentUserId)
+                setOnClickListener {
+                    reactionPressedUpdater(message.id, reaction.emojiCode)
+                }
             })
+        }
+
+        holder.flexbox.plusViewOnClickListener = {
+            val parentFragment = holder.flexbox.findFragment<Fragment>().childFragmentManager
+            EmojiBottomModalFragment(message.id).show(parentFragment, EmojiBottomModalFragment.TAG)
         }
     }
 
     override fun getItemCount(): Int = messages.size
 
-    override fun getItemViewType(position: Int): Int =
-        if (messages[position].user.isItMe) {
+    override fun getItemViewType(position: Int): Int {
+        return if (messages[position].user.isItMe) {
             MessageType.MYSELF.ordinal
         } else {
             MessageType.FOREIGN.ordinal
         }
-
-    fun addMessage(message: Message) {
-        messages.add(message)
-        notifyItemInserted(messages.size - 1)
     }
 
-    inner class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val messageLayout = itemView as MessageLayout
-        val flexbox: FlexBoxLayout = itemView.findViewById(R.id.flexbox)
-        private val messageView = itemView.findViewById<TextView>(R.id.message)
+    fun updateMessage(messageId: Int) {
+        val updatedIndex = messages.indexOfFirst { m -> m.id == messageId }
+        notifyItemChanged(updatedIndex)
+    }
 
-        init {
-            messageView.setOnLongClickListener {
-                val emojiBottomModalFragment = EmojiBottomModalFragment(WeakReference(itemView))
-                emojiBottomModalFragment.show((it.context as FragmentActivity).supportFragmentManager,
-                    EmojiBottomModalFragment.TAG)
-                true
-            }
-        }
+    class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val messageLayout = itemView as IMessageLayout
+        val flexbox: FlexBoxLayout = itemView.findViewById(R.id.flexbox)
+        val messageView: TextView = itemView.findViewById(R.id.message)
     }
 
     enum class MessageType {

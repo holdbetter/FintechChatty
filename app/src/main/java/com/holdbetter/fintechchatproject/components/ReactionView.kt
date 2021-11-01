@@ -11,20 +11,19 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.model.Reaction
 import com.holdbetter.fintechchatproject.services.InvalidateNotNullEmoji
 import com.holdbetter.fintechchatproject.services.RequestLayoutNotNullCount
-import com.holdbetter.fintechchatproject.services.Util
 import com.holdbetter.fintechchatproject.services.ContextExtesions.dpToPx
 import com.holdbetter.fintechchatproject.services.ContextExtesions.spToPx
+import com.holdbetter.fintechchatproject.view.IReactionClickListener
 
 @SuppressLint("ViewConstructor")
 class ReactionView @JvmOverloads constructor(
-    private val reaction: Reaction,
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttrs: Int = 0,
     defStyleRes: Int = 0,
+    private val updateReactionCount: IReactionClickListener? = null
 ) : View(context, attrs, defStyleAttrs, defStyleRes) {
     companion object {
         const val DEFAULT_REACTION_COUNT = 0
@@ -121,21 +120,14 @@ class ReactionView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
+        // TODO: 10/31/2021 Changed hardcoded action to interface (delegate)
+        // TODO: 10/31/2021 Actual action is updating value for in data layer
+        // TODO: so there is only place for selecting / deselecting
         when (event?.action) {
             ACTION_DOWN -> return true
             ACTION_UP -> {
                 isSelected = !isSelected
-                if (isSelected) {
-                    count++
-                    reaction.users_id.add(Util.currentUserId)
-                } else {
-                    count--
-                    reaction.users_id.remove(Util.currentUserId)
-                }
-
-                if (count == 0) {
-                    (this.parent as FlexBoxLayout).removeView(this)
-                }
+                updateReactionCount?.invoke()
                 performClick()
                 return true
             }

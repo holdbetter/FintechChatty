@@ -7,8 +7,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
-import androidx.fragment.app.FragmentActivity
-import com.holdbetter.fintechchatproject.EmojiBottomModalFragment
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.services.ContextExtesions.dpToPx
 import java.lang.ref.WeakReference
@@ -19,6 +17,7 @@ class FlexBoxLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0,
+    var plusViewOnClickListener: (() -> Unit)? = null
 ) :
     ViewGroup(context, attrs, defStyleAttr, defStyleRes) {
     private val marginBtwItemsHorizontal = context?.dpToPx(10f) ?: 0
@@ -135,9 +134,7 @@ class FlexBoxLayout @JvmOverloads constructor(
                 ContextCompat.getDrawable(context, R.drawable.imageview_background_selector)
             setImageResource(R.drawable.ic_plus_reaction)
             setOnClickListener {
-                val emojiBottomModalFragment = EmojiBottomModalFragment(WeakReference(this@FlexBoxLayout))
-                emojiBottomModalFragment.show((it.context as FragmentActivity).supportFragmentManager,
-                    EmojiBottomModalFragment.TAG)
+                plusViewOnClickListener?.invoke()
             }
         })
     }
