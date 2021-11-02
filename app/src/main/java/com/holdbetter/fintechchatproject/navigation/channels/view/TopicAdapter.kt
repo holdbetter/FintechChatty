@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.navigation.channels
+package com.holdbetter.fintechchatproject.navigation.channels.view
 
 import android.content.Context
 import android.graphics.Color

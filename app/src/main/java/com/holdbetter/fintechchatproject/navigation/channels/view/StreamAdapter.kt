@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.navigation.channels
+package com.holdbetter.fintechchatproject.navigation.channels.view
 
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +13,7 @@ import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.model.HashtagStream
 import com.holdbetter.fintechchatproject.model.Topic
 
-class StreamAdapter(val streams: ArrayList<HashtagStream>) :
+class StreamAdapter(var streams: MutableList<HashtagStream>) :
     RecyclerView.Adapter<StreamAdapter.StreamViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StreamViewHolder {
@@ -33,7 +33,13 @@ class StreamAdapter(val streams: ArrayList<HashtagStream>) :
 
     override fun getItemCount() = streams.size
 
+    fun submitList(streams: MutableList<HashtagStream>) {
+        this.streams = streams
+        notifyDataSetChanged()
+    }
+
     class StreamViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        // TODO: 11/2/2021 Animations support
 //        private var topicRecyclerHeight: Int = 0
 
         val stream: TextView = itemView.findViewById(R.id.stream_name)

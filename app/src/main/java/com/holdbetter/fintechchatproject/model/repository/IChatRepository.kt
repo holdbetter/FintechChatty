@@ -10,10 +10,10 @@ import kotlin.collections.ArrayList
 interface IChatRepository {
     val users: TreeSet<StupidUser>
     val currentUser: StupidUser
-    val testingMessages: ArrayList<Message>
-    val bruhMessages: ArrayList<Message>
-    val topics: ArrayList<Topic>
-    val hashtagStreams: ArrayList<HashtagStream>
+    val testingMessages: MutableList<Message>
+    val bruhMessages: MutableList<Message>
+    val topics: MutableList<Topic>
+    val hashtagStreams: MutableList<HashtagStream>
 
     object UserId {
         const val VILEN_ID = 0

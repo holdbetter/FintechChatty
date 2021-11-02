@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="?listPreferredItemHeight"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="21dp"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    tools:background="@color/activity_background">
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="38dp"
+        android:layout_weight="1"
+        android:background="@drawable/shimmer_text_shape"
+        android:paddingHorizontal="16dp"
+        android:textSize="18sp"
+        tools:ignore="RtlHardcoded"
+        tools:text="#general" />
+
+    <View
+        android:id="@+id/dropdown"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:background="@drawable/shimmer_image_shape"
+        android:contentDescription="@string/dropdown_description"
+        />
+
+</LinearLayout>
