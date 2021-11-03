@@ -2,7 +2,6 @@ package com.holdbetter.fintechchatproject.navigation.channels.view
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +19,6 @@ class ShimmerPlaceholderListAdapter(context: Context) : BaseAdapter() {
 
     @SuppressLint("ViewHolder")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        return inflater.inflate(R.layout.shimmer_placeholder, parent, false)
+        return inflater.inflate(R.layout.hashtag_stream_instance_placeholder, parent, false)
     }
 }

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/activity_background">
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/image_placeholder"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/shimmer_text_shape"
+        app:layout_constraintBottom_toTopOf="@id/name_placeholder"
+        app:layout_constraintHeight_percent="0.3"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.25"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintWidth_percent="0.7"
+        app:shimmer_auto_start="false" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/name_placeholder"
+        android:layout_width="220dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/shimmer_text_shape"
+        app:layout_constraintBottom_toTopOf="@id/status_placeholder"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/image_placeholder" />
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/status_placeholder"
+        android:layout_width="100dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/shimmer_text_shape"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/name_placeholder" />
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        style="@style/Widget.MaterialComponents.CircularProgressIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="65dp"
+        android:indeterminate="true"
+        app:indicatorColor="@color/blue_and_green"
+        app:indicatorDirectionCircular="clockwise"
+        app:indicatorSize="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/status_placeholder"
+        app:layout_constraintVertical_bias="1"
+        app:trackThickness="9dp"
+        tools:indeterminate="false"
+        tools:progress="45" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

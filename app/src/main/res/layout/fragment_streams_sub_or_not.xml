@@ -28,7 +28,7 @@
                 android:layout_height="match_parent"
                 android:divider="@color/list_divider"
                 android:dividerHeight="1dp"
-                tools:listitem="@layout/shimmer_placeholder"/>
+                tools:listitem="@layout/hashtag_stream_instance_placeholder"/>
 
         </com.facebook.shimmer.ShimmerFrameLayout>
 

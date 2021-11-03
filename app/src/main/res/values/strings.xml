@@ -13,4 +13,6 @@
     <string name="profile_image">profile_image</string>
     <string name="user_status">user_status</string>
     <string name="log_out">Log out</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="try_again">Try again</string>
 </resources>

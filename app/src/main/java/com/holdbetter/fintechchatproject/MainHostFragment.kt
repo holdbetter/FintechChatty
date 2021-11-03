@@ -31,7 +31,6 @@ class MainHostFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_navigation, container, false)
         bottomNavigationView = view.findViewById(R.id.chat_bottom_navigation)
-//        bottomNavigationView
         bottomNavigationView?.setOnItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.channels -> navigateToChannels()
@@ -49,13 +48,6 @@ class MainHostFragment : Fragment() {
         }
 
         return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
-//        if (bottomNavigationView?.selectedItemId !in menuItems) {
-//            bottomNavigationView?.selectedItemId = R.id.channels
-//        }
     }
 
     // мог сделать в один метод красиво через рефлексию, остановился,

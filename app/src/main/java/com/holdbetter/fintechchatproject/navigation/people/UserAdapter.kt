@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.navigation.profile
+package com.holdbetter.fintechchatproject.navigation.people
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -11,7 +11,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.holdbetter.fintechchatproject.MainActivity
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.navigation.people.DetailUserFragment
 import com.holdbetter.fintechchatproject.model.StupidUser
 
 class UserAdapter(private val users: List<StupidUser>) :
