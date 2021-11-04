@@ -8,8 +8,8 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.holdbetter.fintechchatproject.navigation.channels.ChannelsFragment
-import com.holdbetter.fintechchatproject.navigation.profile.ProfileFragment
 import com.holdbetter.fintechchatproject.navigation.people.PeopleFragment
+import com.holdbetter.fintechchatproject.navigation.profile.ProfileFragment
 
 class MainHostFragment : Fragment() {
     companion object {
@@ -17,7 +17,8 @@ class MainHostFragment : Fragment() {
 
         fun newInstance(defaultBottomNavigationViewSelectedId: Int): MainHostFragment {
             return MainHostFragment().apply {
-                arguments = bundleOf(Pair(defaultBottomNavigationViewSelectedKey, defaultBottomNavigationViewSelectedId))
+                arguments = bundleOf(Pair(defaultBottomNavigationViewSelectedKey,
+                    defaultBottomNavigationViewSelectedId))
             }
         }
     }
@@ -27,7 +28,7 @@ class MainHostFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View? {
         val view = inflater.inflate(R.layout.fragment_navigation, container, false)
         bottomNavigationView = view.findViewById(R.id.chat_bottom_navigation)

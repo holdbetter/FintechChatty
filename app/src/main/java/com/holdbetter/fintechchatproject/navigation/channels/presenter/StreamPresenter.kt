@@ -5,11 +5,8 @@ import com.holdbetter.fintechchatproject.model.repository.IChatRepository
 import com.holdbetter.fintechchatproject.navigation.channels.view.IChannelViewer
 import com.holdbetter.fintechchatproject.services.RxExtensions.delayEach
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.annotations.NonNull
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.functions.Action
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.kotlin.toObservable
@@ -17,7 +14,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 
-class StreamPresenter(val chatRepository: IChatRepository, val channelViewer: IChannelViewer) :
+class StreamPresenter(val chatRepository: IChatRepository, private val channelViewer: IChannelViewer) :
     IStreamPresenter {
     private val compositeDisposable = CompositeDisposable()
     private val searchRequest = PublishSubject.create<String>()

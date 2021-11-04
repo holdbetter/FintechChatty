@@ -12,12 +12,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.chat.MessageAdapter
-import com.holdbetter.fintechchatproject.services.Util
 import com.holdbetter.fintechchatproject.services.ContextExtesions.dpToPx
 import com.holdbetter.fintechchatproject.services.ContextExtesions.spToPx
+import com.holdbetter.fintechchatproject.services.Util
 import java.util.*
 
-class DateOnChatDecorator(context: Context) : DividerItemDecoration(context, LinearLayoutManager.VERTICAL) {
+class DateOnChatDecorator(context: Context) :
+    DividerItemDecoration(context, LinearLayoutManager.VERTICAL) {
     private var dividerHeight: Int = 0
     private val backgroundHorizontalPadding = context.dpToPx(20f)
     private val backgroundVerticalPadding = context.dpToPx(8f)

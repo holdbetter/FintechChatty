@@ -16,7 +16,7 @@ class FlexBoxLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     defStyleRes: Int = 0,
-    var plusViewOnClickListener: (() -> Unit)? = null
+    var plusViewOnClickListener: (() -> Unit)? = null,
 ) :
     ViewGroup(context, attrs, defStyleAttr, defStyleRes) {
     private val marginBtwItemsHorizontal = context?.dpToPx(10f) ?: 0
@@ -60,7 +60,8 @@ class FlexBoxLayout @JvmOverloads constructor(
             }
 
 
-            usedHeight = maxHeightsOfEachRow.sum() + (maxHeightsOfEachRow.size - 1) * marginBtwItemsVertical
+            usedHeight =
+                maxHeightsOfEachRow.sum() + (maxHeightsOfEachRow.size - 1) * marginBtwItemsVertical
         }
 
         val summaryWidth = resolveSize(maxRowWidth, widthMeasureSpec)

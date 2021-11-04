@@ -1,7 +1,6 @@
 package com.holdbetter.fintechchatproject.chat.presenter
 
 import com.holdbetter.fintechchatproject.model.HashtagStream
-import com.holdbetter.fintechchatproject.model.Message
 import com.holdbetter.fintechchatproject.model.Topic
 import io.reactivex.rxjava3.core.Single
 

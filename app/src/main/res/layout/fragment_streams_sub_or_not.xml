@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".navigation.channels.view.StreamCategoryFragment"
-    app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+    app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+    tools:context=".navigation.channels.view.StreamCategoryFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,8 +19,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            tools:visibility="visible"
-            app:shimmer_auto_start="false">
+            app:shimmer_auto_start="false"
+            tools:visibility="visible">
 
             <ListView
                 android:id="@+id/shimmer_content"
@@ -28,7 +28,7 @@
                 android:layout_height="match_parent"
                 android:divider="@color/list_divider"
                 android:dividerHeight="1dp"
-                tools:listitem="@layout/hashtag_stream_instance_placeholder"/>
+                tools:listitem="@layout/hashtag_stream_instance_placeholder" />
 
         </com.facebook.shimmer.ShimmerFrameLayout>
 
@@ -36,8 +36,8 @@
             android:id="@+id/streams_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:visibility="gone"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:visibility="gone" />
 
     </LinearLayout>
 

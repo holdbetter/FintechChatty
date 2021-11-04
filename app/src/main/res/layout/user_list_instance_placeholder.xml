@@ -4,10 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="8dp"
     android:paddingHorizontal="15dp"
-    tools:background="@color/activity_background"
-    >
+    android:paddingVertical="8dp"
+    tools:background="@color/activity_background">
 
     <View
         android:id="@+id/shimmer_image"
@@ -24,8 +23,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
-        android:maxLines="1"
         android:background="@drawable/shimmer_text_shape"
+        android:maxLines="1"
         android:textSize="20sp"
         app:layout_constraintLeft_toRightOf="@id/shimmer_image"
         app:layout_constraintRight_toRightOf="parent"
@@ -36,15 +35,15 @@
         android:id="@+id/shimmer_mail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:maxLines="1"
-        android:textSize="12sp"
         android:layout_marginTop="6dp"
         android:background="@drawable/shimmer_text_shape"
+        android:maxLines="1"
+        android:textSize="12sp"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintLeft_toLeftOf="@id/shimmer_name"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/shimmer_name"
         app:layout_constraintWidth_percent="0.7"
-        app:layout_constraintHorizontal_bias="0"
         tools:text="asap.rocky@music.com" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

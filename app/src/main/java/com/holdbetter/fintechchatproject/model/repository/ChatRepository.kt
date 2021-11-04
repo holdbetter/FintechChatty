@@ -2,8 +2,8 @@ package com.holdbetter.fintechchatproject.model.repository
 
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.model.*
-import com.holdbetter.fintechchatproject.model.repository.IChatRepository.UserId
 import com.holdbetter.fintechchatproject.model.repository.IChatRepository.TopicId
+import com.holdbetter.fintechchatproject.model.repository.IChatRepository.UserId
 import com.holdbetter.fintechchatproject.services.Util
 import java.util.*
 

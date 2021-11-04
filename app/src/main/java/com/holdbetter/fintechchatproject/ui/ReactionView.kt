@@ -11,11 +11,11 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.services.InvalidateNotNullEmoji
-import com.holdbetter.fintechchatproject.services.RequestLayoutNotNullCount
+import com.holdbetter.fintechchatproject.chat.services.IReactionClickListener
 import com.holdbetter.fintechchatproject.services.ContextExtesions.dpToPx
 import com.holdbetter.fintechchatproject.services.ContextExtesions.spToPx
-import com.holdbetter.fintechchatproject.chat.services.IReactionClickListener
+import com.holdbetter.fintechchatproject.services.InvalidateNotNullEmoji
+import com.holdbetter.fintechchatproject.services.RequestLayoutNotNullCount
 
 @SuppressLint("ViewConstructor")
 class ReactionView @JvmOverloads constructor(
@@ -23,7 +23,7 @@ class ReactionView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttrs: Int = 0,
     defStyleRes: Int = 0,
-    private val updateReactionCount: IReactionClickListener? = null
+    private val updateReactionCount: IReactionClickListener? = null,
 ) : View(context, attrs, defStyleAttrs, defStyleRes) {
     companion object {
         const val DEFAULT_REACTION_COUNT = 0

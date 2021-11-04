@@ -4,7 +4,6 @@ import com.holdbetter.fintechchatproject.model.StupidUser
 import com.holdbetter.fintechchatproject.model.repository.IChatRepository
 import com.holdbetter.fintechchatproject.navigation.profile.view.IUserViewer
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo

@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.chat
+package com.holdbetter.fintechchatproject.chat.view
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.chat.EmojiDialogAdapter
 
 class EmojiBottomModalFragment(private val messageId: Int) : BottomSheetDialogFragment(),
     IOnEmojiSelectedListener {

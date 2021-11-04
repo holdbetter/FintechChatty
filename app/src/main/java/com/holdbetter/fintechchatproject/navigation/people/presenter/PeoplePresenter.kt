@@ -1,10 +1,9 @@
 package com.holdbetter.fintechchatproject.navigation.people.presenter
 
-import com.holdbetter.fintechchatproject.model.repository.IChatRepository
 import com.holdbetter.fintechchatproject.model.StupidUser
+import com.holdbetter.fintechchatproject.model.repository.IChatRepository
 import com.holdbetter.fintechchatproject.navigation.people.view.IPeopleViewer
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -23,7 +22,7 @@ class PeoplePresenter(
         peopleFragment.startShimmer()
         return Single.just(users)
             .subscribeOn(Schedulers.io())
-            .delay(10000, TimeUnit.MILLISECONDS)
+            .delay(2500, TimeUnit.MILLISECONDS)
             .map { users.sortedWith(compareBy({ !it.isOnline }, { it.name })) }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess { peopleFragment.stopShimmer() }

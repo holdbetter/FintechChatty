@@ -18,10 +18,10 @@ import com.google.android.material.button.MaterialButton
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.navigation.profile.presenter.IUserPresenter
 import com.holdbetter.fintechchatproject.navigation.profile.presenter.UserPresenter
-import com.holdbetter.fintechchatproject.services.Util
-import com.holdbetter.fintechchatproject.services.FragmentExtensions.chatRepository
 import com.holdbetter.fintechchatproject.navigation.profile.view.IUserViewer
 import com.holdbetter.fintechchatproject.navigation.profile.view.UserNotFoundFragment
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.chatRepository
+import com.holdbetter.fintechchatproject.services.Util
 
 class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
     companion object {

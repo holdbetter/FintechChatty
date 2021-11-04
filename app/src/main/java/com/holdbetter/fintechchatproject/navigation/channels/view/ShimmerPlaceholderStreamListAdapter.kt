@@ -9,11 +9,14 @@ import android.widget.BaseAdapter
 import com.holdbetter.fintechchatproject.R
 
 class ShimmerPlaceholderStreamListAdapter(context: Context) : BaseAdapter() {
-    private val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+    private val inflater =
+        context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getCount(): Int = 10
 
-    override fun getItem(position: Int): Any { return Any() }
+    override fun getItem(position: Int): Any {
+        return Any()
+    }
 
     override fun getItemId(position: Int): Long = position.toLong()
 

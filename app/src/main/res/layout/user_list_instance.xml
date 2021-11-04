@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:clickable="true"
     android:background="@color/user_list_pressed_selector"
-    android:paddingVertical="4dp"
+    android:clickable="true"
+    android:focusable="true"
     android:paddingHorizontal="15dp"
-    tools:background="@color/activity_background"
-    android:focusable="true">
+    android:paddingVertical="4dp"
+    tools:background="@color/activity_background">
 
     <ImageView
         android:id="@+id/user_image"

@@ -11,11 +11,11 @@
         android:layout_height="?listPreferredItemHeight"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        tools:background="@color/activity_background"
         android:paddingHorizontal="21dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        tools:background="@color/activity_background"
         tools:ignore="UseCompoundDrawables">
 
         <TextView
@@ -46,10 +46,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        tools:visibility="visible"
-        app:layout_constraintTop_toBottomOf="@id/collapsed_view_part"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/collapsed_view_part"
         tools:listitem="@layout/topic_instance"
-        />
+        tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

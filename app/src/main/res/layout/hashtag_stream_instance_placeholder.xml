@@ -27,7 +27,6 @@
         android:layout_width="26dp"
         android:layout_height="26dp"
         android:background="@drawable/shimmer_image_shape"
-        android:contentDescription="@string/dropdown_description"
-        />
+        android:contentDescription="@string/dropdown_description" />
 
 </LinearLayout>

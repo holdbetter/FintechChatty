@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.chat.view.IOnEmojiSelectedListener
 import com.holdbetter.fintechchatproject.services.Util
 
 class EmojiDialogAdapter(

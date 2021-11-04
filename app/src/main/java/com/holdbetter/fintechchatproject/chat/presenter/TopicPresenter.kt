@@ -1,9 +1,12 @@
 package com.holdbetter.fintechchatproject.chat.presenter
 
-import com.holdbetter.fintechchatproject.model.*
-import com.holdbetter.fintechchatproject.services.Util
 import com.holdbetter.fintechchatproject.chat.view.ITopicViewer
+import com.holdbetter.fintechchatproject.model.HashtagStream
+import com.holdbetter.fintechchatproject.model.Message
+import com.holdbetter.fintechchatproject.model.Reaction
+import com.holdbetter.fintechchatproject.model.Topic
 import com.holdbetter.fintechchatproject.model.repository.IChatRepository
+import com.holdbetter.fintechchatproject.services.Util
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Single
@@ -11,7 +14,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.ArrayList
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class TopicPresenter(
@@ -49,7 +52,7 @@ class TopicPresenter(
             .subscribeOn(Schedulers.io())
             .delay(50, TimeUnit.MILLISECONDS)
             .flatMap {
-                Maybe.create<Reaction> {
+                Maybe.create<Reaction> { it ->
                     val reaction = find { it.emojiCode == emojiCode }
                     if (reaction != null) {
                         it.onSuccess(reaction)

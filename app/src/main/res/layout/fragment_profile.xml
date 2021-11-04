@@ -13,7 +13,7 @@
     <include
         android:id="@+id/shimmer"
         layout="@layout/fragment_profile_placeholder"
-        tools:visibility="invisible"/>
+        tools:visibility="invisible" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/profile_content"

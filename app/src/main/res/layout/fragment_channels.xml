@@ -54,13 +54,13 @@
             style="@style/ChannelTabStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="4dp"
             android:background="@drawable/tabs_layout_empty_background"
             android:paddingBottom="15dp"
             app:tabIndicatorColor="#219653"
-            android:layout_marginTop="4dp"
-            app:tabPadding="4dp"
-            android:layout_marginHorizontal="40dp"
             app:tabMode="fixed"
+            app:tabPadding="4dp"
             app:tabTextColor="@color/chat_text_color" />
 
     </com.google.android.material.appbar.AppBarLayout>

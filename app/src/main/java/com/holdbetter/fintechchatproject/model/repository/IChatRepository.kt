@@ -5,7 +5,6 @@ import com.holdbetter.fintechchatproject.model.Message
 import com.holdbetter.fintechchatproject.model.StupidUser
 import com.holdbetter.fintechchatproject.model.Topic
 import java.util.*
-import kotlin.collections.ArrayList
 
 interface IChatRepository {
     val users: TreeSet<StupidUser>

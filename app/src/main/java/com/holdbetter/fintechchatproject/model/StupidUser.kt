@@ -12,7 +12,7 @@ data class StupidUser(
     val mail: String,
     val avatarResourceId: Int,
     val subscribedTopicListId: ArrayList<Int> = ArrayList(),
-    val isOnline: Boolean = false
+    val isOnline: Boolean = false,
 ) : Parcelable {
     @IgnoredOnParcel
     val isItMe: Boolean = Util.currentUserId == id

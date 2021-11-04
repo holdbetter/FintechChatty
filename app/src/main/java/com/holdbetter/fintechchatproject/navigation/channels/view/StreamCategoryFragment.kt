@@ -25,7 +25,7 @@ class StreamCategoryFragment : Fragment(R.layout.fragment_streams_sub_or_not) {
     }
 
     var streamsList: RecyclerView? = null
-    var shimmerContent: ListView? = null
+    private var shimmerContent: ListView? = null
     var shimmer: ShimmerFrameLayout? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

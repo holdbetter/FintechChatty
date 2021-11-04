@@ -13,13 +13,14 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.chat.services.ScrollLinearLayoutManager
-import com.holdbetter.fintechchatproject.model.Message
 import com.holdbetter.fintechchatproject.chat.presenter.ITopicPresenter
 import com.holdbetter.fintechchatproject.chat.presenter.TopicPresenter
 import com.holdbetter.fintechchatproject.chat.services.DateOnChatDecorator
-import com.holdbetter.fintechchatproject.services.FragmentExtensions.chatRepository
+import com.holdbetter.fintechchatproject.chat.services.ScrollLinearLayoutManager
+import com.holdbetter.fintechchatproject.chat.view.EmojiBottomModalFragment
 import com.holdbetter.fintechchatproject.chat.view.ITopicViewer
+import com.holdbetter.fintechchatproject.model.Message
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.chatRepository
 
 class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
     companion object {

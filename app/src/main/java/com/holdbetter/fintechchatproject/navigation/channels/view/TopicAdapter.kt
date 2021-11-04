@@ -7,11 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.holdbetter.fintechchatproject.chat.ChatFragment
 import com.holdbetter.fintechchatproject.MainActivity
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.chat.ChatFragment
 import com.holdbetter.fintechchatproject.model.Topic
-import java.lang.Exception
 
 class TopicAdapter(private val topics: ArrayList<Topic>) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {

@@ -30,9 +30,9 @@ class ChannelsFragment : Fragment(R.layout.fragment_channels), IChannelViewer {
         }
     }
 
-    var streamPresenter: IStreamPresenter? = null
+    private var streamPresenter: IStreamPresenter? = null
 
-    var channelPager: ViewPager2? = null
+    private var channelPager: ViewPager2? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
