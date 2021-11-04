@@ -14,9 +14,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.target.Target
 import com.facebook.shimmer.ShimmerFrameLayout
-import com.google.android.material.appbar.MaterialToolbar
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.navigation.people.DetailUserFragment
 import com.holdbetter.fintechchatproject.navigation.profile.presenter.UserPresenter
 import com.holdbetter.fintechchatproject.navigation.profile.view.IUserViewer
 import com.holdbetter.fintechchatproject.navigation.profile.view.UserNotFoundFragment

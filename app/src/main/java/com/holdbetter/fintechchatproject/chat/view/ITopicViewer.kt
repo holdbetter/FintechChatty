@@ -7,6 +7,6 @@ interface ITopicViewer {
     fun setTopicName(name: String)
     fun setHashtagTitle(hashtag: String)
 
-    fun onReactionUpdated(isUpdated: Boolean, messageId: Int)
+    fun onReactionUpdated(messageId: Int)
     fun onMessageInserted(position: Int)
 }

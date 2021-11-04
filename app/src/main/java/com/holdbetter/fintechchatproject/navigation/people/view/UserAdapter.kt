@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.navigation.people
+package com.holdbetter.fintechchatproject.navigation.people.view
 
 import android.content.Context
 import android.view.LayoutInflater

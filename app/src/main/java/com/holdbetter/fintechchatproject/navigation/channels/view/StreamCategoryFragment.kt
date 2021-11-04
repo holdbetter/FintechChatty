@@ -33,7 +33,7 @@ class StreamCategoryFragment : Fragment(R.layout.fragment_streams_sub_or_not) {
         shimmerContent = view.findViewById(R.id.shimmer_content)
         shimmer = view.findViewById(R.id.shimmer)
 
-        shimmerContent!!.adapter = ShimmerPlaceholderListAdapter(view.context)
+        shimmerContent!!.adapter = ShimmerPlaceholderStreamListAdapter(view.context)
 
         streamsList!!.apply {
             addItemDecoration(DividerItemDecoration(view.context,

@@ -4,57 +4,47 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:clickable="true"
-    android:background="@color/user_list_pressed_selector"
-    android:paddingVertical="4dp"
+    android:paddingVertical="8dp"
     android:paddingHorizontal="15dp"
     tools:background="@color/activity_background"
-    android:focusable="true">
+    >
 
-    <ImageView
-        android:id="@+id/user_image"
+    <View
+        android:id="@+id/shimmer_image"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:contentDescription="@string/profile_image"
+        android:background="@drawable/shimmer_text_shape"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@drawable/rocky" />
 
-    <ImageView
-        android:id="@+id/user_online_status"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
-        android:contentDescription="@string/user_status"
-        android:src="@drawable/user_status_shape"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="@id/user_image"
-        app:tint="@color/user_status_color_selector" />
-
     <TextView
-        android:id="@+id/user_name"
+        android:id="@+id/shimmer_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="4dp"
-        android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/chat_text_color"
-        android:textSize="22sp"
-        app:layout_constraintLeft_toRightOf="@id/user_image"
+        android:background="@drawable/shimmer_text_shape"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toRightOf="@id/shimmer_image"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="A$AP ROCKY" />
 
     <TextView
-        android:id="@+id/user_mail"
+        android:id="@+id/shimmer_mail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="#A1A1A1"
-        android:textSize="16sp"
-        app:layout_constraintLeft_toLeftOf="@id/user_name"
+        android:textSize="12sp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/shimmer_text_shape"
+        app:layout_constraintLeft_toLeftOf="@id/shimmer_name"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/user_name"
+        app:layout_constraintTop_toBottomOf="@id/shimmer_name"
+        app:layout_constraintWidth_percent="0.7"
+        app:layout_constraintHorizontal_bias="0"
         tools:text="asap.rocky@music.com" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

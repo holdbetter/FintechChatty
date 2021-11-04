@@ -50,7 +50,29 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        app:shimmer_auto_start="false"
+        tools:visibility="visible">
+
+        <ListView
+            android:id="@+id/shimmer_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:divider="@color/list_divider"
+            android:dividerHeight="1dp"
+            android:paddingTop="8dp"
+            tools:listitem="@layout/user_list_instance_placeholder" />
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/people_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
@@ -59,12 +81,11 @@
             android:id="@+id/users_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:paddingTop="16dp"
             android:clipToPadding="false"
-            tools:listitem="@layout/user_list_instance"
+            android:paddingTop="16dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="1"
-            />
+            tools:listitem="@layout/user_list_instance" />
 
     </androidx.core.widget.NestedScrollView>
 

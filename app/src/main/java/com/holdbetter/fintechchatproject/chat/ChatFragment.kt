@@ -49,7 +49,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
             val emojiCode = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_KEY)
             val messageId = bundle.getInt(EmojiBottomModalFragment.MESSAGE_ID_KEY)
 
-            topicPresenter!!.updateReactionsUsingDialog(messageId, emojiCode!!)
+            topicPresenter!!.addReactionUsingDialog(messageId, emojiCode!!)
         }
     }
 
@@ -99,11 +99,9 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
             Toast.LENGTH_SHORT).show()
     }
 
-    override fun onReactionUpdated(isUpdated: Boolean, messageId: Int) {
-        if (isUpdated) {
-            val adapter = (messageList!!.adapter as MessageAdapter)
-            adapter.updateMessage(messageId)
-        }
+    override fun onReactionUpdated(messageId: Int) {
+        val adapter = (messageList!!.adapter as MessageAdapter)
+        adapter.updateMessage(messageId)
     }
 
     override fun onMessageInserted(position: Int) {
