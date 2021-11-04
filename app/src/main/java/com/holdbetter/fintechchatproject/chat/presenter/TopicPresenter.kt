@@ -60,8 +60,10 @@ class TopicPresenter(
             .blockingGet()
     }
 
-    override fun getStreamById(id: Int): HashtagStream {
-        return chatRepository.hashtagStreams.find { it.id == id }!!
+    override fun getStreamById(id: Int): Single<HashtagStream> {
+        return Single.just(id)
+            .subscribeOn(Schedulers.io())
+            .map { chatRepository.hashtagStreams.find { it.id == id }!! }
     }
 
     private fun addUserToReaction(reaction: Reaction, messageId: Int): Single<Int> {
@@ -166,24 +168,46 @@ class TopicPresenter(
     }
 
     override fun addMessage(messageText: String) {
-        currentTopic.messages.add(
-            Message(
-                chatRepository.currentUser,
-                messageText,
-                topicId
+        Single.just(messageText)
+            .subscribeOn(Schedulers.io())
+            .delay(1000, TimeUnit.MILLISECONDS)
+            .map {
+                currentTopic.messages.add(
+                    Message(
+                        chatRepository.currentUser,
+                        messageText,
+                        topicId
+                    )
+                )
+            }.observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = {
+                    topicViewer.onMessageInserted(currentTopic.messages.lastIndex)
+                }
             )
-        )
-
-        topicViewer.onMessageInserted(currentTopic.messages.lastIndex)
     }
 
     override fun bind() {
-        val topic = currentTopic
-        topicViewer.setMessages(topic.messages)
-
-        val stream = getStreamById(topic.hashtagId)
-        topicViewer.setHashtagTitle(stream.name)
-        topicViewer.setTopicName("Topic: ${topic.name}")
+        topicViewer.startLoading()
+        Single.create<Topic> { emitter ->
+            emitter.onSuccess(currentTopic)
+        }
+            .subscribeOn(Schedulers.io())
+            .delay(1000, TimeUnit.MILLISECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess { topic ->
+                topicViewer.setMessages(topic.messages)
+                topicViewer.setTopicName("Topic: ${topic.name}")
+            }
+            .observeOn(Schedulers.io())
+            .flatMap { getStreamById(it.hashtagId) }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { stream ->
+                    topicViewer.setHashtagTitle(stream.name)
+                    topicViewer.stopLoading()
+                }
+            ).addTo(compositeDisposable)
     }
 
     override fun unbind() {

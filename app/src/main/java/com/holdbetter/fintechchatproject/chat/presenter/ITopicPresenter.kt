@@ -11,7 +11,7 @@ interface ITopicPresenter {
     fun bind()
     fun unbind()
     fun getTopicById(id: Int): Single<Topic>
-    fun getStreamById(id: Int): HashtagStream
+    fun getStreamById(id: Int): Single<HashtagStream>
 
     fun addReactionUsingDialog(messageId: Int, emojiCode: String)
     fun updateReaction(messageId: Int, emojiCode: String)

@@ -5,11 +5,13 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.chat.services.ScrollLinearLayoutManager
 import com.holdbetter.fintechchatproject.model.Message
@@ -35,6 +37,9 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
     private var topicPresenter: ITopicPresenter? = null
 
     private var messageList: RecyclerView? = null
+    private var progress: CircularProgressIndicator? = null
+    private var inputMessage: EditText? = null
+    private var chatActionButton: MaterialButton? = null
     private var hashtagToolbarTitle: MaterialToolbar? = null
     private var topicSubtitle: TextView? = null
 
@@ -58,11 +63,19 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
         topicPresenter!!.bind()
     }
 
+    override fun onDestroyView() {
+        topicPresenter!!.unbind()
+        super.onDestroyView()
+    }
+
     private fun initViewHierarchy(view: View) {
         messageList = view.findViewById<RecyclerView>(R.id.messages).apply {
             layoutManager = ScrollLinearLayoutManager(view.context)
-            addItemDecoration(DateOnChatDecorator(view.context))
         }
+
+        progress = view.findViewById(R.id.progress)
+        inputMessage = view.findViewById(R.id.input_message)
+        chatActionButton = view.findViewById(R.id.chat_action_button)
 
         hashtagToolbarTitle = view.findViewById<MaterialToolbar>(R.id.chat_hashtag_title).apply {
             setNavigationOnClickListener {
@@ -89,6 +102,23 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
         }
     }
 
+    override fun startLoading() {
+        inputMessage!!.isVisible = false
+        chatActionButton!!.isVisible = false
+        inputMessage!!.isVisible = false
+
+        progress!!.isVisible = true
+    }
+
+    override fun stopLoading() {
+        progress!!.isVisible = false
+
+        inputMessage!!.isVisible = true
+        chatActionButton!!.isVisible = true
+        inputMessage!!.isVisible = true
+
+    }
+
     private fun clearTextField(inputMessage: EditText) {
         inputMessage.text = null
     }
@@ -109,10 +139,13 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
     }
 
     override fun setMessages(messages: ArrayList<Message>) {
-        messageList?.adapter = MessageAdapter(
-            messages,
-            topicPresenter!!::updateReaction
-        )
+        messageList?.let {
+            it.adapter = MessageAdapter(
+                messages,
+                topicPresenter!!::updateReaction
+            )
+            it.addItemDecoration(DateOnChatDecorator(it.context))
+        }
     }
 
     override fun setTopicName(name: String) {
@@ -121,10 +154,5 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
 
     override fun setHashtagTitle(hashtag: String) {
         hashtagToolbarTitle?.title = hashtag
-    }
-
-    override fun onDestroyView() {
-        topicPresenter!!.unbind()
-        super.onDestroyView()
     }
 }

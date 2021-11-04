@@ -45,6 +45,25 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/progress"
+        style="@style/Widget.MaterialComponents.CircularProgressIndicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        app:indicatorColor="@color/blue_and_green"
+        app:indicatorDirectionCircular="clockwise"
+        app:indicatorSize="75dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chat_toolbar"
+        app:trackThickness="14dp"
+        tools:indeterminate="false"
+        app:layout_constraintVertical_bias="0.47"
+        tools:visibility="gone"
+        tools:progress="45" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/messages"
         android:layout_width="match_parent"
@@ -54,6 +73,7 @@
         android:layout_marginTop="48dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/chat_toolbar"
+        tools:visibility="visible"
         tools:itemCount="5"
         tools:listitem="@layout/foreign_message_instance" />
 
