@@ -6,15 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.holdbetter.fintechchatproject.MainActivity
+import com.holdbetter.fintechchatproject.main.MainActivity
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.chat.ChatFragment
 import com.holdbetter.fintechchatproject.model.Topic
 
-class TopicAdapter(private val topics: ArrayList<Topic>) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class TopicAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val emptyListItemCount = 1
+    private val asyncDiffer = AsyncListDiffer(this, TopicDiffUtilCallback())
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -32,17 +34,21 @@ class TopicAdapter(private val topics: ArrayList<Topic>) :
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
-            is TopicViewHolder -> holder.bind(topics[position])
+            is TopicViewHolder -> holder.bind(asyncDiffer.currentList[position])
         }
     }
 
-    override fun getItemCount() = if (topics.size != 0) {
-        topics.size
+    override fun getItemCount() = if (asyncDiffer.currentList.size != 0) {
+        asyncDiffer.currentList.size
     } else {
         emptyListItemCount
     }
 
-    override fun getItemViewType(position: Int) = if (topics.size == 0) {
+    fun submitList(topic: List<Topic>) {
+        asyncDiffer.submitList(topic)
+    }
+
+    override fun getItemViewType(position: Int) = if (asyncDiffer.currentList.size == 0) {
         TopicViewType.NO_TOPICS_IN_THIS_STREAM.ordinal
     } else {
         TopicViewType.TOPIC_INSTANCE.ordinal
@@ -55,7 +61,6 @@ class TopicAdapter(private val topics: ArrayList<Topic>) :
         fun bind(topic: Topic) {
             name.text = topic.name
             itemView.setBackgroundColor(Color.parseColor(topic.color))
-            count.text = String.format("%d mes", topic.messages.size)
 
             itemView.setOnClickListener {
                 navigateToChat(it.context, topic)
@@ -67,7 +72,7 @@ class TopicAdapter(private val topics: ArrayList<Topic>) :
             topic: Topic,
         ) {
             val mainActivity = context as MainActivity
-            val chatFragment = ChatFragment.newInstance(topic.id)
+            val chatFragment = ChatFragment.newInstance(topic.streamId, topic.name)
 
             mainActivity.supportFragmentManager
                 .beginTransaction()
@@ -82,5 +87,15 @@ class TopicAdapter(private val topics: ArrayList<Topic>) :
     enum class TopicViewType {
         NO_TOPICS_IN_THIS_STREAM,
         TOPIC_INSTANCE
+    }
+
+    class TopicDiffUtilCallback : DiffUtil.ItemCallback<Topic>() {
+        override fun areItemsTheSame(oldItem: Topic, newItem: Topic): Boolean {
+            return oldItem.name == newItem.name
+        }
+
+        override fun areContentsTheSame(oldItem: Topic, newItem: Topic): Boolean {
+            return oldItem == newItem
+        }
     }
 }

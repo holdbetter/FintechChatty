@@ -9,11 +9,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.holdbetter.fintechchatproject.MainActivity
+import com.holdbetter.fintechchatproject.main.MainActivity
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.model.StupidUser
+import com.holdbetter.fintechchatproject.model.User
 
-class UserAdapter(private val users: List<StupidUser>) :
+class UserAdapter(private val users: List<User>) :
     RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val view =
@@ -34,9 +34,9 @@ class UserAdapter(private val users: List<StupidUser>) :
         private val name: TextView = itemView.findViewById(R.id.user_name)
         private val mail: TextView = itemView.findViewById(R.id.user_mail)
 
-        fun bind(user: StupidUser) {
+        fun bind(user: User) {
             Glide.with(itemView)
-                .load(user.avatarResourceId)
+                .load(user.avatarUrl)
                 .apply(RequestOptions().circleCrop())
                 .into(avatar)
 
@@ -51,7 +51,7 @@ class UserAdapter(private val users: List<StupidUser>) :
 
         private fun navigateToUser(
             context: Context,
-            user: StupidUser,
+            user: User,
         ) {
             val mainActivity = context as MainActivity
             val detailUserFragment = DetailUserFragment.newInstance(user.id)

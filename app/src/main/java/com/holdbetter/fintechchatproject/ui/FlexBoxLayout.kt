@@ -8,7 +8,7 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.services.ContextExtesions.dpToPx
+import com.holdbetter.fintechchatproject.services.ContextExtensions.dpToPx
 import kotlin.math.max
 
 class FlexBoxLayout @JvmOverloads constructor(

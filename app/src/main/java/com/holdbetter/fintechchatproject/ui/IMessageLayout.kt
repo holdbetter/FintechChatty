@@ -1,5 +1,5 @@
 package com.holdbetter.fintechchatproject.ui
 
 interface IMessageLayout {
-    var message: String
+    var message: CharSequence
 }

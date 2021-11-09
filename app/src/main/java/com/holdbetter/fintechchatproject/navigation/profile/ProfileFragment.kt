@@ -16,12 +16,8 @@ import com.bumptech.glide.request.target.Target
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.button.MaterialButton
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.navigation.profile.presenter.IUserPresenter
-import com.holdbetter.fintechchatproject.navigation.profile.presenter.UserPresenter
 import com.holdbetter.fintechchatproject.navigation.profile.view.IUserViewer
 import com.holdbetter.fintechchatproject.navigation.profile.view.UserNotFoundFragment
-import com.holdbetter.fintechchatproject.services.FragmentExtensions.chatRepository
-import com.holdbetter.fintechchatproject.services.Util
 
 class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
     companion object {
@@ -33,7 +29,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
         }
     }
 
-    private var presenter: IUserPresenter? = null
+//    private var presenter: IUserPresenter? = null
     private var shimmer: ConstraintLayout? = null
     private var content: ConstraintLayout? = null
     private var avatar: ImageView? = null
@@ -41,7 +37,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
     private var statusView: TextView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        presenter = UserPresenter(Util.currentUserId, chatRepository, this)
+//        presenter = UserPresenter(Util.currentUserId, chatRepository, this)
 
         shimmer = view.findViewById(R.id.shimmer)
         content = view.findViewById(R.id.profile_content)
@@ -53,11 +49,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
             Toast.makeText(it.context, "No action yet!", Toast.LENGTH_SHORT).show()
         }
 
-        presenter!!.bind()
+//        presenter!!.bind()
+        stopShimming()
     }
 
     override fun onDestroyView() {
-        presenter!!.unbind()
+//        presenter!!.unbind()
         super.onDestroyView()
     }
 

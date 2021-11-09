@@ -15,16 +15,14 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.target.Target
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.navigation.profile.presenter.UserPresenter
 import com.holdbetter.fintechchatproject.navigation.profile.view.IUserViewer
 import com.holdbetter.fintechchatproject.navigation.profile.view.UserNotFoundFragment
-import com.holdbetter.fintechchatproject.services.FragmentExtensions.chatRepository
 
 class ProfileContent : Fragment(R.layout.user_detail_instance), IUserViewer {
     companion object {
         private const val USER_ID = "user"
 
-        fun newInstance(userId: Int): ProfileContent {
+        fun newInstance(userId: Long): ProfileContent {
             return ProfileContent().apply {
                 arguments = bundleOf(USER_ID to userId)
             }
@@ -38,12 +36,12 @@ class ProfileContent : Fragment(R.layout.user_detail_instance), IUserViewer {
     private var nameView: TextView? = null
     private var statusView: TextView? = null
 
-    private var presenter: UserPresenter? = null
-    private var userId: Int? = null
+//    private var presenter: UserPresenter? = null
+    private var userId: Long? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        userId = requireArguments().getInt(DetailUserFragment.USER_ID)
-        presenter = UserPresenter(userId!!, chatRepository, this)
+        userId = requireArguments().getLong(DetailUserFragment.USER_ID)
+//        presenter = UserPresenter(userId!!, chatRepository, this)
 
         shimmer = view.findViewById(R.id.shimmer)
         content = view.findViewById(R.id.profile_content)
@@ -52,11 +50,11 @@ class ProfileContent : Fragment(R.layout.user_detail_instance), IUserViewer {
         nameView = view.findViewById(R.id.user_name)
         statusView = view.findViewById(R.id.user_online_status)
 
-        presenter!!.bind()
+//        presenter!!.bind()
     }
 
     override fun onDestroyView() {
-        presenter!!.unbind()
+//        presenter!!.unbind()
         super.onDestroyView()
     }
 

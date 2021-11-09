@@ -11,7 +11,7 @@ class DetailUserFragment : Fragment(R.layout.fragment_user_detail) {
     companion object {
         const val USER_ID = "user"
 
-        fun newInstance(userId: Int): DetailUserFragment {
+        fun newInstance(userId: Long): DetailUserFragment {
             return DetailUserFragment().apply {
                 arguments = bundleOf(USER_ID to userId)
             }
@@ -19,7 +19,7 @@ class DetailUserFragment : Fragment(R.layout.fragment_user_detail) {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val userId = requireArguments().getInt(USER_ID)
+        val userId = requireArguments().getLong(USER_ID)
 
         view.findViewById<MaterialToolbar>(R.id.profile_toolbar).apply {
             setNavigationOnClickListener {

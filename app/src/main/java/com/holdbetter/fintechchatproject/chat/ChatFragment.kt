@@ -8,34 +8,46 @@ import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.chat.presenter.ITopicPresenter
-import com.holdbetter.fintechchatproject.chat.presenter.TopicPresenter
 import com.holdbetter.fintechchatproject.chat.services.DateOnChatDecorator
 import com.holdbetter.fintechchatproject.chat.services.ScrollLinearLayoutManager
 import com.holdbetter.fintechchatproject.chat.view.EmojiBottomModalFragment
 import com.holdbetter.fintechchatproject.chat.view.ITopicViewer
+import com.holdbetter.fintechchatproject.chat.viewmodel.ChatViewModel
+import com.holdbetter.fintechchatproject.domain.retrofit.Narrow
+import com.holdbetter.fintechchatproject.main.viewmodel.PersonalViewModel
 import com.holdbetter.fintechchatproject.model.Message
-import com.holdbetter.fintechchatproject.services.FragmentExtensions.chatRepository
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
 
 class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
     companion object {
-        const val TOPIC_ID_KEY = "topic"
+        const val TOPIC_NAME_KEY = "topic"
+        const val STREAM_ID_KEY = "stream"
 
-        fun newInstance(topicId: Int): ChatFragment {
+        fun newInstance(streamId: Long, topicName: String): ChatFragment {
             val bundle = Bundle()
-            bundle.putInt(TOPIC_ID_KEY, topicId)
+            bundle.putLong(STREAM_ID_KEY, streamId)
+            bundle.putString(TOPIC_NAME_KEY, topicName)
             return ChatFragment().apply {
                 arguments = bundle
             }
         }
     }
 
-    private var topicPresenter: ITopicPresenter? = null
+    private val chatViewModel: ChatViewModel by viewModels()
+    private val personalViewModel: PersonalViewModel by viewModels()
+    private val compositeDisposable = CompositeDisposable()
+
+    private var topicName: String? = null
+    private var streamId: Long? = null
 
     private var messageList: RecyclerView? = null
     private var progress: CircularProgressIndicator? = null
@@ -47,31 +59,35 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val topicId = requireArguments().getInt(TOPIC_ID_KEY)
-        topicPresenter = TopicPresenter(topicId, this.chatRepository, this)
+        topicName = requireArguments().getString(TOPIC_NAME_KEY)
+        streamId = requireArguments().getLong(STREAM_ID_KEY)
 
         childFragmentManager.setFragmentResultListener(EmojiBottomModalFragment.RESULT_REQUEST_KEY,
             this) { _, bundle ->
             val emojiCode = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_KEY)
-            val messageId = bundle.getInt(EmojiBottomModalFragment.MESSAGE_ID_KEY)
+            val messageId = bundle.getLong(EmojiBottomModalFragment.MESSAGE_ID_KEY)
 
-            topicPresenter!!.addReactionUsingDialog(messageId, emojiCode!!)
+//            topicPresenter!!.addReactionUsingDialog(messageId, emojiCode!!)
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         initViewHierarchy(view)
-        topicPresenter!!.bind()
+//        topicPresenter!!.bind()
+        this.bind()
     }
 
     override fun onDestroyView() {
-        topicPresenter!!.unbind()
+//        topicPresenter!!.unbind()
+        this.unbind()
         super.onDestroyView()
     }
 
     private fun initViewHierarchy(view: View) {
         messageList = view.findViewById<RecyclerView>(R.id.messages).apply {
-            layoutManager = ScrollLinearLayoutManager(view.context)
+            layoutManager = ScrollLinearLayoutManager(context)
+            adapter = MessageAdapter(null)
+            addItemDecoration(DateOnChatDecorator(context))
         }
 
         progress = view.findViewById(R.id.progress)
@@ -95,12 +111,28 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
 
         chatActionButton.setOnClickListener { sendTextButton ->
             if (sendTextButton.isActivated) {
-                topicPresenter!!.addMessage(inputMessage.text.toString())
+//                topicPresenter!!.addMessage(inputMessage.text.toString())
                 clearTextField(inputMessage)
             } else {
                 showNotSupportedFeatureNotification(view)
             }
         }
+    }
+
+    private fun bind() {
+        startLoading()
+        chatViewModel.getMessages(
+            personalViewModel::getMyself,
+            Narrow.MessageNarrow(streamId!!, topicName!!)
+        ).observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess { stopLoading() }
+            .subscribeBy(
+                onSuccess = ::setMessages
+            ).addTo(compositeDisposable)
+    }
+
+    private fun unbind() {
+        compositeDisposable.clear()
     }
 
     override fun startLoading() {
@@ -117,7 +149,6 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
         inputMessage!!.isVisible = true
         chatActionButton!!.isVisible = true
         inputMessage!!.isVisible = true
-
     }
 
     private fun clearTextField(inputMessage: EditText) {
@@ -132,20 +163,16 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
 
     override fun onReactionUpdated(messageId: Int) {
         val adapter = (messageList!!.adapter as MessageAdapter)
-        adapter.updateMessage(messageId)
+//        adapter.updateMessage(messageId)
     }
 
     override fun onMessageInserted(position: Int) {
         messageList!!.adapter!!.notifyItemInserted(position)
     }
 
-    override fun setMessages(messages: ArrayList<Message>) {
+    override fun setMessages(messages: List<Message>) {
         messageList?.let {
-            it.adapter = MessageAdapter(
-                messages,
-                topicPresenter!!::updateReaction
-            )
-            it.addItemDecoration(DateOnChatDecorator(it.context))
+            (it.adapter as MessageAdapter).submitList(messages, personalViewModel.currentUserId)
         }
     }
 

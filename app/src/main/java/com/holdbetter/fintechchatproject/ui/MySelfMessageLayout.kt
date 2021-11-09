@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.services.ContextExtesions.dpToPx
+import com.holdbetter.fintechchatproject.services.ContextExtensions.dpToPx
 
 class MySelfMessageLayout @JvmOverloads constructor(
     context: Context,
@@ -37,9 +37,9 @@ class MySelfMessageLayout @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
 
-    override var message: String = ""
-        set(fullName) {
-            (getChildAt(messageIndex) as TextView).text = fullName
+    override var message: CharSequence = ""
+        set(message) {
+            (getChildAt(messageIndex) as TextView).text = message
             field = message
         }
 

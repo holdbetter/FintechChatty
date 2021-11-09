@@ -11,7 +11,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.chat.EmojiDialogAdapter
 
-class EmojiBottomModalFragment(private val messageId: Int) : BottomSheetDialogFragment(),
+class EmojiBottomModalFragment(private val messageId: Long) : BottomSheetDialogFragment(),
     IOnEmojiSelectedListener {
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,7 +27,7 @@ class EmojiBottomModalFragment(private val messageId: Int) : BottomSheetDialogFr
             val emojiUnicode = convertToBigUnicode(selectedEmojiSymbol)
             setFragmentResult(RESULT_REQUEST_KEY, Bundle().apply {
                 putString(EMOJI_SELECTED_KEY, emojiUnicode)
-                putInt(MESSAGE_ID_KEY, messageId)
+                putLong(MESSAGE_ID_KEY, messageId)
             })
         }
     }

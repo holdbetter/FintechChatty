@@ -1,7 +1,12 @@
 package com.holdbetter.fintechchatproject.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
-@Parcelize
-data class Reaction(val usersId: ArrayList<Int>, val emojiCode: String) : Parcelable
+data class Reaction(
+    val userId: Long,
+    val emojiCode: String,
+    val emojiName: String,
+    var reactionType: String
+) {
+    companion object {
+        const val SUPPORTED_REACTION_TYPE = "unicode_emoji"
+    }
+}

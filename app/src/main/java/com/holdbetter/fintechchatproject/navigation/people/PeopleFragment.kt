@@ -10,13 +10,11 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.model.StupidUser
+import com.holdbetter.fintechchatproject.model.User
 import com.holdbetter.fintechchatproject.navigation.people.presenter.IPeoplePresenter
-import com.holdbetter.fintechchatproject.navigation.people.presenter.PeoplePresenter
 import com.holdbetter.fintechchatproject.navigation.people.view.IPeopleViewer
 import com.holdbetter.fintechchatproject.navigation.people.view.ShimmerPlaceholderUserListAdapter
 import com.holdbetter.fintechchatproject.navigation.people.view.UserAdapter
-import com.holdbetter.fintechchatproject.services.FragmentExtensions.chatRepository
 
 class PeopleFragment : Fragment(R.layout.fragment_people), IPeopleViewer {
     companion object {
@@ -34,7 +32,7 @@ class PeopleFragment : Fragment(R.layout.fragment_people), IPeopleViewer {
     private var shimmer: ShimmerFrameLayout? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        presenter = PeoplePresenter(chatRepository, this)
+//        presenter = PeoplePresenter(chatRepository, this)
 
         content = view.findViewById(R.id.people_content)
         shimmer = view.findViewById(R.id.shimmer)
@@ -52,7 +50,8 @@ class PeopleFragment : Fragment(R.layout.fragment_people), IPeopleViewer {
             })
         }
 
-        presenter!!.bind()
+        stopShimmer()
+//        presenter!!.bind()
     }
 
     override fun startShimmer() {
@@ -68,11 +67,11 @@ class PeopleFragment : Fragment(R.layout.fragment_people), IPeopleViewer {
     }
 
     override fun onDestroyView() {
-        presenter!!.unbind()
+//        presenter!!.unbind()
         super.onDestroyView()
     }
 
-    override fun setUsers(users: List<StupidUser>) {
+    override fun setUsers(users: List<User>) {
         userRecycler?.adapter = UserAdapter(users)
     }
 }

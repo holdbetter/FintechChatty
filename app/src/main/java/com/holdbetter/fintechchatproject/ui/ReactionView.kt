@@ -12,8 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.chat.services.IReactionClickListener
-import com.holdbetter.fintechchatproject.services.ContextExtesions.dpToPx
-import com.holdbetter.fintechchatproject.services.ContextExtesions.spToPx
+import com.holdbetter.fintechchatproject.services.ContextExtensions.dpToPx
+import com.holdbetter.fintechchatproject.services.ContextExtensions.spToPx
 import com.holdbetter.fintechchatproject.services.InvalidateNotNullEmoji
 import com.holdbetter.fintechchatproject.services.RequestLayoutNotNullCount
 

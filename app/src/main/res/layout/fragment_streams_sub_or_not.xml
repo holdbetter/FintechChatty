@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-    tools:context=".navigation.channels.view.StreamCategoryFragment">
+    tools:context=".navigation.channels.view.AllStreamsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

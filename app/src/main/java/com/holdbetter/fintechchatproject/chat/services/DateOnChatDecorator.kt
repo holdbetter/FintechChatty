@@ -12,9 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.chat.MessageAdapter
-import com.holdbetter.fintechchatproject.services.ContextExtesions.dpToPx
-import com.holdbetter.fintechchatproject.services.ContextExtesions.spToPx
-import com.holdbetter.fintechchatproject.services.Util
+import com.holdbetter.fintechchatproject.services.ContextExtensions.dpToPx
+import com.holdbetter.fintechchatproject.services.ContextExtensions.spToPx
 import java.util.*
 
 class DateOnChatDecorator(context: Context) :
@@ -36,20 +35,12 @@ class DateOnChatDecorator(context: Context) :
             R.font.inter_light)!!
     }
 
-    private val dateText: String
-        get() {
-            val day = Util.calendarInstance.get(Calendar.DAY_OF_MONTH).toString()
-            val month = Util.calendarInstance.getDisplayName(Calendar.MONTH,
-                1,
-                Locale("ru", "RU"))
-
-            return "$day $month"
-        }
+    private var dateText: String = SAMPLE_DATA
 
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         val adapter = parent.adapter as MessageAdapter
 
-        var currentDayDateInMillis: Long = 0
+        val calendar = Calendar.getInstance()
         for (childIndex in 0..parent.childCount) {
             val view = parent.getChildAt(childIndex)
             val position = parent.getChildAdapterPosition(view)
@@ -57,38 +48,32 @@ class DateOnChatDecorator(context: Context) :
             if (position > -1) {
                 val message = adapter.messages[position]
 
-                Util.calendarInstance.clear()
-                Util.calendarInstance.timeInMillis = message.dateInMillis
+                calendar.timeInMillis = message.dateInSeconds * 1000L
+                val day = calendar.get(Calendar.DAY_OF_MONTH).toString()
+                val month = calendar.getDisplayName(Calendar.MONTH,
+                    1,
+                    Locale("ru", "RU"))
 
-                val d = Util.calendarInstance.get(Calendar.DAY_OF_MONTH)
-                val m = Util.calendarInstance.get(Calendar.MONTH)
-                val y = Util.calendarInstance.get(Calendar.YEAR)
+                dateText = "$day $month"
 
-                Util.calendarInstance.clear()
-                Util.calendarInstance.set(y, m, d)
+                val textBounds = Rect()
+                textPaint.getTextBounds(dateText, 0, dateText.length, textBounds)
 
-                if (currentDayDateInMillis != Util.calendarInstance.timeInMillis) {
-                    currentDayDateInMillis = Util.calendarInstance.timeInMillis
+                textBackground?.bounds = Rect(
+                    parent.width / 2 - textBounds.width() / 2 - backgroundHorizontalPadding,
+                    view.top - textBounds.height() - backgroundVerticalPadding,
+                    parent.width / 2 + textBounds.width() / 2 + backgroundHorizontalPadding,
+                    view.top
+                )
 
-                    val textBounds = Rect()
-                    textPaint.getTextBounds(dateText, 0, dateText.length, textBounds)
+                textBackground?.draw(c)
 
-                    textBackground?.bounds = Rect(
-                        parent.width / 2 - textBounds.width() / 2 - backgroundHorizontalPadding,
-                        view.top - textBounds.height() - backgroundVerticalPadding,
-                        parent.width / 2 + textBounds.width() / 2 + backgroundHorizontalPadding,
-                        view.top
-                    )
+                c.drawText(dateText,
+                    parent.width / 2f,
+                    view.top - (backgroundVerticalPadding / 2f),
+                    textPaint)
 
-                    textBackground?.draw(c)
-
-                    c.drawText(dateText,
-                        parent.width / 2f,
-                        view.top - (backgroundVerticalPadding / 2f),
-                        textPaint)
-
-                    dividerHeight = textBackground!!.bounds.height()
-                }
+                dividerHeight = textBackground!!.bounds.height()
             }
         }
     }
@@ -104,5 +89,9 @@ class DateOnChatDecorator(context: Context) :
         textPaint.getTextBounds(dateText, 0, dateText.length, textBounds)
         val dividerHeight = textBounds.height() + backgroundVerticalPadding
         outRect.top = dividerHeight + extraMarginTop
+    }
+
+    companion object {
+        const val SAMPLE_DATA = "9 Nov"
     }
 }

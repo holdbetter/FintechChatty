@@ -1,7 +1,8 @@
-package com.holdbetter.fintechchatproject
+package com.holdbetter.fintechchatproject.main
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.holdbetter.fintechchatproject.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

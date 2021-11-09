@@ -12,7 +12,7 @@ import androidx.core.view.*
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.services.ContextExtesions.dpToPx
+import com.holdbetter.fintechchatproject.services.ContextExtensions.dpToPx
 
 class ForeignMessageLayout @JvmOverloads constructor(
     context: Context,
@@ -40,13 +40,13 @@ class ForeignMessageLayout @JvmOverloads constructor(
         color = ContextCompat.getColor(this@ForeignMessageLayout.context, R.color.black_matte)
     }
 
-    var avatar: Int = 0
-        set(avatarResourceId) {
+    var avatar: String = ""
+        set(avatarResourceUrl) {
             Glide.with(this)
-                .load(avatarResourceId)
+                .load(avatarResourceUrl)
                 .apply(RequestOptions().circleCrop())
                 .into(getChildAt(avatarIndex) as ImageView)
-            field = avatarResourceId
+            field = avatarResourceUrl
         }
 
     var name: String = ""
@@ -55,9 +55,9 @@ class ForeignMessageLayout @JvmOverloads constructor(
             field = fullName
         }
 
-    override var message: String = ""
-        set(fullName) {
-            (getChildAt(messageIndex) as TextView).text = fullName
+    override var message: CharSequence = ""
+        set(message) {
+            (getChildAt(messageIndex) as TextView).text = message
             field = message
         }
 

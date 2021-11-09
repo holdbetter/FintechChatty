@@ -3,7 +3,7 @@ package com.holdbetter.fintechchatproject.services
 import android.content.Context
 import android.util.TypedValue
 
-object ContextExtesions {
+object ContextExtensions {
     fun Context.dpToPx(dp: Float): Int {
         val px = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,

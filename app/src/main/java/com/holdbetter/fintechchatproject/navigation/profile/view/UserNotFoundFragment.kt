@@ -13,19 +13,19 @@ class UserNotFoundFragment : Fragment(R.layout.fragment_user_not_found) {
     companion object {
         private const val USER_ID = "user"
 
-        fun newInstance(userId: Int = -1): UserNotFoundFragment {
+        fun newInstance(userId: Long = -1): UserNotFoundFragment {
             return UserNotFoundFragment().apply {
                 arguments = bundleOf(USER_ID to userId)
             }
         }
     }
 
-    var userId: Int? = null
+    var userId: Long? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        userId = requireArguments().getInt(USER_ID)
+        userId = requireArguments().getLong(USER_ID)
 
         val retry = view.findViewById<MaterialButton>(R.id.retry)
         retry.setOnClickListener { tryNavigateToUser() }
@@ -34,7 +34,7 @@ class UserNotFoundFragment : Fragment(R.layout.fragment_user_not_found) {
     private fun tryNavigateToUser() {
         userId?.let {
             when (it) {
-                -1 -> parentFragmentManager.beginTransaction()
+                -1L -> parentFragmentManager.beginTransaction()
                     .replace(R.id.bottom_navigation_container,
                         ProfileFragment.newInstance()).commit()
                 else -> parentFragmentManager.beginTransaction()
