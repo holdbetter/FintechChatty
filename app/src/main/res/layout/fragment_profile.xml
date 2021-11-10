@@ -8,7 +8,7 @@
     android:clipToPadding="false"
     android:paddingBottom="16dp"
     tools:background="@color/activity_background"
-    tools:context=".chat.ChatFragment">
+    tools:context=".navigation.profile.ProfileFragment">
 
     <include
         android:id="@+id/shimmer"
@@ -57,6 +57,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/user_status_color_selector"
             android:textSize="16sp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
@@ -72,6 +73,7 @@
             android:letterSpacing="0"
             android:paddingHorizontal="52dp"
             android:paddingVertical="8dp"
+            android:visibility="gone"
             android:text="@string/log_out"
             android:textAllCaps="false"
             android:textColor="@color/chat_text_color"

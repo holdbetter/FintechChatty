@@ -9,6 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -16,8 +17,14 @@ import com.bumptech.glide.request.target.Target
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.button.MaterialButton
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.main.viewmodel.PersonalViewModel
+import com.holdbetter.fintechchatproject.model.User
 import com.holdbetter.fintechchatproject.navigation.profile.view.IUserViewer
 import com.holdbetter.fintechchatproject.navigation.profile.view.UserNotFoundFragment
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
+import io.reactivex.rxjava3.kotlin.subscribeBy
 
 class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
     companion object {
@@ -29,7 +36,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
         }
     }
 
-//    private var presenter: IUserPresenter? = null
+    private val viewModel: PersonalViewModel by activityViewModels()
+    private val compositeDisposable = CompositeDisposable()
+
     private var shimmer: ConstraintLayout? = null
     private var content: ConstraintLayout? = null
     private var avatar: ImageView? = null
@@ -37,8 +46,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
     private var statusView: TextView? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        presenter = UserPresenter(Util.currentUserId, chatRepository, this)
-
         shimmer = view.findViewById(R.id.shimmer)
         content = view.findViewById(R.id.profile_content)
         avatar = view.findViewById(R.id.user_image)
@@ -49,13 +56,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
             Toast.makeText(it.context, "No action yet!", Toast.LENGTH_SHORT).show()
         }
 
-//        presenter!!.bind()
-        stopShimming()
+        this.bind()
     }
 
     override fun onDestroyView() {
-//        presenter!!.unbind()
         super.onDestroyView()
+        this.unbind()
     }
 
     override fun startShimming() {
@@ -85,11 +91,23 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
     }
 
     override fun bind() {
-
+        startShimming()
+        viewModel.getMyself()
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess { stopShimming() }
+            .subscribeBy(
+                onSuccess = ::bindUser,
+                onError = ::handleError
+            ).addTo(compositeDisposable)
     }
 
     override fun unbind() {
+        compositeDisposable.clear()
+    }
 
+    private fun bindUser(user: User) {
+        setUserName(user.name)
+        setImage(user.avatarUrl)
     }
 
     override fun setUserName(name: String) {

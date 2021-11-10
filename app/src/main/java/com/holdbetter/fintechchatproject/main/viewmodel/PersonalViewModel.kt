@@ -13,7 +13,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class PersonalViewModel : ViewModel() {
     private var _currentUser: MutableLiveData<User> = MutableLiveData()
-    val currentUser: LiveData<User>
+    private val currentUser: LiveData<User>
         get() = _currentUser
 
     val currentUserId: Long
