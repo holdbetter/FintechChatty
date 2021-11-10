@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.main.repository
+package com.holdbetter.fintechchatproject.domain.repository
 
 import com.holdbetter.fintechchatproject.domain.retrofit.ServiceProvider
 import com.holdbetter.fintechchatproject.domain.services.Mapper.toUser

@@ -9,16 +9,16 @@ object Mapper {
     fun StreamResponse.toHashtagStream(): MutableList<HashtagStream> {
         return ArrayList(streams.map {
             HashtagStream(
-                it.streamID,
+                it.id,
                 it.name,
                 arrayListOf()
             )
         })
     }
 
-    fun TopicResponse.toTopics(streamId: Long): List<Topic> {
+    fun TopicResponse.toTopics(streamId: Long, streamName: String): List<Topic> {
         return topics.map {
-            Topic(it.maxId, it.name, streamId)
+            Topic(it.maxId, it.name, streamId, streamName)
         }
     }
 
@@ -54,6 +54,15 @@ object Mapper {
             this.fullName,
             this.email,
             this.avatarURL
+        )
+    }
+
+    fun User.toSender(): Sender {
+        return Sender(
+            this.id,
+            this.name,
+            this.mail,
+            this.avatarUrl
         )
     }
 

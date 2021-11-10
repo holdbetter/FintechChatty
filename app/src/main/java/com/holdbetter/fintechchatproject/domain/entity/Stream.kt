@@ -8,7 +8,7 @@ data class Stream (
     val name: String,
 
     @field:Json(name = "stream_id")
-    val streamID: Long,
+    val id: Long,
 
     val description: String,
 

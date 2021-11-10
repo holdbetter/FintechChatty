@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.domain.entity.Stream
 import com.holdbetter.fintechchatproject.model.HashtagStream
 import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModel
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -33,7 +34,7 @@ class StreamAdapter(val viewModel: StreamViewModel) : RecyclerView.Adapter<Strea
         val stream = asyncDiffer.currentList[position]
 
         holder.stream.text = stream.name
-        holder.setOnStreamClickListener(stream.id)
+        holder.setOnStreamClickListener(stream)
 
         // TODO: 10/25/2021 Restoring expand state
     }
@@ -69,9 +70,9 @@ class StreamAdapter(val viewModel: StreamViewModel) : RecyclerView.Adapter<Strea
             }
         }
 
-        private fun setInnerAdapter(streamId: Long, topicsRecycler: RecyclerView) {
+        private fun setInnerAdapter(stream: HashtagStream, topicsRecycler: RecyclerView) {
             topicsRecycler.adapter = TopicAdapter()
-            this@StreamAdapter.viewModel.getTopics(streamId)
+            this@StreamAdapter.viewModel.getTopics(stream)
                 .subscribeBy(
                     onSuccess = {
                         (topicsRecycler.adapter as TopicAdapter).submitList(it)
@@ -80,23 +81,23 @@ class StreamAdapter(val viewModel: StreamViewModel) : RecyclerView.Adapter<Strea
                 .addTo(compositeDisposable)
         }
 
-        private fun updateTopicsForStream(streamId: Long, topicsRecycler: RecyclerView) {
+        private fun updateTopicsForStream(stream: HashtagStream, topicsRecycler: RecyclerView) {
             val adapter = topicsRecycler.adapter as TopicAdapter
 
-            this@StreamAdapter.viewModel.getTopics(streamId)
+            this@StreamAdapter.viewModel.getTopics(stream)
                 .subscribeBy(
                     onSuccess = adapter::submitList
                 )
                 .addTo(compositeDisposable)
         }
 
-        fun setOnStreamClickListener(streamId: Long) {
+        fun setOnStreamClickListener(stream: HashtagStream) {
             itemView.setOnClickListener { recyclerItem ->
                 if (!recyclerItem.isSelected) {
                     if (topicsRecycler.adapter == null) {
-                        setInnerAdapter(streamId, topicsRecycler)
+                        setInnerAdapter(stream, topicsRecycler)
                     } else {
-                        updateTopicsForStream(streamId, topicsRecycler)
+                        updateTopicsForStream(stream, topicsRecycler)
                     }
 
 //                    calculateAnimationsHeight()

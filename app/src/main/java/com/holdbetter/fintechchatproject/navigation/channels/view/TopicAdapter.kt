@@ -72,7 +72,7 @@ class TopicAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             topic: Topic,
         ) {
             val mainActivity = context as MainActivity
-            val chatFragment = ChatFragment.newInstance(topic.streamId, topic.name)
+            val chatFragment = ChatFragment.newInstance(topic.streamId, topic.streamName, topic.name)
 
             mainActivity.supportFragmentManager
                 .beginTransaction()

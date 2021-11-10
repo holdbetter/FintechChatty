@@ -1,5 +1,6 @@
 package com.holdbetter.fintechchatproject.domain.repository
 
+import com.holdbetter.fintechchatproject.domain.entity.Stream
 import com.holdbetter.fintechchatproject.domain.retrofit.ServiceProvider
 import com.holdbetter.fintechchatproject.domain.services.Mapper.toHashtagStream
 import com.holdbetter.fintechchatproject.domain.services.Mapper.toTopics
@@ -17,9 +18,9 @@ class StreamRepository : IStreamRepository {
             .map { message -> message.toHashtagStream() }
     }
 
-    override fun getTopicsForStream(streamId: Long): Single<List<Topic>> {
+    override fun getTopicsForStream(streamId: Long, streamName: String): Single<List<Topic>> {
         return api.getStreamTopics(streamId)
             .subscribeOn(Schedulers.io())
-            .map { message -> message.toTopics(streamId) }
+            .map { message -> message.toTopics(streamId, streamName) }
     }
 }

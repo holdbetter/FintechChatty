@@ -90,9 +90,9 @@ class MySelfMessageLayout @JvmOverloads constructor(
         val flexBox = getChildAt(flexBoxIndex) as FlexBoxLayout
 
         message.layout(
-            this.right - paddingRight - message.measuredWidth,
+            this.measuredWidth - paddingRight - message.measuredWidth,
             paddingTop + message.marginTop + context.dpToPx(RECT_MARGIN_TOP),
-            this.right - paddingRight,
+            this.measuredWidth - paddingRight,
             paddingTop + message.measuredHeight + message.marginTop + context.dpToPx(RECT_MARGIN_TOP)
         )
 

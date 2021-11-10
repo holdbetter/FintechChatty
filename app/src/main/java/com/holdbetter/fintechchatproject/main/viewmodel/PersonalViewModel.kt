@@ -3,17 +3,18 @@ package com.holdbetter.fintechchatproject.main.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.holdbetter.fintechchatproject.main.repository.IPersonalRepository
-import com.holdbetter.fintechchatproject.main.repository.PersonalRepository
+import com.holdbetter.fintechchatproject.domain.repository.IPersonalRepository
+import com.holdbetter.fintechchatproject.domain.repository.PersonalRepository
 import com.holdbetter.fintechchatproject.model.User
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class PersonalViewModel : ViewModel() {
     private var _currentUser: MutableLiveData<User> = MutableLiveData()
-    private val currentUser: LiveData<User>
+    val currentUser: LiveData<User>
         get() = _currentUser
 
     val currentUserId: Long
@@ -38,11 +39,12 @@ class PersonalViewModel : ViewModel() {
     }
 
     private fun getCachedMyself(): Observable<User> {
-        return Observable.create { emitter ->
+        return Observable.create<User> { emitter ->
             _currentUser.value?.let {
                 emitter.onNext(it)
             }
             emitter.onComplete()
-        }
+        }.subscribeOn(Schedulers.io())
+            .delay(250, TimeUnit.MILLISECONDS)
     }
 }

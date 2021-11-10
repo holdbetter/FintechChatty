@@ -3,6 +3,7 @@ package com.holdbetter.fintechchatproject.navigation.channels.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.holdbetter.fintechchatproject.domain.entity.Stream
 import com.holdbetter.fintechchatproject.domain.repository.IStreamRepository
 import com.holdbetter.fintechchatproject.domain.repository.StreamRepository
 import com.holdbetter.fintechchatproject.model.HashtagStream
@@ -108,8 +109,8 @@ class StreamViewModel : ViewModel() {
             ).addTo(compositeDisposable)
     }
 
-    fun getTopics(streamId: Long): Single<List<Topic>> {
-        return streamRepository.getTopicsForStream(streamId)
+    fun getTopics(stream: HashtagStream): Single<List<Topic>> {
+        return streamRepository.getTopicsForStream(stream.id, stream.name)
             .observeOn(AndroidSchedulers.mainThread())
     }
 }

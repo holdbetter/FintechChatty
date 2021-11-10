@@ -13,6 +13,7 @@ import com.holdbetter.fintechchatproject.chat.EmojiDialogAdapter
 
 class EmojiBottomModalFragment(private val messageId: Long) : BottomSheetDialogFragment(),
     IOnEmojiSelectedListener {
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,8 +54,4 @@ class EmojiBottomModalFragment(private val messageId: Long) : BottomSheetDialogF
     }
 
 
-}
-
-interface IOnEmojiSelectedListener {
-    fun finish(selectedEmojiSymbol: String)
 }

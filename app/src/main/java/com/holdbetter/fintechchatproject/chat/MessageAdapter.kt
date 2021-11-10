@@ -20,7 +20,7 @@ import com.holdbetter.fintechchatproject.ui.ReactionView
 
 class MessageAdapter(
     val reactionPressedUpdater: ((messageId: Int, emojiCode: String) -> Unit)?,
-) : RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val asyncDiffer = AsyncListDiffer(this, MessageDiffUtilCallback())
     private var currentUserId: Long = -1
@@ -28,58 +28,50 @@ class MessageAdapter(
     val messages: List<Message>
         get() = asyncDiffer.currentList
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
-        val root = when (viewType) {
-            MessageType.FOREIGN.ordinal -> LayoutInflater.from(parent.context)
-                .inflate(R.layout.foreign_message_instance, parent, false)
-            else -> LayoutInflater.from(parent.context)
-                .inflate(R.layout.myself_message_instance, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val root: View
+        val i = LayoutInflater.from(parent.context)
+        return when (viewType) {
+            MessageType.LOADING_MYSELF.ordinal -> {
+                root = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.myself_message_loading_instance, parent, false)
+                LoadingViewHolder(root)
+            }
+            MessageType.MYSELF.ordinal -> {
+                root = i.inflate(R.layout.myself_message_instance, parent, false)
+                MessageViewHolder(root)
+            }
+            else -> {
+                root = i.inflate(R.layout.foreign_message_instance, parent, false)
+                MessageViewHolder(root)
+            }
         }
-        return MessageViewHolder(root)
     }
 
-    override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val message = asyncDiffer.currentList[position]
-        if (holder.messageLayout is ForeignMessageLayout) {
-            holder.messageLayout.avatar = message.sender.avatarUrl
-            holder.messageLayout.name = message.sender.name
-        }
-
-        holder.messageLayout.message =
-            HtmlCompat.fromHtml(message.htmlSourceMessage, HtmlCompat.FROM_HTML_MODE_LEGACY)
-                .removeSuffix("\n\n")
-
-        holder.messageView.setOnLongClickListener {
-            val parentFragment = it.findFragment<Fragment>().childFragmentManager
-            EmojiBottomModalFragment(message.id).show(parentFragment, EmojiBottomModalFragment.TAG)
-            true
-        }
-
-        holder.flexbox.removeAllViews()
-        for (reaction in message.reactions.groupBy { it.emojiCode }) {
-            holder.flexbox.addView(ReactionView(holder.itemView.context).apply {
-                emojiUnicode = reaction.key
-                count = reaction.value.size
-                isSelected = message.sender.id == currentUserId
-                setOnClickListener {
-//                    reactionPressedUpdater(message.id, reaction.emojiCode)
-                }
-            })
-        }
-
-        holder.flexbox.plusViewOnClickListener = {
-            val parentFragment = holder.flexbox.findFragment<Fragment>().childFragmentManager
-            EmojiBottomModalFragment(message.id).show(parentFragment, EmojiBottomModalFragment.TAG)
+        when (holder) {
+            is MessageViewHolder -> holder.bind(message, currentUserId)
+            is LoadingViewHolder -> holder.bind(message)
         }
     }
 
     override fun getItemCount(): Int = asyncDiffer.currentList.size
 
     override fun getItemViewType(position: Int): Int {
-        return if (asyncDiffer.currentList[position].sender.id == currentUserId) {
-            MessageType.MYSELF.ordinal
-        } else {
-            MessageType.FOREIGN.ordinal
+        val message = asyncDiffer.currentList[position]
+        return when (message.sender.id) {
+            currentUserId -> {
+                when (message.id) {
+                    Message.NOT_SENT_MESSAGE -> {
+                        MessageType.LOADING_MYSELF.ordinal
+                    }
+                    else -> {
+                        MessageType.MYSELF.ordinal
+                    }
+                }
+            }
+            else -> MessageType.FOREIGN.ordinal
         }
     }
 
@@ -88,10 +80,72 @@ class MessageAdapter(
         asyncDiffer.submitList(messages)
     }
 
+    fun sendMessage(message: Message) {
+        val currentList = ArrayList(asyncDiffer.currentList)
+        currentList.add(message)
+        asyncDiffer.submitList(currentList)
+    }
+
+    fun submitSentMessage(messages: List<Message>) {
+        val currentList = asyncDiffer.currentList
+        val firstNotSentMessageIndex = currentList.indexOfFirst { m -> m.id == Message.NOT_SENT_MESSAGE }
+        val notReceivedSubList = currentList.subList(firstNotSentMessageIndex + 1, currentList.size)
+
+        val updateMessages = ArrayList(messages)
+        updateMessages.addAll(notReceivedSubList)
+        asyncDiffer.submitList(updateMessages)
+    }
+
     class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val messageLayout = itemView as IMessageLayout
-        val flexbox: FlexBoxLayout = itemView.findViewById(R.id.flexbox)
-        val messageView: TextView = itemView.findViewById(R.id.message)
+        private val messageLayout = itemView as IMessageLayout
+        private val flexbox: FlexBoxLayout = itemView.findViewById(R.id.flexbox)
+        private val messageView: TextView = itemView.findViewById(R.id.message)
+
+        fun bind(message: Message, currentUserId: Long) {
+            if (messageLayout is ForeignMessageLayout) {
+                messageLayout.avatar = message.sender.avatarUrl
+                messageLayout.name = message.sender.name
+            }
+
+            messageLayout.message =
+                HtmlCompat.fromHtml(message.messageContent, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                    .removeSuffix("\n\n")
+
+            messageView.setOnLongClickListener {
+                val parentFragment = it.findFragment<Fragment>().childFragmentManager
+                EmojiBottomModalFragment(message.id).show(parentFragment,
+                    EmojiBottomModalFragment.TAG)
+                true
+            }
+
+            flexbox.removeAllViews()
+            for (reaction in message.reactions.groupBy { it.emojiCode }) {
+                flexbox.addView(ReactionView(itemView.context).apply {
+                    emojiUnicode = reaction.key
+                    count = reaction.value.size
+                    isSelected = message.sender.id == currentUserId
+                    setOnClickListener {
+//                    reactionPressedUpdater(message.id, reaction.emojiCode)
+                    }
+                })
+            }
+
+            flexbox.plusViewOnClickListener = {
+                val parentFragment = flexbox.findFragment<Fragment>().childFragmentManager
+                EmojiBottomModalFragment(message.id).show(parentFragment,
+                    EmojiBottomModalFragment.TAG)
+            }
+        }
+    }
+
+    class LoadingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val messageLayout = itemView.findViewById(R.id.myself_message) as IMessageLayout
+
+        fun bind(message: Message) {
+            messageLayout.message =
+                HtmlCompat.fromHtml(message.messageContent, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                    .removeSuffix("\n\n")
+        }
     }
 
     class MessageDiffUtilCallback : DiffUtil.ItemCallback<Message>() {
@@ -106,6 +160,7 @@ class MessageAdapter(
 
     enum class MessageType {
         FOREIGN,
-        MYSELF
+        MYSELF,
+        LOADING_MYSELF
     }
 }
