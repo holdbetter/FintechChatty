@@ -7,4 +7,6 @@ interface IPeopleViewer {
 
     fun startShimmer()
     fun stopShimmer()
+    fun bind()
+    fun unbind()
 }

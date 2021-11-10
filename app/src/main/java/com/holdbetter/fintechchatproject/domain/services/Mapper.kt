@@ -41,10 +41,19 @@ object Mapper {
 
     fun UserResponse.toUser(): User {
         return User(
-            this.userID.toLong(),
+            this.userID,
             this.fullName,
             this.email,
             this.avatarURL,
+        )
+    }
+
+    fun Member.toUser(): User {
+        return User(
+            this.userID,
+            this.fullName,
+            this.email,
+            this.avatarURL
         )
     }
 

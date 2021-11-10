@@ -76,12 +76,20 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
         content!!.isVisible = true
     }
 
-    override fun setImage(resourceId: Int) {
+    override fun setImage(avatarUrl: String) {
         Glide.with(this)
-            .load(resourceId)
+            .load(avatarUrl)
             .transform(CenterInside(), RoundedCorners(15))
             .override(Target.SIZE_ORIGINAL)
             .into(avatar!!)
+    }
+
+    override fun bind() {
+
+    }
+
+    override fun unbind() {
+
     }
 
     override fun setUserName(name: String) {

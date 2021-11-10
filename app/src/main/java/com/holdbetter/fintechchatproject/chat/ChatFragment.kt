@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
@@ -33,11 +34,8 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
         const val STREAM_ID_KEY = "stream"
 
         fun newInstance(streamId: Long, topicName: String): ChatFragment {
-            val bundle = Bundle()
-            bundle.putLong(STREAM_ID_KEY, streamId)
-            bundle.putString(TOPIC_NAME_KEY, topicName)
             return ChatFragment().apply {
-                arguments = bundle
+                arguments = bundleOf(STREAM_ID_KEY to streamId, TOPIC_NAME_KEY to topicName)
             }
         }
     }

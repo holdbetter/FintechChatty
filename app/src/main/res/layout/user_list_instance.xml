@@ -25,6 +25,7 @@
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:contentDescription="@string/user_status"
+        android:visibility="gone"
         android:src="@drawable/user_status_shape"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="@id/user_image"

@@ -4,9 +4,14 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-class UserResponse(
+class AllUsersResponse(
     val result: String,
     val msg: String,
+    val members: List<Member>
+)
+
+@JsonClass(generateAdapter = true)
+class Member(
     val email: String,
 
     @field:Json(name = "user_id")
@@ -44,8 +49,7 @@ class UserResponse(
     val dateJoined: String,
 
     @field:Json(name = "avatar_url")
-    val avatarURL: String,
-
-    @field:Json(name = "max_message_id")
-    val maxMessageID: Long
+    val avatarURL: String
 )
+
+

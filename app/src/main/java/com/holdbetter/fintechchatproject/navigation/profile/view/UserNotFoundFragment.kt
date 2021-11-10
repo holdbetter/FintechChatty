@@ -20,7 +20,7 @@ class UserNotFoundFragment : Fragment(R.layout.fragment_user_not_found) {
         }
     }
 
-    var userId: Long? = null
+    private var userId: Long? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

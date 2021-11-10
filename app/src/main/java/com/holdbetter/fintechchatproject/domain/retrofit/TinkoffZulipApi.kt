@@ -1,9 +1,6 @@
 package com.holdbetter.fintechchatproject.domain.retrofit
 
-import com.holdbetter.fintechchatproject.domain.entity.MessageResponse
-import com.holdbetter.fintechchatproject.domain.entity.StreamResponse
-import com.holdbetter.fintechchatproject.domain.entity.TopicResponse
-import com.holdbetter.fintechchatproject.domain.entity.UserResponse
+import com.holdbetter.fintechchatproject.domain.entity.*
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -27,4 +24,7 @@ interface TinkoffZulipApi {
         @Query("num_after") numAfter: Int = 0,
         @Query("apply_markdown") shouldBeHtml: Boolean = true
     ): Single<MessageResponse>
+
+    @GET("users")
+    fun getUsers(): Single<AllUsersResponse>
 }

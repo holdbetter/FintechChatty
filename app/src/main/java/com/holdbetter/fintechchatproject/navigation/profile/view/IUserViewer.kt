@@ -1,7 +1,7 @@
 package com.holdbetter.fintechchatproject.navigation.profile.view
 
 interface IUserViewer {
-    fun setImage(resourceId: Int)
+    fun setImage(avatarUrl: String)
     fun setUserName(name: String)
     fun setStatus(isOnline: Boolean, statusText: String)
 
@@ -9,4 +9,7 @@ interface IUserViewer {
     fun stopShimming()
 
     fun handleError(throwable: Throwable)
+
+    fun bind()
+    fun unbind()
 }
