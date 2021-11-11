@@ -4,10 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.holdbetter.fintechchatproject.chat.view.ChatViewState
+import com.holdbetter.fintechchatproject.domain.entity.EmojiApi
 import com.holdbetter.fintechchatproject.domain.repository.ChatRepository
 import com.holdbetter.fintechchatproject.domain.repository.IChatRepository
 import com.holdbetter.fintechchatproject.domain.retrofit.Narrow
 import com.holdbetter.fintechchatproject.model.Message
+import com.holdbetter.fintechchatproject.model.Reaction
 import com.holdbetter.fintechchatproject.model.User
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Maybe
@@ -33,7 +35,7 @@ class ChatViewModel : ViewModel() {
             .toSingle()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
-                onSuccess = { _chatViewState.value = ChatViewState.Result(it) },
+                onSuccess = { _chatViewState.value = ChatViewState.MessagesUpdate(it) },
                 onError = { _chatViewState.value = ChatViewState.Error(it) }
             ).addTo(compositeDisposable)
     }
@@ -62,5 +64,56 @@ class ChatViewModel : ViewModel() {
                 onSuccess = { _chatViewState.value = ChatViewState.MessageReceived(it) },
                 onError = { _chatViewState.value = ChatViewState.MessageSendError(it) }
             ).addTo(compositeDisposable)
+    }
+
+    fun sendReaction(
+        originalEmojiList: List<EmojiApi>,
+        messageId: Long,
+        reaction: Reaction,
+        streamId: Long,
+        topicName: String,
+    ) {
+        exchangeReaction(originalEmojiList, reaction)
+            .subscribeOn(Schedulers.io())
+            .flatMap { emojiApi -> chatRepository.sendReaction(messageId, emojiApi) }
+            .flatMap { getMessages(Narrow.MessageNarrow(streamId, topicName)) }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { _chatViewState.value = ChatViewState.MessagesUpdate(it) },
+//                onError = { _chatViewState.value = ChatViewState.Error(it) }
+            ).addTo(compositeDisposable)
+    }
+
+    fun removeReaction(
+        originalEmojiList: List<EmojiApi>,
+        messageId: Long,
+        reaction: Reaction,
+        streamId: Long,
+        topicName: String,
+    ) {
+        exchangeReaction(originalEmojiList, reaction)
+            .subscribeOn(Schedulers.io())
+            .flatMap { emojiApi -> chatRepository.removeReaction(messageId, emojiApi) }
+            .flatMap { getMessages(Narrow.MessageNarrow(streamId, topicName)) }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { _chatViewState.value = ChatViewState.MessagesUpdate(it) },
+//                onError = { _chatViewState.value = ChatViewState.Error(it) }
+            ).addTo(compositeDisposable)
+    }
+
+    private fun exchangeReaction(
+        originalEmojiList: List<EmojiApi>,
+        reaction: Reaction,
+    ): Single<EmojiApi> {
+        return Single.create { emitter ->
+            val emojiApi = originalEmojiList.find { it.emojiName == reaction.emojiName }
+
+            if (emojiApi != null) {
+                emitter.onSuccess(emojiApi)
+            } else {
+                emitter.onError(Exception("Couldn't exchange reaction to api emoji"))
+            }
+        }
     }
 }

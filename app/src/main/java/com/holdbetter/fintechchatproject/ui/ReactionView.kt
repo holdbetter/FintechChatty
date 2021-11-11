@@ -4,14 +4,10 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
-import android.view.MotionEvent
-import android.view.MotionEvent.ACTION_DOWN
-import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.chat.services.IReactionClickListener
 import com.holdbetter.fintechchatproject.services.ContextExtensions.dpToPx
 import com.holdbetter.fintechchatproject.services.ContextExtensions.spToPx
 import com.holdbetter.fintechchatproject.services.InvalidateNotNullEmoji
@@ -23,7 +19,6 @@ class ReactionView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttrs: Int = 0,
     defStyleRes: Int = 0,
-    private val updateReactionCount: IReactionClickListener? = null,
 ) : View(context, attrs, defStyleAttrs, defStyleRes) {
     companion object {
         const val DEFAULT_REACTION_COUNT = 0
@@ -119,22 +114,5 @@ class ReactionView @JvmOverloads constructor(
         textPaint.getFontMetrics(fontMetrics)
         coordinates.x = w / 2f
         coordinates.y = h - fontMetrics.descent - paddingBottom
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        // TODO: 10/31/2021 Changed hardcoded action to interface (delegate)
-        // TODO: 10/31/2021 Actual action is updating value for in data layer
-        // TODO: so there is only place for selecting / deselecting
-        when (event?.action) {
-            ACTION_DOWN -> return true
-            ACTION_UP -> {
-                isSelected = !isSelected
-                updateReactionCount?.invoke()
-                performClick()
-                return true
-            }
-        }
-        return false
     }
 }

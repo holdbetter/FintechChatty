@@ -22,18 +22,20 @@ class EmojiDialogAdapter(
     }
 
     override fun onBindViewHolder(holder: EmojiViewHolder, position: Int) {
-        holder.emoji.text = Util.getEmojiByCode(emojiList[position].emojiCode.toInt(16))
+        holder.bind(emojiList[position])
     }
 
     override fun getItemCount(): Int = emojiList.size
 
     inner class EmojiViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val emoji = itemView.findViewById<TextView>(R.id.emoji_text)!!
+        fun bind(reaction: Reaction) {
+            emoji.text = Util.getEmojiByCode(reaction.emojiCode.toInt(16))
 
-        init {
             emoji.setOnClickListener {
-                onEmojiSelectedAction.finish(emoji.text.toString())
+                onEmojiSelectedAction.finish(reaction.emojiName, reaction.emojiCode)
             }
         }
+
+        private val emoji = itemView.findViewById<TextView>(R.id.emoji_text)
     }
 }

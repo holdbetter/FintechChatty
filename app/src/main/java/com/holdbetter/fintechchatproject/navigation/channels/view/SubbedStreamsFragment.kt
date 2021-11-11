@@ -14,7 +14,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.model.HashtagStream
 import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModel
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 
 class SubbedStreamsFragment : Fragment(R.layout.fragment_streams_sub_or_not),
     IStreamCategoryFragment {
@@ -29,7 +28,7 @@ class SubbedStreamsFragment : Fragment(R.layout.fragment_streams_sub_or_not),
         }
     }
 
-    var streamsList: RecyclerView? = null
+    private var streamsList: RecyclerView? = null
     private var shimmerContent: ListView? = null
     var shimmer: ShimmerFrameLayout? = null
 

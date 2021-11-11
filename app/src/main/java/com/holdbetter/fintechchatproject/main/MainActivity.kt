@@ -24,8 +24,8 @@ class MainActivity : AppCompatActivity() {
             } else {
                 supportFragmentManager.beginTransaction()
                     .add(R.id.main_host_fragment, MainHostFragment.newInstance(R.id.channels))
+                    .runOnCommit { progress.isVisible = false }
                     .commitAllowingStateLoss()
-                progress.isVisible = false
             }
         })
 

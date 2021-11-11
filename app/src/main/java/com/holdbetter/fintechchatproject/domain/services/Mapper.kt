@@ -34,7 +34,7 @@ object Mapper {
                 ),
                 it.content,
                 it.timestamp,
-                it.userReactions.toReactions()
+                it.userReactions.reversed().toReactions()
             )
         }
     }
@@ -67,20 +67,20 @@ object Mapper {
     }
 
     fun EmojiListResponse.toReactionList(): List<Reaction> {
-        return codepointToName.map {
+        return nameToCodepoint.map {
             Reaction(
                 0,
-                it.key.uppercase().split('-')[0],
-                it.value,
+                it.key,
+                it.value.uppercase().split('-')[0],
             )
         }
     }
 
     fun EmojiListResponse.toEmojiApiList(): List<EmojiApi> {
-        return codepointToName.map {
+        return nameToCodepoint.map {
             EmojiApi(
-                it.key.uppercase(),
-                it.value
+                it.key,
+                it.value.uppercase()
             )
         }
     }
@@ -93,8 +93,8 @@ object Mapper {
     private fun UserReactionApi.toReaction(): Reaction {
         return Reaction(
             this.userID,
-            this.emojiCode.split('-')[0],
             this.emojiName,
+            this.emojiCode.split('-')[0],
             this.reactionType
         )
     }

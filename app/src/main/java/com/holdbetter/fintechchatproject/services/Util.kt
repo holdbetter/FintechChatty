@@ -2,10 +2,8 @@ package com.holdbetter.fintechchatproject.services
 
 import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
-import java.util.*
 
-object Util { // неопределенные, фантомные функции, которые может пригодятся
-
+object Util {
     fun getEmojiByCode(code: Int): String {
         return Character.toChars(code).concatToString()
     }
@@ -14,12 +12,9 @@ object Util { // неопределенные, фантомные функции
         return Character.toChars(code.substring(2).toInt(16)).concatToString()
     }
 
-    val supportedEmojiList = listOf(
-        (0x1F601..0x1F64F).toList(),
-        (0x2702..0x27B0).toList(),
-        (0x1F680..0x1F6C0).toList(),
-        (0x1F170..0x1F251).toList()
-    ).flatten()
+    fun convertToBigUnicode(code: String) =
+        "U+${Integer.toHexString(code.codePointAt(0))}".uppercase()
+
 
     // source: https://proandroiddev.com/complex-ui-animation-on-android-8f7a46f4aec4
     inline fun getValueAnimator(

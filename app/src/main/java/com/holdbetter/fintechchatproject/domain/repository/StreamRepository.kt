@@ -1,6 +1,5 @@
 package com.holdbetter.fintechchatproject.domain.repository
 
-import com.holdbetter.fintechchatproject.domain.entity.Stream
 import com.holdbetter.fintechchatproject.domain.retrofit.ServiceProvider
 import com.holdbetter.fintechchatproject.domain.services.Mapper.toHashtagStream
 import com.holdbetter.fintechchatproject.domain.services.Mapper.toTopics

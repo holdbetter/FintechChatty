@@ -2,6 +2,7 @@ package com.holdbetter.fintechchatproject.domain.retrofit
 
 import com.holdbetter.fintechchatproject.domain.entity.*
 import io.reactivex.rxjava3.core.Single
+import okhttp3.ResponseBody
 import retrofit2.http.*
 
 interface TinkoffZulipApi {
@@ -31,6 +32,24 @@ interface TinkoffZulipApi {
         @Field("topic") topic: String,
         @Field("type") type: String = "stream",
     ): Single<SentMessageResponse>
+
+    @FormUrlEncoded
+    @POST("messages/{message_id}/reactions")
+    fun sendReaction(
+        @Path("message_id") messageId: Long,
+        @Field("emoji_name") emojiName: String,
+        @Field("emoji_code") emojiCode: String,
+        @Field("reaction_type") reactionType: String = "unicode_emoji"
+    ): Single<ResponseBody>
+
+    @FormUrlEncoded
+    @HTTP(method = "DELETE", path = "messages/{message_id}/reactions", hasBody = true)
+    fun removeReaction(
+        @Path("message_id") messageId: Long,
+        @Field("emoji_name") emojiName: String,
+        @Field("emoji_code") emojiCode: String,
+        @Field("reaction_type") reactionType: String = "unicode_emoji"
+    ): Single<ResponseBody>
 
     @GET("users")
     fun getUsers(): Single<AllUsersResponse>

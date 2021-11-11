@@ -26,19 +26,16 @@ class EmojiBottomModalFragment(private val messageId: Long) : BottomSheetDialogF
         return inflater.inflate(R.layout.emoji_bottom_dialog, container, false)
     }
 
-    override fun finish(selectedEmojiSymbol: String) {
+    override fun finish(selectedEmojiName: String, selectedEmojiCode: String) {
         if (showsDialog) {
             dismiss()
-            val emojiUnicode = convertToBigUnicode(selectedEmojiSymbol)
             setFragmentResult(RESULT_REQUEST_KEY, Bundle().apply {
-                putString(EMOJI_SELECTED_KEY, emojiUnicode)
+                putString(EMOJI_SELECTED_NAME_KEY, selectedEmojiName)
+                putString(EMOJI_SELECTED_CODE_KEY, selectedEmojiCode)
                 putLong(MESSAGE_ID_KEY, messageId)
             })
         }
     }
-
-    private fun convertToBigUnicode(selectedEmojiText: String) =
-        "U+${Integer.toHexString(selectedEmojiText.codePointAt(0))}".uppercase()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         // TODO: 10/19/2021 Auto span count
@@ -53,7 +50,8 @@ class EmojiBottomModalFragment(private val messageId: Long) : BottomSheetDialogF
     companion object {
         const val TAG = "EmojiBottomModalFragment"
         const val RESULT_REQUEST_KEY = "selectedEmoji"
-        const val EMOJI_SELECTED_KEY = "emoji"
+        const val EMOJI_SELECTED_CODE_KEY = "emojiCode"
+        const val EMOJI_SELECTED_NAME_KEY = "emojiName"
         const val MESSAGE_ID_KEY = "messageId"
     }
 

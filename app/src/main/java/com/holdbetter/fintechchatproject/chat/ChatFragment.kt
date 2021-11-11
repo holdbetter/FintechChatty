@@ -1,7 +1,6 @@
 package com.holdbetter.fintechchatproject.chat
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -22,20 +21,17 @@ import com.holdbetter.fintechchatproject.chat.services.DateOnChatDecorator
 import com.holdbetter.fintechchatproject.chat.services.ScrollLinearLayoutManager
 import com.holdbetter.fintechchatproject.chat.view.ChatViewState
 import com.holdbetter.fintechchatproject.chat.view.EmojiBottomModalFragment
-import com.holdbetter.fintechchatproject.chat.view.ITopicViewer
+import com.holdbetter.fintechchatproject.chat.view.IChatViewer
 import com.holdbetter.fintechchatproject.chat.viewmodel.ChatViewModel
 import com.holdbetter.fintechchatproject.domain.retrofit.Narrow
 import com.holdbetter.fintechchatproject.domain.services.Mapper.toSender
 import com.holdbetter.fintechchatproject.main.viewmodel.EmojiViewModel
 import com.holdbetter.fintechchatproject.main.viewmodel.PersonalViewModel
 import com.holdbetter.fintechchatproject.model.Message
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
+import com.holdbetter.fintechchatproject.model.Reaction
 import java.util.*
 
-class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
+class ChatFragment : Fragment(R.layout.fragment_chat), IChatViewer {
     companion object {
         const val TOPIC_NAME_KEY = "topic"
         const val STREAM_ID_KEY = "streamId"
@@ -54,6 +50,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
 
     private val chatViewModel: ChatViewModel by viewModels()
     private val personalViewModel: PersonalViewModel by activityViewModels()
+    private val emojiViewModel: EmojiViewModel by activityViewModels()
 
     private var streamId: Long? = null
     private var topicName: String? = null
@@ -70,15 +67,26 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
         super.onCreate(savedInstanceState)
 
         streamId = requireArguments().getLong(STREAM_ID_KEY)
-        topicName = requireArguments().getString(TOPIC_NAME_KEY)
         streamName = requireArguments().getString(STREAM_NAME_KEY)
+        topicName = requireArguments().getString(TOPIC_NAME_KEY)
 
         childFragmentManager.setFragmentResultListener(EmojiBottomModalFragment.RESULT_REQUEST_KEY,
             this) { _, bundle ->
-            val emojiCode = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_KEY)
+            val emojiName = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_NAME_KEY)
+            val emojiCode = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_CODE_KEY)
             val messageId = bundle.getLong(EmojiBottomModalFragment.MESSAGE_ID_KEY)
 
-//            topicPresenter!!.addReactionUsingDialog(messageId, emojiCode!!)
+            chatViewModel.sendReaction(
+                emojiViewModel.originalEmojiList,
+                messageId,
+                Reaction(
+                    personalViewModel.currentUserId,
+                    emojiName!!,
+                    emojiCode!!
+                ),
+                streamId!!,
+                topicName!!
+            )
         }
     }
 
@@ -101,7 +109,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
     private fun initViewHierarchy(view: View) {
         messageList = view.findViewById<RecyclerView>(R.id.messages).apply {
             layoutManager = ScrollLinearLayoutManager(context)
-            adapter = MessageAdapter(null)
+            adapter = MessageAdapter(this@ChatFragment::onReactionPressed)
             addItemDecoration(DateOnChatDecorator(context))
         }
 
@@ -135,10 +143,10 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
     }
 
     private fun handleChatViewState(state: ChatViewState) {
-        when(state) {
+        when (state) {
             is ChatViewState.Error -> handleError(state.error)
             ChatViewState.Loading -> startLoading()
-            is ChatViewState.Result -> {
+            is ChatViewState.MessagesUpdate -> {
                 stopLoading()
                 setMessages(state.messages)
             }
@@ -149,7 +157,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
     }
 
     private fun handleError(error: Throwable) {
-        Snackbar.make(requireView(), "Problems in sending", Snackbar.LENGTH_SHORT).show()
+        Snackbar.make(requireView(), "Problems in reaction update", Snackbar.LENGTH_SHORT).show()
     }
 
     override fun startLoading() {
@@ -178,11 +186,6 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
             Toast.LENGTH_SHORT).show()
     }
 
-    override fun onReactionUpdated(messageId: Int) {
-        val adapter = (messageList!!.adapter as MessageAdapter)
-//        adapter.updateMessage(messageId)
-    }
-
     override fun setMessages(messages: List<Message>) {
         messageList?.let {
             (it.adapter as MessageAdapter).submitList(messages, personalViewModel.currentUserId)
@@ -204,6 +207,28 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
     private fun onMessageReceived(messages: List<Message>) {
         messageList?.let {
             (it.adapter as MessageAdapter).submitSentMessage(messages)
+        }
+    }
+
+    private fun onReactionPressed(
+        isReactionSelectedNow: Boolean,
+        messageId: Long,
+        emojiName: String,
+        emojiCode: String,
+    ) {
+        val reactionToUpdate = Reaction(personalViewModel.currentUserId, emojiName, emojiCode)
+        if (isReactionSelectedNow) {
+            chatViewModel.removeReaction(emojiViewModel.originalEmojiList,
+                messageId,
+                reactionToUpdate,
+                streamId!!,
+                topicName!!)
+        } else {
+            chatViewModel.sendReaction(emojiViewModel.originalEmojiList,
+                messageId,
+                reactionToUpdate,
+                streamId!!,
+                topicName!!)
         }
     }
 }

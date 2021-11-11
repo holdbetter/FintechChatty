@@ -3,7 +3,6 @@ package com.holdbetter.fintechchatproject.navigation.channels.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.holdbetter.fintechchatproject.domain.entity.Stream
 import com.holdbetter.fintechchatproject.domain.repository.IStreamRepository
 import com.holdbetter.fintechchatproject.domain.repository.StreamRepository
 import com.holdbetter.fintechchatproject.model.HashtagStream
@@ -68,9 +67,8 @@ class StreamViewModel : ViewModel() {
         } else {
             return cachedStreams?.let {
                 Single.just(it)
+                    .subscribeOn(Schedulers.io())
                     .flatMapObservable { streams -> streams.toObservable() }
-                    .subscribeOn(Schedulers.computation())
-                    .observeOn(Schedulers.io())
                     .filter { s -> isMatchingPattern(request, s.name) }
                     .toList()
             } ?: throw Exception("Streams aren't existing")
@@ -95,7 +93,7 @@ class StreamViewModel : ViewModel() {
 
 
     private fun getStreams() {
-        _streamViewState.value = StreamViewState.Loading
+        _streamViewState.postValue(StreamViewState.Loading)
         streamRepository.getStreams()
             .subscribeOn(Schedulers.io())
             .delay(500, TimeUnit.MILLISECONDS)
@@ -113,6 +111,7 @@ class StreamViewModel : ViewModel() {
 
     fun getTopics(stream: HashtagStream): Single<List<Topic>> {
         return streamRepository.getTopicsForStream(stream.id, stream.name)
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
     }
 }

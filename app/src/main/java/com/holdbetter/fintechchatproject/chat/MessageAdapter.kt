@@ -19,11 +19,20 @@ import com.holdbetter.fintechchatproject.ui.IMessageLayout
 import com.holdbetter.fintechchatproject.ui.ReactionView
 
 class MessageAdapter(
-    val reactionPressedUpdater: ((messageId: Int, emojiCode: String) -> Unit)?,
+    val reactionPressedUpdater: (
+        isReactionSelectedNow: Boolean,
+        messageId: Long,
+        emojiName: String,
+        emojiCode: String,
+    ) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    companion object {
+        const val DEFAULT_USER_ID_VALUE = -1L
+    }
+
     private val asyncDiffer = AsyncListDiffer(this, MessageDiffUtilCallback())
-    private var currentUserId: Long = -1
+    private var currentUserId: Long = DEFAULT_USER_ID_VALUE
 
     val messages: List<Message>
         get() = asyncDiffer.currentList
@@ -88,7 +97,8 @@ class MessageAdapter(
 
     fun submitSentMessage(messages: List<Message>) {
         val currentList = asyncDiffer.currentList
-        val firstNotSentMessageIndex = currentList.indexOfFirst { m -> m.id == Message.NOT_SENT_MESSAGE }
+        val firstNotSentMessageIndex =
+            currentList.indexOfFirst { m -> m.id == Message.NOT_SENT_MESSAGE }
         val notReceivedSubList = currentList.subList(firstNotSentMessageIndex + 1, currentList.size)
 
         val updateMessages = ArrayList(messages)
@@ -96,7 +106,7 @@ class MessageAdapter(
         asyncDiffer.submitList(updateMessages)
     }
 
-    class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val messageLayout = itemView as IMessageLayout
         private val flexbox: FlexBoxLayout = itemView.findViewById(R.id.flexbox)
         private val messageView: TextView = itemView.findViewById(R.id.message)
@@ -107,9 +117,10 @@ class MessageAdapter(
                 messageLayout.name = message.sender.name
             }
 
-            messageLayout.message =
-                HtmlCompat.fromHtml(message.messageContent, HtmlCompat.FROM_HTML_MODE_LEGACY)
-                    .removeSuffix("\n\n")
+            messageLayout.message = HtmlCompat.fromHtml(
+                message.messageContent,
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+            ).removeSuffix("\n\n")
 
             messageView.setOnLongClickListener {
                 val parentFragment = it.findFragment<Fragment>().childFragmentManager
@@ -119,13 +130,15 @@ class MessageAdapter(
             }
 
             flexbox.removeAllViews()
-            for (reaction in message.reactions.groupBy { it.emojiCode }) {
+            for (reactionGroup in message.reactions.groupBy { it.emojiCode }.iterator()) {
                 flexbox.addView(ReactionView(itemView.context).apply {
-                    emojiUnicode = reaction.key
-                    count = reaction.value.size
-                    isSelected = message.sender.id == currentUserId
+                    emojiUnicode = reactionGroup.key
+                    count = reactionGroup.value.size
+                    isSelected = reactionGroup.value.any { it.userId == currentUserId }
                     setOnClickListener {
-//                    reactionPressedUpdater(message.id, reaction.emojiCode)
+                        val reaction = reactionGroup.value[0]
+                        reactionPressedUpdater(isSelected, message.id, reaction.emojiName, reaction.emojiCode)
+                        isSelected = !isSelected
                     }
                 })
             }
