@@ -7,9 +7,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.chat.view.IOnEmojiSelectedListener
+import com.holdbetter.fintechchatproject.model.Reaction
 import com.holdbetter.fintechchatproject.services.Util
 
 class EmojiDialogAdapter(
+    val emojiList: List<Reaction>,
     val onEmojiSelectedAction: IOnEmojiSelectedListener,
 ) :
     RecyclerView.Adapter<EmojiDialogAdapter.EmojiViewHolder>() {
@@ -20,10 +22,10 @@ class EmojiDialogAdapter(
     }
 
     override fun onBindViewHolder(holder: EmojiViewHolder, position: Int) {
-        holder.emoji.text = Util.getEmojiByCode(Util.supportedEmojiList[position])
+        holder.emoji.text = Util.getEmojiByCode(emojiList[position].emojiCode.toInt(16))
     }
 
-    override fun getItemCount(): Int = Util.supportedEmojiList.size
+    override fun getItemCount(): Int = emojiList.size
 
     inner class EmojiViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val emoji = itemView.findViewById<TextView>(R.id.emoji_text)!!

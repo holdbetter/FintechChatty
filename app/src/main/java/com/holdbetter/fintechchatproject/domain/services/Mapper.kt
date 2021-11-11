@@ -34,7 +34,7 @@ object Mapper {
                 ),
                 it.content,
                 it.timestamp,
-                it.reactions.toReactions()
+                it.userReactions.toReactions()
             )
         }
     }
@@ -66,15 +66,34 @@ object Mapper {
         )
     }
 
-    private fun List<ReactionApi>.toReactions(): List<Reaction> {
+    fun EmojiListResponse.toReactionList(): List<Reaction> {
+        return codepointToName.map {
+            Reaction(
+                0,
+                it.key.uppercase().split('-')[0],
+                it.value,
+            )
+        }
+    }
+
+    fun EmojiListResponse.toEmojiApiList(): List<EmojiApi> {
+        return codepointToName.map {
+            EmojiApi(
+                it.key.uppercase(),
+                it.value
+            )
+        }
+    }
+
+    private fun List<UserReactionApi>.toReactions(): List<Reaction> {
         return filter { it.reactionType == Reaction.SUPPORTED_REACTION_TYPE }
             .map { it.toReaction() }
     }
 
-    private fun ReactionApi.toReaction(): Reaction {
+    private fun UserReactionApi.toReaction(): Reaction {
         return Reaction(
             this.userID,
-            this.emojiCode,
+            this.emojiCode.split('-')[0],
             this.emojiName,
             this.reactionType
         )

@@ -78,7 +78,7 @@ class StreamViewModel : ViewModel() {
     }
 
     private fun provideDefaultResult(): Single<List<HashtagStream>> {
-        return Single.just(cachedStreams)
+        return Single.just(cachedStreams!!)
     }
 
     private fun isMatchingPattern(searchInput: String, streamNameToCheck: String): Boolean =
@@ -97,6 +97,8 @@ class StreamViewModel : ViewModel() {
     private fun getStreams() {
         _streamViewState.value = StreamViewState.Loading
         streamRepository.getStreams()
+            .subscribeOn(Schedulers.io())
+            .delay(500, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess {
                 _isAllStreamsAvailable.value = true

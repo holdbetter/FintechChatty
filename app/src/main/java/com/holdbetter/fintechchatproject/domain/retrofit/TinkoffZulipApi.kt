@@ -34,4 +34,8 @@ interface TinkoffZulipApi {
 
     @GET("users")
     fun getUsers(): Single<AllUsersResponse>
+
+    @Headers("isAuthRequired: false")
+    @GET("/static/generated/emoji/emoji_codes.json")
+    fun getAllEmoji(): Single<EmojiListResponse>
 }

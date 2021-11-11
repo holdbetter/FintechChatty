@@ -26,7 +26,7 @@ class Message(
     val isMeMessage: Boolean,
 
     @field:Json(name = "reactions")
-    val reactions: List<ReactionApi>,
+    val userReactions: List<UserReactionApi>,
     val flags: List<String>,
 
     @field:Json(name = "sender_full_name")

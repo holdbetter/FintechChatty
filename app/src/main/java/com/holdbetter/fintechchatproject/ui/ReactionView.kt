@@ -97,8 +97,11 @@ class ReactionView @JvmOverloads constructor(
         val elementDesirableHeight = textHeight + paddingBottom + paddingTop
         val elementDesirableWidth = textWidth + paddingStart + paddingEnd
 
-        val viewHeight = resolveSize(elementDesirableHeight, heightMeasureSpec)
-        val viewWidth = resolveSize(elementDesirableWidth, heightMeasureSpec)
+        val minWidth = context.dpToPx(46f)
+        val minHeight = context.dpToPx(27.5f)
+
+        val viewHeight = resolveSize(maxOf(elementDesirableHeight, minHeight), heightMeasureSpec)
+        val viewWidth = resolveSize(maxOf(elementDesirableWidth, minWidth), heightMeasureSpec)
 
         setMeasuredDimension(viewWidth, viewHeight)
     }

@@ -10,6 +10,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
@@ -25,6 +26,7 @@ import com.holdbetter.fintechchatproject.chat.view.ITopicViewer
 import com.holdbetter.fintechchatproject.chat.viewmodel.ChatViewModel
 import com.holdbetter.fintechchatproject.domain.retrofit.Narrow
 import com.holdbetter.fintechchatproject.domain.services.Mapper.toSender
+import com.holdbetter.fintechchatproject.main.viewmodel.EmojiViewModel
 import com.holdbetter.fintechchatproject.main.viewmodel.PersonalViewModel
 import com.holdbetter.fintechchatproject.model.Message
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -51,7 +53,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat), ITopicViewer {
     }
 
     private val chatViewModel: ChatViewModel by viewModels()
-    private val personalViewModel: PersonalViewModel by viewModels()
+    private val personalViewModel: PersonalViewModel by activityViewModels()
 
     private var streamId: Long? = null
     private var topicName: String? = null

@@ -4,7 +4,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
-data class ReactionApi (
+data class UserReactionApi (
     @field:Json(name = "emoji_name")
     val emojiName: String,
 
