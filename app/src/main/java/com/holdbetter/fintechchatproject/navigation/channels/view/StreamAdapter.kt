@@ -16,7 +16,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 
 class StreamAdapter(val viewModel: StreamViewModel) :
-    RecyclerView.Adapter<StreamAdapter.StreamViewHolder>() {
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     object DropdownAngle {
         const val TO_COLLAPSE = 0f
         const val TO_EXPAND = 180f
@@ -24,30 +24,59 @@ class StreamAdapter(val viewModel: StreamViewModel) :
 
     private val asyncDiffer = AsyncListDiffer(this, StreamDiffUtilCallback())
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StreamViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.hashtag_stream_instance, parent, false)
-        return StreamViewHolder(view)
+    init {
+        submitList(emptyList())
     }
 
-    override fun onBindViewHolder(holder: StreamViewHolder, position: Int) {
-        val stream = asyncDiffer.currentList[position]
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val view: View
+        return when (viewType) {
+            StreamViewType.EMPTY_LIST.ordinal -> {
+                view = inflater.inflate(R.layout.no_stream_instance,
+                    parent,
+                    false)
+                EmptyViewHolder(view)
+            }
+            else -> {
+                view = inflater.inflate(R.layout.hashtag_stream_instance, parent, false)
+                StreamViewHolder(view)
+            }
+        }
+    }
 
-        holder.stream.text = stream.name
-        holder.setOnStreamClickListener(stream)
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is StreamViewHolder -> {
+                val stream = asyncDiffer.currentList[position]
+                holder.bind(stream)
+            }
+        }
 
         // TODO: 10/25/2021 Restoring expand state
     }
 
-    override fun getItemCount() = asyncDiffer.currentList.size
+    override fun getItemCount() = if (asyncDiffer.currentList.isEmpty()) {
+        1
+    } else {
+        asyncDiffer.currentList.size
+    }
+
+    override fun getItemViewType(position: Int): Int = if (asyncDiffer.currentList.isEmpty()) {
+        StreamViewType.EMPTY_LIST.ordinal
+    } else {
+        StreamViewType.NON_EMPTY_LIST.ordinal
+    }
 
     fun submitList(streams: List<HashtagStream>) {
         asyncDiffer.submitList(streams)
     }
 
+    class EmptyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+
     inner class StreamViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         // TODO: 11/2/2021 Animations support
-        val stream: TextView = itemView.findViewById(R.id.stream_name)
+        private val streamView: TextView = itemView.findViewById(R.id.stream_name)
         private val topicsRecycler: RecyclerView = itemView.findViewById(R.id.topic_nested_list)
         private val dropdown: ImageView = itemView.findViewById(R.id.dropdown)
         private val compositeDisposable = CompositeDisposable()
@@ -122,6 +151,11 @@ class StreamAdapter(val viewModel: StreamViewModel) :
                 dropdownAnimator.rotation(DropdownAngle.TO_COLLAPSE)
             }
         }
+
+        fun bind(stream: HashtagStream) {
+            streamView.text = stream.name
+            setOnStreamClickListener(stream)
+        }
     }
 
     class StreamDiffUtilCallback : DiffUtil.ItemCallback<HashtagStream>() {
@@ -132,5 +166,10 @@ class StreamAdapter(val viewModel: StreamViewModel) :
         override fun areContentsTheSame(oldItem: HashtagStream, newItem: HashtagStream): Boolean {
             return oldItem == newItem
         }
+    }
+
+    enum class StreamViewType {
+        EMPTY_LIST,
+        NON_EMPTY_LIST
     }
 }

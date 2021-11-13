@@ -3,17 +3,24 @@ package com.holdbetter.fintechchatproject.navigation.channels.view
 import android.os.Bundle
 import android.view.View
 import android.widget.ListView
+import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
 import com.holdbetter.fintechchatproject.model.HashtagStream
 import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModel
+import java.io.IOException
+import java.net.UnknownHostException
 
 class AllStreamsFragment : Fragment(R.layout.fragment_streams_sub_or_not),
     IStreamCategoryFragment {
@@ -48,6 +55,12 @@ class AllStreamsFragment : Fragment(R.layout.fragment_streams_sub_or_not),
                     R.drawable.streams_divider_decoration)!!)
             })
 
+            layoutManager = object : LinearLayoutManager(this.context, VERTICAL, false) {
+                override fun supportsPredictiveItemAnimations(): Boolean {
+                    return false
+                }
+            }
+
             adapter = StreamAdapter(viewModel)
         }
 
@@ -56,14 +69,36 @@ class AllStreamsFragment : Fragment(R.layout.fragment_streams_sub_or_not),
 
     private fun handleStreamViewState(streamViewState: StreamViewState) {
         when (streamViewState) {
-            is StreamViewState.Error -> Snackbar.make(requireView(),
-                "Shit happens",
-                Snackbar.LENGTH_SHORT).show()
+            is StreamViewState.Error -> {
+                stopShimming()
+                handleError(streamViewState.error)
+            }
             StreamViewState.Loading -> startShimming()
             is StreamViewState.Result -> {
                 stopShimming()
                 setStreams(streamViewState.streams)
             }
+        }
+    }
+
+    private fun handleError(e: Throwable) {
+        val appResource = resources
+        val appTheme = requireActivity().theme
+
+        val snackbar = Snackbar.make(requireView() , "Нет подключения к интернету", Snackbar.LENGTH_INDEFINITE).apply {
+            setActionTextColor(appResource.getColor(R.color.blue_and_green, appTheme))
+            setTextColor(appResource.getColor(android.R.color.black, appTheme))
+            setBackgroundTint(appResource.getColor(R.color.white, appTheme))
+
+            view.findViewById<TextView>(com.google.android.material.R.id.snackbar_action).apply {
+                typeface = ResourcesCompat.getFont(context, R.font.inter_medium)
+            }
+
+            setAction("Повторить") { viewModel.getStreams() }
+        }
+
+        when(e) {
+            is NotConnectedException, is IOException -> snackbar.show()
         }
     }
 

@@ -16,6 +16,8 @@
             android:layout_height="match_parent"
             android:layout_marginTop="20dp"
             android:paddingHorizontal="20dp"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
             app:layout_scrollFlags="enterAlways|scroll">
 
             <EditText
