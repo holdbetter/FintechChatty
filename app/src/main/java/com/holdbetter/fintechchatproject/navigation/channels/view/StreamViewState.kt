@@ -6,4 +6,5 @@ sealed class StreamViewState {
     object Loading : StreamViewState()
     class Result(val streams: List<HashtagStream>) : StreamViewState()
     class Error(val error: Throwable) : StreamViewState()
+    class CacheShowing(val streams: List<HashtagStream>) : StreamViewState()
 }

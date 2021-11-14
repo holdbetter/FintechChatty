@@ -12,6 +12,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.chat.EmojiDialogAdapter
 import com.holdbetter.fintechchatproject.main.viewmodel.EmojiViewModel
+import com.holdbetter.fintechchatproject.main.viewmodel.EmojiViewModelFactory
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.application
 
 class EmojiBottomModalFragment(private val messageId: Long) : BottomSheetDialogFragment(),
     IOnEmojiSelectedListener {

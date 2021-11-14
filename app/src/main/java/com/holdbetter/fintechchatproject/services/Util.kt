@@ -2,6 +2,10 @@ package com.holdbetter.fintechchatproject.services
 
 import android.animation.TimeInterpolator
 import android.animation.ValueAnimator
+import android.net.ConnectivityManager
+import com.holdbetter.fintechchatproject.services.ContextExtensions.checkConnectionStatusSynchronously
+import com.holdbetter.fintechchatproject.services.connectivity.NetworkStateHolder
+import io.reactivex.rxjava3.core.Single
 
 object Util {
     fun getEmojiByCode(code: Int): String {
@@ -31,5 +35,15 @@ object Util {
         valueAnimator.duration = duration
         valueAnimator.interpolator = interpolator
         return valueAnimator
+    }
+
+    fun isConnected(connectivityManager: ConnectivityManager): Single<Boolean> {
+        return Single.just(
+            if (NetworkStateHolder.network != null) {
+                NetworkStateHolder.isNetworkConnected
+            } else {
+                connectivityManager.checkConnectionStatusSynchronously()
+            }
+        )
     }
 }

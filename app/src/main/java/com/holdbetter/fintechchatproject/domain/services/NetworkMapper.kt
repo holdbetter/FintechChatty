@@ -4,16 +4,25 @@ import com.holdbetter.fintechchatproject.domain.entity.*
 import com.holdbetter.fintechchatproject.model.*
 import com.holdbetter.fintechchatproject.model.Message
 import com.holdbetter.fintechchatproject.model.Topic
+import com.holdbetter.fintechchatproject.room.entity.HashtagStreamEntity
 
-object Mapper {
+object NetworkMapper {
     fun StreamResponse.toHashtagStream(): MutableList<HashtagStream> {
         return ArrayList(streams.map {
             HashtagStream(
                 it.id,
-                it.name,
-                arrayListOf()
+                it.name
             )
         })
+    }
+
+    fun StreamResponse.toHashtagStreamEntity(): List<HashtagStreamEntity> {
+        return streams.map {
+            HashtagStreamEntity(
+                it.id,
+                it.name
+            )
+        }
     }
 
     fun TopicResponse.toTopics(streamId: Long, streamName: String): List<Topic> {

@@ -1,16 +1,14 @@
 package com.holdbetter.fintechchatproject.navigation.channels.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.net.ConnectivityManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.holdbetter.fintechchatproject.domain.repository.IStreamRepository
-import com.holdbetter.fintechchatproject.domain.repository.StreamRepository
 import com.holdbetter.fintechchatproject.model.HashtagStream
 import com.holdbetter.fintechchatproject.model.Topic
 import com.holdbetter.fintechchatproject.navigation.channels.view.StreamViewState
-import com.holdbetter.fintechchatproject.services.ContextExtensions.isConnected
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -21,8 +19,10 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 
-class StreamViewModel(app: Application) : AndroidViewModel(app) {
-    private val streamRepository: IStreamRepository = StreamRepository()
+class StreamViewModel(
+    private val streamRepository: IStreamRepository,
+    private val connectivityManager: ConnectivityManager,
+) : ViewModel() {
     private var cachedStreams: List<HashtagStream>? = null
 
     private val _isAllStreamsAvailable: MutableLiveData<Boolean> = MutableLiveData()
@@ -44,6 +44,7 @@ class StreamViewModel(app: Application) : AndroidViewModel(app) {
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.dispose()
+        streamRepository.dispose()
     }
 
     private fun startHandleSearchRequests() {
@@ -51,7 +52,6 @@ class StreamViewModel(app: Application) : AndroidViewModel(app) {
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { _streamViewState.value = StreamViewState.Loading }
             .observeOn(Schedulers.io())
-            .delay(1000, TimeUnit.MILLISECONDS)
             .switchMapSingle(::getSearchResponse)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
@@ -96,24 +96,43 @@ class StreamViewModel(app: Application) : AndroidViewModel(app) {
 
 
     fun getStreams() {
-        isConnected()
-            .doOnSuccess { _streamViewState.value = StreamViewState.Loading }
-            .delay(5000, TimeUnit.MILLISECONDS)
+        _streamViewState.value = StreamViewState.Loading
+        streamRepository.getStreamsCached()
+            .delay(2000, TimeUnit.MILLISECONDS)
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess {
+                if (it.isNotEmpty()) {
+                    _streamViewState.value = StreamViewState.CacheShowing(it)
+                    enableSearch()
+                    viewModelCache(it)
+                }
+            }
+            .map { it.isNotEmpty() }
             .observeOn(Schedulers.io())
-            .flatMap { getRepository(it) }
-            .flatMap { it.getStreams() }
+            .delay(3000, TimeUnit.MILLISECONDS)
+            .flatMap { isCacheShowing ->
+                streamRepository.getStreamsOnline(connectivityManager)
+            }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
-                    cacheResponse(it)
                     _streamViewState.value = StreamViewState.Result(it)
                     enableSearch()
+                    viewModelCache(it)
                 },
-                onError = { _streamViewState.value = StreamViewState.Error(it) }
+                onError = ::provideCorrectErrorState
             ).addTo(compositeDisposable)
     }
 
-    private fun cacheResponse(it: List<HashtagStream>?) {
+    private fun provideCorrectErrorState(throwable: Throwable) {
+        when (streamViewState.value) {
+            is StreamViewState.Loading -> {
+                _streamViewState.value = StreamViewState.Error(throwable)
+            }
+        }
+    }
+
+    private fun viewModelCache(it: List<HashtagStream>?) {
         cachedStreams = it
     }
 
@@ -122,17 +141,21 @@ class StreamViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun getTopics(stream: HashtagStream): Single<List<Topic>> {
-        return streamRepository.getTopicsForStream(stream.id, stream.name)
+        return streamRepository.getTopicsForStreamOnline(stream.id, stream.name)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
     }
+}
 
-    private fun getRepository(isConnected: Boolean) =
-        Single.create<IStreamRepository> { emitter ->
-            if (isConnected) {
-                emitter.onSuccess(streamRepository)
-            } else {
-                emitter.onError(NotConnectedException())
-            }
+class StreamViewModelFactory(
+    private val streamRepository: IStreamRepository,
+    private val connectivityManager: ConnectivityManager,
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(StreamViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return StreamViewModel(streamRepository, connectivityManager) as T
         }
+        throw IllegalArgumentException("Wrong ViewModel class")
+    }
 }

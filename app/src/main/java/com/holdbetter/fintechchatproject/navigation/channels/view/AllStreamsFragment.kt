@@ -17,8 +17,11 @@ import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
+import com.holdbetter.fintechchatproject.main.ChatApplication
 import com.holdbetter.fintechchatproject.model.HashtagStream
 import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModel
+import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModelFactory
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.application
 import java.io.IOException
 import java.net.UnknownHostException
 
@@ -75,6 +78,10 @@ class AllStreamsFragment : Fragment(R.layout.fragment_streams_sub_or_not),
             }
             StreamViewState.Loading -> startShimming()
             is StreamViewState.Result -> {
+                stopShimming()
+                setStreams(streamViewState.streams)
+            }
+            is StreamViewState.CacheShowing -> {
                 stopShimming()
                 setStreams(streamViewState.streams)
             }

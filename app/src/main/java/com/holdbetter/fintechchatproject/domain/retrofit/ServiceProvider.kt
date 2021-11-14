@@ -2,6 +2,7 @@ package com.holdbetter.fintechchatproject.domain.retrofit
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import io.reactivex.rxjava3.core.Single
 import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -45,10 +46,12 @@ class ServiceProvider {
             }
         }
 
+        val api by lazy {
+            retrofit.create(TinkoffZulipApi::class.java)
+        }
+
         private val authClient: OkHttpClient by lazy {
             OkHttpClient.Builder().addInterceptor(authInterceptor).build()
         }
-
-        fun getApi(): TinkoffZulipApi = retrofit.create()
     }
 }

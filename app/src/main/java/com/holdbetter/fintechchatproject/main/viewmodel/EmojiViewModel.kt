@@ -1,18 +1,16 @@
 package com.holdbetter.fintechchatproject.main.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.net.ConnectivityManager
+import androidx.lifecycle.*
 import com.holdbetter.fintechchatproject.domain.entity.EmojiApi
 import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
 import com.holdbetter.fintechchatproject.domain.retrofit.ServiceProvider
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
-import com.holdbetter.fintechchatproject.domain.services.Mapper.toEmojiApiList
-import com.holdbetter.fintechchatproject.domain.services.Mapper.toReactionList
+import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toEmojiApiList
+import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toReactionList
 import com.holdbetter.fintechchatproject.main.view.EmojiLoadedState
 import com.holdbetter.fintechchatproject.model.Reaction
-import com.holdbetter.fintechchatproject.services.ContextExtensions.isConnected
+import com.holdbetter.fintechchatproject.services.Util.isConnected
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -20,7 +18,7 @@ import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 
-class EmojiViewModel(app: Application) : AndroidViewModel(app) {
+class EmojiViewModel(val connectivityManager: ConnectivityManager) : ViewModel() {
     private val compositeDisposable = CompositeDisposable()
 
     private val _isEmojiLoaded: MutableLiveData<EmojiLoadedState> = MutableLiveData()
@@ -36,7 +34,7 @@ class EmojiViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun getEmojiList() {
-        isConnected()
+        isConnected(connectivityManager)
             .doOnSuccess { _isEmojiLoaded.value = EmojiLoadedState.Loading }
             .observeOn(Schedulers.io())
             .flatMap { isConnected -> getApi(isConnected) }
@@ -53,9 +51,21 @@ class EmojiViewModel(app: Application) : AndroidViewModel(app) {
     private fun getApi(isConnected: Boolean) =
         Single.create<TinkoffZulipApi> { emitter ->
             if (isConnected) {
-                emitter.onSuccess(ServiceProvider.getApi())
+                emitter.onSuccess(ServiceProvider.api)
             } else {
                 emitter.onError(NotConnectedException())
             }
         }
+}
+
+class EmojiViewModelFactory(
+    private val connectivityManager: ConnectivityManager,
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(EmojiViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return EmojiViewModel(connectivityManager) as T
+        }
+        throw IllegalArgumentException("Wrong ViewModel class")
+    }
 }

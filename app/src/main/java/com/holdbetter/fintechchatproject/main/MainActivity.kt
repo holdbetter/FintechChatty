@@ -1,9 +1,7 @@
 package com.holdbetter.fintechchatproject.main
 
-import android.graphics.Typeface
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -16,13 +14,24 @@ import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
 import com.holdbetter.fintechchatproject.main.view.EmojiLoadedState
 import com.holdbetter.fintechchatproject.main.viewmodel.EmojiViewModel
+import com.holdbetter.fintechchatproject.main.viewmodel.EmojiViewModelFactory
+import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModel
+import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModelFactory
 import com.holdbetter.fintechchatproject.services.connectivity.ChatNetworkCallback
 import com.holdbetter.fintechchatproject.services.connectivity.NetworkState
 import com.holdbetter.fintechchatproject.services.connectivity.NetworkStateHolder
 import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
-    private val viewModel: EmojiViewModel by viewModels()
+    private val emojiViewModel: EmojiViewModel by viewModels {
+        EmojiViewModelFactory((application as ChatApplication).connectivityManager)
+    }
+
+    private val streamViewModel: StreamViewModel by viewModels {
+        val app = application as ChatApplication
+        StreamViewModelFactory(app.streamRepository, app.connectivityManager)
+    }
+
     private lateinit var state: NetworkState
     private lateinit var callback: ChatNetworkCallback
 
@@ -35,10 +44,10 @@ class MainActivity : AppCompatActivity() {
         progress = findViewById(R.id.progress)
 
         if (savedInstanceState == null) {
-            viewModel.getEmojiList()
+            emojiViewModel.getEmojiList()
         }
 
-        viewModel.isEmojiLoaded.observe(this, ::handleState)
+        emojiViewModel.isEmojiLoaded.observe(this, ::handleState)
     }
 
     private fun handleState(state: EmojiLoadedState?) {
@@ -85,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                 typeface = ResourcesCompat.getFont(context, R.font.inter_medium)
             }
 
-            setAction("Повторить") { viewModel.getEmojiList() }
+            setAction("Повторить") { emojiViewModel.getEmojiList() }
         }
 
         when(e) {

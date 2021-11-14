@@ -12,6 +12,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.navigation.channels.view.IChannelViewer
 import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModel
+import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModelFactory
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.application
 
 class ChannelsFragment : Fragment(R.layout.fragment_channels), IChannelViewer {
     companion object {
@@ -23,7 +25,9 @@ class ChannelsFragment : Fragment(R.layout.fragment_channels), IChannelViewer {
         }
     }
 
-    private val viewModel: StreamViewModel by activityViewModels()
+    private val viewModel: StreamViewModel by activityViewModels {
+        StreamViewModelFactory(application.streamRepository, application.connectivityManager)
+    }
 
     private var channelPager: ViewPager2? = null
     private var searchField: EditText? = null

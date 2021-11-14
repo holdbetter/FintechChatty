@@ -19,6 +19,8 @@ import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
 import com.holdbetter.fintechchatproject.model.HashtagStream
 import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModel
+import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModelFactory
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.application
 import java.io.IOException
 
 class SubbedStreamsFragment : Fragment(R.layout.fragment_streams_sub_or_not),
@@ -74,6 +76,10 @@ class SubbedStreamsFragment : Fragment(R.layout.fragment_streams_sub_or_not),
             }
             StreamViewState.Loading -> startShimming()
             is StreamViewState.Result -> {
+                stopShimming()
+                setStreams(streamViewState.streams)
+            }
+            is StreamViewState.CacheShowing -> {
                 stopShimming()
                 setStreams(streamViewState.streams)
             }

@@ -24,11 +24,13 @@ import com.holdbetter.fintechchatproject.chat.view.EmojiBottomModalFragment
 import com.holdbetter.fintechchatproject.chat.view.IChatViewer
 import com.holdbetter.fintechchatproject.chat.viewmodel.ChatViewModel
 import com.holdbetter.fintechchatproject.domain.retrofit.Narrow
-import com.holdbetter.fintechchatproject.domain.services.Mapper.toSender
+import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toSender
 import com.holdbetter.fintechchatproject.main.viewmodel.EmojiViewModel
+import com.holdbetter.fintechchatproject.main.viewmodel.EmojiViewModelFactory
 import com.holdbetter.fintechchatproject.main.viewmodel.PersonalViewModel
 import com.holdbetter.fintechchatproject.model.Message
 import com.holdbetter.fintechchatproject.model.Reaction
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.application
 import java.util.*
 
 class ChatFragment : Fragment(R.layout.fragment_chat), IChatViewer {
