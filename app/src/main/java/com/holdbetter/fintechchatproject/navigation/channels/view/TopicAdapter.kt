@@ -9,12 +9,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.holdbetter.fintechchatproject.main.MainActivity
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.chat.ChatFragment
+import com.holdbetter.fintechchatproject.main.MainActivity
 import com.holdbetter.fintechchatproject.model.Topic
 
 class TopicAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private var wasSomethingSumbitted: Boolean = false
     private val emptyListItemCount = 1
     private val asyncDiffer = AsyncListDiffer(this, TopicDiffUtilCallback())
 
@@ -38,13 +39,20 @@ class TopicAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         }
     }
 
-    override fun getItemCount() = if (asyncDiffer.currentList.size != 0) {
-        asyncDiffer.currentList.size
-    } else {
-        emptyListItemCount
+    override fun getItemCount() = when {
+        asyncDiffer.currentList.size != 0 -> {
+            asyncDiffer.currentList.size
+        }
+        wasSomethingSumbitted -> {
+            emptyListItemCount
+        }
+        else -> {
+            0
+        }
     }
 
     fun submitList(topic: List<Topic>) {
+        wasSomethingSumbitted = true
         asyncDiffer.submitList(topic)
     }
 
@@ -72,7 +80,8 @@ class TopicAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             topic: Topic,
         ) {
             val mainActivity = context as MainActivity
-            val chatFragment = ChatFragment.newInstance(topic.streamId, topic.streamName, topic.name)
+            val chatFragment =
+                ChatFragment.newInstance(topic.streamId, topic.streamName, topic.name)
 
             mainActivity.supportFragmentManager
                 .beginTransaction()

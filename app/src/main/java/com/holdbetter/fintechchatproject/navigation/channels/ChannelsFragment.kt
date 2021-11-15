@@ -25,8 +25,12 @@ class ChannelsFragment : Fragment(R.layout.fragment_channels), IChannelViewer {
         }
     }
 
-    private val viewModel: StreamViewModel by activityViewModels {
-        StreamViewModelFactory(application.streamRepository, application.connectivityManager)
+    private val streamViewModel: StreamViewModel by activityViewModels {
+        StreamViewModelFactory(
+            application.streamRepository,
+            application.topicRepository,
+            application.connectivityManager
+        )
     }
 
     private var channelPager: ViewPager2? = null
@@ -53,10 +57,10 @@ class ChannelsFragment : Fragment(R.layout.fragment_channels), IChannelViewer {
                 channelPager!!.currentItem = 1
             }
 
-            viewModel.startSearch(input.toString())
+            streamViewModel.startSearch(input.toString())
         }
 
-        viewModel.isAllStreamsAvailable.observe(viewLifecycleOwner, ::handleSearchAvailability)
+        streamViewModel.isAllStreamsAvailable.observe(viewLifecycleOwner, ::handleSearchAvailability)
     }
 
     override fun handleSearchAvailability(isAllStreamsAvailable: Boolean) {

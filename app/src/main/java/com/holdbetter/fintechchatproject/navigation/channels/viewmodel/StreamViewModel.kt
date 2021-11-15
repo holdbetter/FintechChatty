@@ -5,11 +5,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.holdbetter.fintechchatproject.domain.repository.IRepository
 import com.holdbetter.fintechchatproject.domain.repository.IStreamRepository
+import com.holdbetter.fintechchatproject.domain.repository.ITopicRepository
 import com.holdbetter.fintechchatproject.model.HashtagStream
 import com.holdbetter.fintechchatproject.model.Topic
 import com.holdbetter.fintechchatproject.navigation.channels.view.StreamViewState
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.core.Maybe
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -21,6 +26,7 @@ import java.util.concurrent.TimeUnit
 
 class StreamViewModel(
     private val streamRepository: IStreamRepository,
+    private val topicRepository: ITopicRepository,
     private val connectivityManager: ConnectivityManager,
 ) : ViewModel() {
     private var cachedStreams: List<HashtagStream>? = null
@@ -110,9 +116,7 @@ class StreamViewModel(
             .map { it.isNotEmpty() }
             .observeOn(Schedulers.io())
             .delay(3000, TimeUnit.MILLISECONDS)
-            .flatMap { isCacheShowing ->
-                streamRepository.getStreamsOnline(connectivityManager)
-            }
+            .flatMap { streamRepository.getStreamsOnline(connectivityManager) }
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
@@ -140,21 +144,23 @@ class StreamViewModel(
         _isAllStreamsAvailable.value = true
     }
 
-    fun getTopics(stream: HashtagStream): Single<List<Topic>> {
-        return streamRepository.getTopicsForStreamOnline(stream.id, stream.name)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+    fun getTopics(stream: HashtagStream): Flowable<List<Topic>> {
+        return Maybe.concat(
+            topicRepository.getTopicsCached(stream.id),
+            topicRepository.getTopicsForStreamOnline(stream.id, stream.name, connectivityManager)
+        )
     }
 }
 
 class StreamViewModelFactory(
     private val streamRepository: IStreamRepository,
+    private val topicRepository: ITopicRepository,
     private val connectivityManager: ConnectivityManager,
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(StreamViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return StreamViewModel(streamRepository, connectivityManager) as T
+            return StreamViewModel(streamRepository, topicRepository, connectivityManager) as T
         }
         throw IllegalArgumentException("Wrong ViewModel class")
     }

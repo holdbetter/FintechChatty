@@ -27,11 +27,6 @@ class MainActivity : AppCompatActivity() {
         EmojiViewModelFactory((application as ChatApplication).connectivityManager)
     }
 
-    private val streamViewModel: StreamViewModel by viewModels {
-        val app = application as ChatApplication
-        StreamViewModelFactory(app.streamRepository, app.connectivityManager)
-    }
-
     private lateinit var state: NetworkState
     private lateinit var callback: ChatNetworkCallback
 

@@ -1,9 +1,13 @@
 package com.holdbetter.fintechchatproject.model
 
 data class Topic(
-    val maxId: Int,
+    val maxId: Long,
     val name: String,
     val streamId: Long,
     val streamName: String,
-    val color: String = "#121212"
-)
+    val color: String = TOPIC_DEFAULT_HEX
+) {
+    companion object {
+        const val TOPIC_DEFAULT_HEX = "#899694"
+    }
+}

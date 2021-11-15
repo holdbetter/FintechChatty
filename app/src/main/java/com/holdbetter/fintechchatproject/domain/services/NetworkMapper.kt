@@ -5,6 +5,7 @@ import com.holdbetter.fintechchatproject.model.*
 import com.holdbetter.fintechchatproject.model.Message
 import com.holdbetter.fintechchatproject.model.Topic
 import com.holdbetter.fintechchatproject.room.entity.HashtagStreamEntity
+import com.holdbetter.fintechchatproject.room.entity.TopicEntity
 
 object NetworkMapper {
     fun StreamResponse.toHashtagStream(): MutableList<HashtagStream> {
@@ -28,6 +29,17 @@ object NetworkMapper {
     fun TopicResponse.toTopics(streamId: Long, streamName: String): List<Topic> {
         return topics.map {
             Topic(it.maxId, it.name, streamId, streamName)
+        }
+    }
+
+    fun TopicResponse.toTopicEntity(streamId: Long, streamName: String): List<TopicEntity> {
+        return topics.map {
+            TopicEntity(
+                it.maxId,
+                it.name,
+                streamId,
+                streamName
+            )
         }
     }
 

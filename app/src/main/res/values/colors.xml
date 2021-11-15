@@ -22,5 +22,6 @@
     <color name="navigation_background_toolbar">#1E1E1E</color>
     <color name="list_divider">#282828</color>
     <color name="shimmer_background_color">#4DCFCFCF</color>
+    <color name="shimmer_background_color_dark">#303030</color>
     <color name="invisible">#00FFFFFF</color>
 </resources>
