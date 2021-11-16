@@ -24,7 +24,8 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
     private val emojiViewModel: EmojiViewModel by viewModels {
-        EmojiViewModelFactory((application as ChatApplication).connectivityManager)
+        val app = application as ChatApplication
+        EmojiViewModelFactory(app.emojiRepository, app.connectivityManager)
     }
 
     private lateinit var state: NetworkState

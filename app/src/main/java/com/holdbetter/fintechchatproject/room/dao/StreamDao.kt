@@ -11,7 +11,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 @Dao
 interface StreamDao {
-    @Query("select * from ${ChatDatabase.STREAM_TABLE_NAME}")
+    @Query("select * from streams")
     fun getStreams(): Single<List<HashtagStreamEntity>>
 
     fun applyStreams(streams: List<HashtagStreamEntity>): Completable {
@@ -25,6 +25,6 @@ interface StreamDao {
     @Insert
     fun insertStreams(vararg streams: HashtagStreamEntity)
 
-    @Query("delete from ${ChatDatabase.STREAM_TABLE_NAME}")
+    @Query("delete from streams")
     fun deleteAllStreams()
 }

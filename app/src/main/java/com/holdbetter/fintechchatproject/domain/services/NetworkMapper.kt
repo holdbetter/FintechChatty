@@ -4,6 +4,8 @@ import com.holdbetter.fintechchatproject.domain.entity.*
 import com.holdbetter.fintechchatproject.model.*
 import com.holdbetter.fintechchatproject.model.Message
 import com.holdbetter.fintechchatproject.model.Topic
+import com.holdbetter.fintechchatproject.room.entity.ApiEmojiEntity
+import com.holdbetter.fintechchatproject.room.entity.EmojiEntity
 import com.holdbetter.fintechchatproject.room.entity.HashtagStreamEntity
 import com.holdbetter.fintechchatproject.room.entity.TopicEntity
 
@@ -85,6 +87,24 @@ object NetworkMapper {
             this.mail,
             this.avatarUrl
         )
+    }
+
+    fun EmojiListResponse.toApiEmojiEntityList(): List<ApiEmojiEntity> {
+        return nameToCodepoint.map {
+            ApiEmojiEntity(
+                it.key,
+                it.value
+            )
+        }
+    }
+
+    fun EmojiListResponse.toEmojiEntityList(): List<EmojiEntity> {
+        return nameToCodepoint.map {
+            EmojiEntity(
+                it.key,
+                it.value.uppercase().split('-')[0]
+            )
+        }
     }
 
     fun EmojiListResponse.toReactionList(): List<Reaction> {

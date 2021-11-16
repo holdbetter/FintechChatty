@@ -11,7 +11,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 @Dao
 interface TopicDao {
-    @Query("select * from ${ChatDatabase.TOPIC_TABLE_NAME} where stream_id = :streamId")
+    @Query("select * from topics where stream_id = :streamId")
     fun getTopics(streamId: Long): Single<List<TopicEntity>>
 
     fun applyTopics(streamId: Long, topics: List<TopicEntity>): Completable {
@@ -25,6 +25,6 @@ interface TopicDao {
     @Insert
     fun insertTopics(vararg topics: TopicEntity)
 
-    @Query("delete from ${ChatDatabase.TOPIC_TABLE_NAME} where stream_id = :streamId")
+    @Query("delete from topics where stream_id = :streamId")
     fun deleteAllTopicsInStream(streamId: Long)
 }
