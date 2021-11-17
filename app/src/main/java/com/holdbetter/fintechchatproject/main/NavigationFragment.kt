@@ -12,12 +12,12 @@ import com.holdbetter.fintechchatproject.navigation.channels.ChannelsFragment
 import com.holdbetter.fintechchatproject.navigation.people.PeopleFragment
 import com.holdbetter.fintechchatproject.navigation.profile.ProfileFragment
 
-class MainHostFragment : Fragment() {
+class NavigationFragment : Fragment() {
     companion object {
         const val defaultBottomNavigationViewSelectedKey = "selectedItem"
 
-        fun newInstance(defaultBottomNavigationViewSelectedId: Int): MainHostFragment {
-            return MainHostFragment().apply {
+        fun newInstance(defaultBottomNavigationViewSelectedId: Int): NavigationFragment {
+            return NavigationFragment().apply {
                 arguments = bundleOf(Pair(defaultBottomNavigationViewSelectedKey,
                     defaultBottomNavigationViewSelectedId))
             }

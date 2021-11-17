@@ -16,4 +16,5 @@
     <string name="something_went_wrong">Something went wrong</string>
     <string name="try_again">Try again</string>
     <string name="no_stream">We couldn\'t find \n any available stream</string>
+    <string name="loadingisover">loadingIsOver</string>
 </resources>

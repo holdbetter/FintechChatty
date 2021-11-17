@@ -1,13 +1,18 @@
 package com.holdbetter.fintechchatproject.services
 
+import android.app.Activity
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.TypedValue
+import com.holdbetter.fintechchatproject.main.ChatApplication
 import com.holdbetter.fintechchatproject.services.connectivity.NetworkStateHolder
 import io.reactivex.rxjava3.core.Single
 
 object ContextExtensions {
+    val Activity.app: ChatApplication
+        get() = application as ChatApplication
+
     fun Context.dpToPx(dp: Float): Int {
         val px = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
