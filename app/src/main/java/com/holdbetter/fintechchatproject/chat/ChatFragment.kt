@@ -17,6 +17,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.app.viewmodel.PersonalViewModel
 import com.holdbetter.fintechchatproject.chat.services.DateOnChatDecorator
 import com.holdbetter.fintechchatproject.chat.services.ScrollLinearLayoutManager
 import com.holdbetter.fintechchatproject.chat.view.ChatViewState
@@ -25,12 +26,8 @@ import com.holdbetter.fintechchatproject.chat.view.IChatViewer
 import com.holdbetter.fintechchatproject.chat.viewmodel.ChatViewModel
 import com.holdbetter.fintechchatproject.domain.retrofit.Narrow
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toSender
-import com.holdbetter.fintechchatproject.main.viewmodel.EmojiViewModel
-import com.holdbetter.fintechchatproject.main.viewmodel.EmojiViewModelFactory
-import com.holdbetter.fintechchatproject.main.viewmodel.PersonalViewModel
 import com.holdbetter.fintechchatproject.model.Message
 import com.holdbetter.fintechchatproject.model.Reaction
-import com.holdbetter.fintechchatproject.services.FragmentExtensions.application
 import java.util.*
 
 class ChatFragment : Fragment(R.layout.fragment_chat), IChatViewer {
@@ -52,7 +49,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat), IChatViewer {
 
     private val chatViewModel: ChatViewModel by viewModels()
     private val personalViewModel: PersonalViewModel by activityViewModels()
-    private val emojiViewModel: EmojiViewModel by activityViewModels()
+//    private val emojiViewModel: EmojiViewModel by activityViewModels()
 
     private var streamId: Long? = null
     private var topicName: String? = null
@@ -78,17 +75,17 @@ class ChatFragment : Fragment(R.layout.fragment_chat), IChatViewer {
             val emojiCode = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_CODE_KEY)
             val messageId = bundle.getLong(EmojiBottomModalFragment.MESSAGE_ID_KEY)
 
-            chatViewModel.sendReaction(
-                emojiViewModel.originalEmojiList,
-                messageId,
-                Reaction(
-                    personalViewModel.currentUserId,
-                    emojiName!!,
-                    emojiCode!!
-                ),
-                streamId!!,
-                topicName!!
-            )
+//            chatViewModel.sendReaction(
+//                emojiViewModel.originalEmojiList,
+//                messageId,
+//                Reaction(
+//                    personalViewModel.currentUserId,
+//                    emojiName!!,
+//                    emojiCode!!
+//                ),
+//                streamId!!,
+//                topicName!!
+//            )
         }
     }
 
@@ -219,18 +216,18 @@ class ChatFragment : Fragment(R.layout.fragment_chat), IChatViewer {
         emojiCode: String,
     ) {
         val reactionToUpdate = Reaction(personalViewModel.currentUserId, emojiName, emojiCode)
-        if (isReactionSelectedNow) {
-            chatViewModel.removeReaction(emojiViewModel.originalEmojiList,
-                messageId,
-                reactionToUpdate,
-                streamId!!,
-                topicName!!)
-        } else {
-            chatViewModel.sendReaction(emojiViewModel.originalEmojiList,
-                messageId,
-                reactionToUpdate,
-                streamId!!,
-                topicName!!)
-        }
+//        if (isReactionSelectedNow) {
+//            chatViewModel.removeReaction(emojiViewModel.originalEmojiList,
+//                messageId,
+//                reactionToUpdate,
+//                streamId!!,
+//                topicName!!)
+//        } else {
+//            chatViewModel.sendReaction(emojiViewModel.originalEmojiList,
+//                messageId,
+//                reactionToUpdate,
+//                streamId!!,
+//                topicName!!)
+//        }
     }
 }

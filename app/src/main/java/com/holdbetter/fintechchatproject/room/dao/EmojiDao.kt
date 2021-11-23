@@ -30,6 +30,7 @@ interface EmojiDao {
         return Completable.create {
             deleteAll()
             insertAll(emojis, apiEmojis)
+            it.onComplete()
         }.subscribeOn(Schedulers.io())
     }
 

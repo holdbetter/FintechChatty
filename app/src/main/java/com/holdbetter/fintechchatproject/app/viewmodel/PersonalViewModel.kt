@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.main.viewmodel
+package com.holdbetter.fintechchatproject.app.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

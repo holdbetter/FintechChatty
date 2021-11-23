@@ -17,7 +17,7 @@ import com.bumptech.glide.request.target.Target
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.button.MaterialButton
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.main.viewmodel.PersonalViewModel
+import com.holdbetter.fintechchatproject.app.viewmodel.PersonalViewModel
 import com.holdbetter.fintechchatproject.model.User
 import com.holdbetter.fintechchatproject.navigation.profile.view.IUserViewer
 import com.holdbetter.fintechchatproject.navigation.profile.view.UserNotFoundFragment

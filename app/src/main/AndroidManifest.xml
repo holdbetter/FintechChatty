@@ -13,9 +13,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FragmentsAndMessaging"
-        android:name="com.holdbetter.fintechchatproject.main.ChatApplication"
+        android:name="com.holdbetter.fintechchatproject.app.ChatApplication"
         tools:ignore="AllowBackup">
-        <activity android:name="com.holdbetter.fintechchatproject.main.MainActivity">
+        <activity android:name="com.holdbetter.fintechchatproject.app.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

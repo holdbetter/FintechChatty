@@ -5,9 +5,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.TypedValue
-import com.holdbetter.fintechchatproject.main.ChatApplication
-import com.holdbetter.fintechchatproject.services.connectivity.NetworkStateHolder
-import io.reactivex.rxjava3.core.Single
+import com.holdbetter.fintechchatproject.app.ChatApplication
 
 object ContextExtensions {
     val Activity.app: ChatApplication

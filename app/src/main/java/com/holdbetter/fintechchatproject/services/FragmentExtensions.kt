@@ -1,7 +1,7 @@
 package com.holdbetter.fintechchatproject.services
 
 import androidx.fragment.app.Fragment
-import com.holdbetter.fintechchatproject.main.ChatApplication
+import com.holdbetter.fintechchatproject.app.ChatApplication
 
 object FragmentExtensions {
     val Fragment.application

@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.main
+package com.holdbetter.fintechchatproject.app.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,7 +18,8 @@ class NavigationFragment : Fragment() {
 
         fun newInstance(defaultBottomNavigationViewSelectedId: Int): NavigationFragment {
             return NavigationFragment().apply {
-                arguments = bundleOf(Pair(defaultBottomNavigationViewSelectedKey,
+                arguments = bundleOf(Pair(
+                    defaultBottomNavigationViewSelectedKey,
                     defaultBottomNavigationViewSelectedId))
             }
         }

@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.main.MainActivity
+import com.holdbetter.fintechchatproject.app.MainActivity
 import com.holdbetter.fintechchatproject.model.User
 
 class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {

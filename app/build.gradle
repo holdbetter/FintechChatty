@@ -35,6 +35,9 @@ android {
 }
 
 dependencies {
+    implementation "com.github.vivid-money.elmslie:elmslie-core:$elmslie"
+    implementation "com.github.vivid-money.elmslie:elmslie-android:$elmslie"
+
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-rxjava3:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
