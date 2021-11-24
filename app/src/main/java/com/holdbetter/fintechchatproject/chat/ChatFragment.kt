@@ -17,7 +17,7 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.viewmodel.PersonalViewModel
+import com.holdbetter.fintechchatproject.navigation.profile.viewmodel.PersonalViewModel
 import com.holdbetter.fintechchatproject.chat.services.DateOnChatDecorator
 import com.holdbetter.fintechchatproject.chat.services.ScrollLinearLayoutManager
 import com.holdbetter.fintechchatproject.chat.view.ChatViewState

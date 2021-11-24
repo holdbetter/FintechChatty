@@ -10,20 +10,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
-import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
-import com.holdbetter.fintechchatproject.model.HashtagStream
+import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.model.Topic
-import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModel
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
 import java.io.IOException
 
-class StreamAdapter(val viewModel: StreamViewModel) :
+class StreamAdapter(/*val viewModel: StreamViewModel*/) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     object DropdownAngle {
         const val TO_COLLAPSE = 0f
@@ -48,7 +43,7 @@ class StreamAdapter(val viewModel: StreamViewModel) :
             }
             else -> {
                 view = inflater.inflate(R.layout.hashtag_stream_instance, parent, false)
-                StreamViewHolder(viewModel, view)
+                StreamViewHolder(/*viewModel,*/ view)
             }
         }
     }
@@ -76,13 +71,13 @@ class StreamAdapter(val viewModel: StreamViewModel) :
         StreamViewType.NON_EMPTY_LIST.ordinal
     }
 
-    fun submitList(streams: List<HashtagStream>) {
+    fun submitList(streams: List<Stream>) {
         asyncDiffer.submitList(streams)
     }
 
     class EmptyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    class StreamViewHolder(val viewModel: StreamViewModel, itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class StreamViewHolder(/*val viewModel: StreamViewModel,*/ itemView: View) : RecyclerView.ViewHolder(itemView) {
         // TODO: 11/2/2021 Animations support
         private val streamView: TextView = itemView.findViewById(R.id.stream_name)
         private val topicsRecycler: RecyclerView = itemView.findViewById(R.id.topic_nested_list)
@@ -109,16 +104,16 @@ class StreamAdapter(val viewModel: StreamViewModel) :
             }
         }
 
-        private fun updateTopicsForStream(stream: HashtagStream) {
+        private fun updateTopicsForStream(stream: Stream) {
             topicsRecycler.isVisible = false
             topicShimmer.isVisible = true
-            viewModel.getTopics(stream)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                    onNext = { submitTopics(it) },
-                    onError = { handleError(it, stream) }
-                )
-                .addTo(compositeDisposable)
+//            viewModel.getTopics(stream)
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeBy(
+//                    onNext = { submitTopics(it) },
+//                    onError = { handleError(it, stream) }
+//                )
+//                .addTo(compositeDisposable)
         }
 
         private fun submitTopics(topics: List<Topic>) {
@@ -127,7 +122,7 @@ class StreamAdapter(val viewModel: StreamViewModel) :
             (topicsRecycler.adapter as TopicAdapter).submitList(topics)
         }
 
-        fun setOnStreamClickListener(stream: HashtagStream) {
+        fun setOnStreamClickListener(stream: Stream) {
             itemView.setOnClickListener { recyclerItem ->
                 if (!recyclerItem.isSelected) {
                     updateTopicsForStream(stream)
@@ -144,7 +139,7 @@ class StreamAdapter(val viewModel: StreamViewModel) :
             }
         }
 
-        private fun handleError(e: Throwable, stream: HashtagStream) {
+        private fun handleError(e: Throwable, stream: Stream) {
             if (topicShimmer.isVisible) {
                 topicShimmer.isVisible = false
                 (topicsRecycler.adapter as TopicAdapter).submitList(emptyList())
@@ -188,18 +183,18 @@ class StreamAdapter(val viewModel: StreamViewModel) :
             }
         }
 
-        fun bind(stream: HashtagStream) {
+        fun bind(stream: Stream) {
             streamView.text = stream.name
             setOnStreamClickListener(stream)
         }
     }
 
-    class StreamDiffUtilCallback : DiffUtil.ItemCallback<HashtagStream>() {
-        override fun areItemsTheSame(oldItem: HashtagStream, newItem: HashtagStream): Boolean {
+    class StreamDiffUtilCallback : DiffUtil.ItemCallback<Stream>() {
+        override fun areItemsTheSame(oldItem: Stream, newItem: Stream): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: HashtagStream, newItem: HashtagStream): Boolean {
+        override fun areContentsTheSame(oldItem: Stream, newItem: Stream): Boolean {
             return oldItem == newItem
         }
     }

@@ -4,18 +4,21 @@ import android.os.Bundle
 import android.view.View
 import android.widget.EditText
 import androidx.core.widget.doOnTextChanged
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.app.di.PocketDI
+import com.holdbetter.fintechchatproject.navigation.channels.elm.ChannelModel
+import com.holdbetter.fintechchatproject.navigation.channels.elm.StreamEvent
+import com.holdbetter.fintechchatproject.navigation.channels.view.AllStreamsFragment
 import com.holdbetter.fintechchatproject.navigation.channels.view.IChannelViewer
-import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModel
-import com.holdbetter.fintechchatproject.navigation.channels.viewmodel.StreamViewModelFactory
-import com.holdbetter.fintechchatproject.services.FragmentExtensions.application
+import vivid.money.elmslie.android.base.ElmFragment
+import vivid.money.elmslie.core.store.Store
 
-class ChannelsFragment : Fragment(R.layout.fragment_channels), IChannelViewer {
+class ChannelsFragment :
+    ElmFragment<ChannelModel.ChannelEvent, ChannelModel.ChannelEffect, ChannelModel.ChannelState>(R.layout.fragment_channels),
+    IChannelViewer {
     companion object {
         fun newInstance(): ChannelsFragment {
             val bundle = Bundle()
@@ -25,23 +28,15 @@ class ChannelsFragment : Fragment(R.layout.fragment_channels), IChannelViewer {
         }
     }
 
-    private val streamViewModel: StreamViewModel by activityViewModels {
-        StreamViewModelFactory(
-            application.streamRepository,
-            application.topicRepository,
-            application.connectivityManager
-        )
-    }
-
     private var channelPager: ViewPager2? = null
     private var searchField: EditText? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val tabLayout = view.findViewById<TabLayout>(R.id.channel_tabs)
         channelPager = view.findViewById<ViewPager2>(R.id.channel_pager).apply {
-            offscreenPageLimit = 2
+//            offscreenPageLimit = 2
             adapter = ChannelPagerAdapter(this@ChannelsFragment)
-            currentItem = 1
+//            currentItem = 1
         }
 
         TabLayoutMediator(tabLayout, channelPager!!) { tab, position ->
@@ -54,18 +49,26 @@ class ChannelsFragment : Fragment(R.layout.fragment_channels), IChannelViewer {
         searchField = view.findViewById(R.id.stream_search_input)
         searchField!!.doOnTextChanged { input, _, _, _ ->
             if (!input.isNullOrBlank() && channelPager!!.currentItem != 1) {
-                channelPager!!.currentItem = 1
+//                channelPager!!.currentItem = 1
             }
 
-            streamViewModel.startSearch(input.toString())
+            store.accept(ChannelModel.ChannelEvent.Ui.Searching(input.toString()))
         }
-
-        streamViewModel.isAllStreamsAvailable.observe(viewLifecycleOwner, ::handleSearchAvailability)
     }
 
-    override fun handleSearchAvailability(isAllStreamsAvailable: Boolean) {
+    override val initEvent: ChannelModel.ChannelEvent
+        get() = ChannelModel.ChannelEvent.Ui.Started
+
+    override fun createStore(): Store<ChannelModel.ChannelEvent, ChannelModel.ChannelEffect, ChannelModel.ChannelState> {
+        return PocketDI.ChannelElmProvider.store.provide()
+    }
+
+    override fun render(state: ChannelModel.ChannelState) {
         searchField?.let {
-            it.isEnabled = isAllStreamsAvailable
+            it.isEnabled = state.isReadyToSearch
         }
     }
+
+    private val allStreamFragment: AllStreamsFragment
+        get() = childFragmentManager.findFragmentByTag("f0") as AllStreamsFragment
 }

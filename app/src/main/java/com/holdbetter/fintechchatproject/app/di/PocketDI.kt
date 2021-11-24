@@ -8,6 +8,10 @@ import com.holdbetter.fintechchatproject.app.hoster.elm.InitializerStore
 import com.holdbetter.fintechchatproject.app.load.elm.EmojiActor
 import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadingStore
 import com.holdbetter.fintechchatproject.domain.repository.*
+import com.holdbetter.fintechchatproject.navigation.channels.elm.ChannelActor
+import com.holdbetter.fintechchatproject.navigation.channels.elm.ChannelStore
+import com.holdbetter.fintechchatproject.navigation.channels.elm.StreamActor
+import com.holdbetter.fintechchatproject.navigation.channels.elm.StreamStore
 import com.holdbetter.fintechchatproject.room.ChatDatabase
 
 class PocketDI private constructor(app: Application) {
@@ -35,8 +39,28 @@ class PocketDI private constructor(app: Application) {
         }
     }
 
+    object ChannelElmProvider {
+        private val actor by lazy {
+            ChannelActor(INSTANCE.streamRepository)
+        }
+
+        val store by lazy {
+            ChannelStore(actor)
+        }
+    }
+
+    object StreamElmProvider {
+        private val actor by lazy {
+            StreamActor(INSTANCE.streamRepository)
+        }
+
+        val store by lazy {
+            StreamStore(actor)
+        }
+    }
+
     val emojiRepository: IEmojiRepository by lazy { EmojiRepository(database.emojiDao(), connectivityManager) }
-    val streamRepository: IStreamRepository by lazy { StreamRepository(database.streamDao()) }
+    val streamRepository: IStreamRepository by lazy { StreamRepository(database.streamDao(), connectivityManager) }
     val topicRepository: ITopicRepository by lazy { TopicRepository(database.topicDao()) }
 
     companion object {

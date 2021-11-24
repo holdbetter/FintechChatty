@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.app.viewmodel
+package com.holdbetter.fintechchatproject.navigation.profile.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

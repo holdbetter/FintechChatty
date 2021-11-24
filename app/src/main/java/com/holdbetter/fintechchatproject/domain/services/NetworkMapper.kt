@@ -3,6 +3,7 @@ package com.holdbetter.fintechchatproject.domain.services
 import com.holdbetter.fintechchatproject.domain.entity.*
 import com.holdbetter.fintechchatproject.model.*
 import com.holdbetter.fintechchatproject.model.Message
+import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.model.Topic
 import com.holdbetter.fintechchatproject.room.entity.ApiEmojiEntity
 import com.holdbetter.fintechchatproject.room.entity.EmojiEntity
@@ -10,9 +11,9 @@ import com.holdbetter.fintechchatproject.room.entity.HashtagStreamEntity
 import com.holdbetter.fintechchatproject.room.entity.TopicEntity
 
 object NetworkMapper {
-    fun StreamResponse.toHashtagStream(): MutableList<HashtagStream> {
+    fun StreamResponse.toHashtagStream(): MutableList<Stream> {
         return ArrayList(streams.map {
-            HashtagStream(
+            Stream(
                 it.id,
                 it.name
             )
