@@ -9,16 +9,14 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.app.di.PocketDI
-import com.holdbetter.fintechchatproject.navigation.channels.elm.ChannelModel
-import com.holdbetter.fintechchatproject.navigation.channels.elm.StreamEvent
-import com.holdbetter.fintechchatproject.navigation.channels.view.AllStreamsFragment
-import com.holdbetter.fintechchatproject.navigation.channels.view.IChannelViewer
+import com.holdbetter.fintechchatproject.navigation.channels.elm.channel.ChannelModel
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
 
 class ChannelsFragment :
-    ElmFragment<ChannelModel.ChannelEvent, ChannelModel.ChannelEffect, ChannelModel.ChannelState>(R.layout.fragment_channels),
-    IChannelViewer {
+    ElmFragment<ChannelModel.ChannelEvent,
+            ChannelModel.ChannelEffect,
+            ChannelModel.ChannelState>(R.layout.fragment_channels) {
     companion object {
         fun newInstance(): ChannelsFragment {
             val bundle = Bundle()
@@ -34,9 +32,9 @@ class ChannelsFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val tabLayout = view.findViewById<TabLayout>(R.id.channel_tabs)
         channelPager = view.findViewById<ViewPager2>(R.id.channel_pager).apply {
-//            offscreenPageLimit = 2
+            offscreenPageLimit = 2
             adapter = ChannelPagerAdapter(this@ChannelsFragment)
-//            currentItem = 1
+            currentItem = 1
         }
 
         TabLayoutMediator(tabLayout, channelPager!!) { tab, position ->
@@ -49,7 +47,7 @@ class ChannelsFragment :
         searchField = view.findViewById(R.id.stream_search_input)
         searchField!!.doOnTextChanged { input, _, _, _ ->
             if (!input.isNullOrBlank() && channelPager!!.currentItem != 1) {
-//                channelPager!!.currentItem = 1
+                channelPager!!.currentItem = 1
             }
 
             store.accept(ChannelModel.ChannelEvent.Ui.Searching(input.toString()))
@@ -68,7 +66,4 @@ class ChannelsFragment :
             it.isEnabled = state.isReadyToSearch
         }
     }
-
-    private val allStreamFragment: AllStreamsFragment
-        get() = childFragmentManager.findFragmentByTag("f0") as AllStreamsFragment
 }

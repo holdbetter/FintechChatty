@@ -43,14 +43,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:drawableLeft="@drawable/turn_on_emoji_load_screen"
                 android:drawablePadding="16dp"
                 android:fontFamily="@font/inter_medium"
                 android:gravity="center"
                 android:text="Загружаем смайлы"
                 android:textAlignment="center"
                 android:textColor="#000000"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                app:drawableLeftCompat="@drawable/turn_on_emoji_load_screen" />
 
         </FrameLayout>
 
@@ -80,14 +80,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:drawableLeft="@drawable/no_bugs_load_screen"
                 android:drawablePadding="16dp"
                 android:fontFamily="@font/inter_medium"
                 android:gravity="center"
                 android:text="Ищем жуков"
                 android:textAlignment="center"
                 android:textColor="#000000"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                app:drawableLeftCompat="@drawable/no_bugs_load_screen" />
 
         </FrameLayout>
 
@@ -117,14 +117,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:drawableLeft="@drawable/who_are_you_sized_load_screen"
                 android:drawablePadding="16dp"
                 android:fontFamily="@font/inter_medium"
                 android:gravity="center"
                 android:text="Узнаем кто вы"
                 android:textAlignment="center"
                 android:textColor="#000000"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                app:drawableLeftCompat="@drawable/who_are_you_sized_load_screen" />
 
         </FrameLayout>
 
@@ -154,14 +154,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:drawableLeft="@drawable/one_more_step_load_screen"
                 android:drawablePadding="16dp"
                 android:fontFamily="@font/inter_medium"
                 android:gravity="center"
                 android:text="Просто еще один шаг"
                 android:textAlignment="center"
                 android:textColor="#000000"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                app:drawableLeftCompat="@drawable/one_more_step_load_screen" />
 
         </FrameLayout>
 
@@ -192,14 +192,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:drawableLeft="@drawable/interner_sized_load_screen"
                 android:drawablePadding="16dp"
                 android:fontFamily="@font/inter_medium"
                 android:gravity="center"
                 android:text="Включаем интернеты"
                 android:textAlignment="center"
                 android:textColor="#000000"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                app:drawableLeftCompat="@drawable/interner_sized_load_screen" />
 
         </FrameLayout>
 

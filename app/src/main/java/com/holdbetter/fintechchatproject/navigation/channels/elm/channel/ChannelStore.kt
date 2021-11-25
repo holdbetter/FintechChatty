@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.navigation.channels.elm
+package com.holdbetter.fintechchatproject.navigation.channels.elm.channel
 
 import vivid.money.elmslie.core.store.ElmStore
 

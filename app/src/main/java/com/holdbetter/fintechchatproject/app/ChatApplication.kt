@@ -9,9 +9,6 @@ import com.holdbetter.fintechchatproject.room.ChatDatabase
 
 class ChatApplication : Application() {
     val database by lazy { ChatDatabase.getDatabase(this) }
-    val streamRepository: IStreamRepository by lazy { StreamRepository(database.streamDao(), connectivityManager) }
-    val topicRepository: ITopicRepository by lazy { TopicRepository(database.topicDao()) }
-    val emojiRepository: IEmojiRepository by lazy { EmojiRepository(database.emojiDao(), connectivityManager) }
     val connectivityManager by lazy { getSystemService<ConnectivityManager>()!! }
 
     override fun onCreate() {

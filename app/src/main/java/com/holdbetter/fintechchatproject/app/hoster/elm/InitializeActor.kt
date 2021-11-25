@@ -16,7 +16,7 @@ class InitializeActor(
                 .doOnSuccess { emojiRepository.applyCacheIfNotEmpty(it) }
                 .filter { continueIfAnyListIsEmpty(it) }
                 .mapEvents(
-                    successEventMapper = { _ -> InitializerCacheEvent.Internal.CacheEmpty },
+                    successEventMapper = { InitializerCacheEvent.Internal.CacheEmpty },
                     completionEvent = InitializerCacheEvent.Internal.CacheNotEmpty,
                     failureEventMapper = { e -> InitializerCacheEvent.Internal.Error(e) }
                 )

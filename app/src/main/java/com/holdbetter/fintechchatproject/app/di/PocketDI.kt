@@ -8,10 +8,11 @@ import com.holdbetter.fintechchatproject.app.hoster.elm.InitializerStore
 import com.holdbetter.fintechchatproject.app.load.elm.EmojiActor
 import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadingStore
 import com.holdbetter.fintechchatproject.domain.repository.*
-import com.holdbetter.fintechchatproject.navigation.channels.elm.ChannelActor
-import com.holdbetter.fintechchatproject.navigation.channels.elm.ChannelStore
-import com.holdbetter.fintechchatproject.navigation.channels.elm.StreamActor
-import com.holdbetter.fintechchatproject.navigation.channels.elm.StreamStore
+import com.holdbetter.fintechchatproject.navigation.channels.elm.channel.ChannelActor
+import com.holdbetter.fintechchatproject.navigation.channels.elm.channel.ChannelStore
+import com.holdbetter.fintechchatproject.navigation.channels.elm.stream.StreamActor
+import com.holdbetter.fintechchatproject.navigation.channels.elm.stream.AllStreamStore
+import com.holdbetter.fintechchatproject.navigation.channels.elm.stream.SubbedStreamStore
 import com.holdbetter.fintechchatproject.room.ChatDatabase
 
 class PocketDI private constructor(app: Application) {
@@ -49,13 +50,23 @@ class PocketDI private constructor(app: Application) {
         }
     }
 
-    object StreamElmProvider {
+    object AllStreamElmProvider {
         private val actor by lazy {
             StreamActor(INSTANCE.streamRepository)
         }
 
         val store by lazy {
-            StreamStore(actor)
+            AllStreamStore(actor)
+        }
+    }
+
+    object SubbedStreamElmProvider {
+        private val actor by lazy {
+            StreamActor(INSTANCE.streamRepository)
+        }
+
+        val store by lazy {
+            SubbedStreamStore(actor)
         }
     }
 

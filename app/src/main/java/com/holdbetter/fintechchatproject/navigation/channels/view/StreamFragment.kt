@@ -16,17 +16,18 @@ import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
 import com.holdbetter.fintechchatproject.model.Stream
+import com.holdbetter.fintechchatproject.navigation.channels.elm.stream.StreamEvent
 import vivid.money.elmslie.android.base.ElmFragment
 import java.io.IOException
 
-abstract class StreamFragment<Event : Any, Effect : Any, State : Any>(
-    private val onErrorRetryEvent: Event,
+abstract class StreamFragment<Effect : Any, State : Any>(
+    private val onErrorRetryEvent: StreamEvent,
     @LayoutRes contentLayoutId: Int
 ) :
-    ElmFragment<Event, Effect, State>(contentLayoutId), IStreamFragment {
+    ElmFragment<StreamEvent, Effect, State>(contentLayoutId), IStreamFragment {
 
-    var streamsList: RecyclerView? = null
-    var shimmerContent: ListView? = null
+    private var streamsList: RecyclerView? = null
+    private var shimmerContent: ListView? = null
     var shimmer: ShimmerFrameLayout? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,7 +59,12 @@ abstract class StreamFragment<Event : Any, Effect : Any, State : Any>(
 
             adapter = StreamAdapter()
         }
+
+        store.accept(StreamEvent.Ui.Started)
     }
+
+    override val initEvent: StreamEvent
+        get() = StreamEvent.Ui.Init
 
     fun handleError(e: Throwable) {
         val appResource = resources

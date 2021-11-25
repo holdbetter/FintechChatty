@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.navigation.channels.elm
+package com.holdbetter.fintechchatproject.navigation.channels.elm.channel
 
 import com.holdbetter.fintechchatproject.domain.repository.IStreamRepository
 import io.reactivex.rxjava3.core.Observable

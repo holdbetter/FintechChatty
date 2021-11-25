@@ -46,7 +46,7 @@ class ServiceProvider {
             }
         }
 
-        val api by lazy {
+        val api: TinkoffZulipApi by lazy {
             retrofit.create(TinkoffZulipApi::class.java)
         }
 

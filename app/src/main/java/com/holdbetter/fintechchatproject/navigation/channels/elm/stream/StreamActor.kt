@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.navigation.channels.elm
+package com.holdbetter.fintechchatproject.navigation.channels.elm.stream
 
 import com.holdbetter.fintechchatproject.domain.repository.IStreamRepository
 import io.reactivex.rxjava3.core.Observable
@@ -24,8 +24,15 @@ class StreamActor(
             StreamCommand.DataIsAvailable -> {
                 streamRepository.notifyParentsAboutDataAvailability()
                 streamRepository.startHandleSearchRequests()
-                    .mapSuccessEvent { streams -> StreamEvent.Internal.Searched(streams) }
+                    .mapSuccessEvent { streams -> AllStreamEvent.Internal.Searched(streams) }
             }
+            StreamCommand.LoadSubbedStreams -> streamRepository.getStreams()
+                .filter { it.isNotEmpty() }
+                .mapEvents(
+                    successEventMapper = { streams -> StreamEvent.Internal.DataReady(streams) },
+                    StreamEvent.Internal.CacheEmpty,
+                    failureEventMapper = { error -> StreamEvent.Internal.DataLoadError(error) }
+                )
         }
     }
 }
