@@ -4,7 +4,6 @@ import android.app.Application
 import android.net.ConnectivityManager
 import androidx.core.content.getSystemService
 import com.holdbetter.fintechchatproject.app.di.PocketDI
-import com.holdbetter.fintechchatproject.domain.repository.*
 import com.holdbetter.fintechchatproject.room.ChatDatabase
 
 class ChatApplication : Application() {

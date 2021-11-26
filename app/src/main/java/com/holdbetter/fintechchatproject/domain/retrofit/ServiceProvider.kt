@@ -2,14 +2,12 @@ package com.holdbetter.fintechchatproject.domain.retrofit
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import io.reactivex.rxjava3.core.Single
 import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.create
 
 class ServiceProvider {
     companion object {

@@ -4,7 +4,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
-import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.room.entity.StreamEntity
 import com.holdbetter.fintechchatproject.room.entity.StreamWithTopics
 import com.holdbetter.fintechchatproject.room.entity.TopicEntity

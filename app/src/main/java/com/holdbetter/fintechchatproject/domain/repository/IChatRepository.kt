@@ -4,7 +4,6 @@ import com.holdbetter.fintechchatproject.domain.entity.EmojiApi
 import com.holdbetter.fintechchatproject.domain.entity.SentMessageResponse
 import com.holdbetter.fintechchatproject.domain.retrofit.Narrow
 import com.holdbetter.fintechchatproject.model.Message
-import com.holdbetter.fintechchatproject.model.Reaction
 import io.reactivex.rxjava3.core.Single
 import okhttp3.ResponseBody
 

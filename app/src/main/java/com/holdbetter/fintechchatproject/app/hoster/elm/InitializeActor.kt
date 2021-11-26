@@ -1,6 +1,5 @@
 package com.holdbetter.fintechchatproject.app.hoster.elm
 
-import android.util.Log
 import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository
 import com.holdbetter.fintechchatproject.room.entity.ApiEmojiEntity
 import com.holdbetter.fintechchatproject.room.entity.EmojiEntity
