@@ -3,5 +3,5 @@
     <item
         android:width="28dp"
         android:height="28dp"
-        android:drawable="@drawable/turnonemoji"/>
+        android:drawable="@drawable/turn_on_emoji"/>
 </layer-list>

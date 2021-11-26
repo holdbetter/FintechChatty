@@ -9,7 +9,8 @@
     android:focusable="true"
     android:paddingHorizontal="15dp"
     android:paddingVertical="4dp"
-    tools:background="@color/activity_background">
+    tools:background="@color/activity_background"
+    tools:viewBindingIgnore="true">
 
     <ImageView
         android:id="@+id/user_image"
@@ -25,8 +26,8 @@
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:contentDescription="@string/user_status"
-        android:visibility="gone"
         android:src="@drawable/user_status_shape"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="@id/user_image"
         app:tint="@color/user_status_color_selector" />

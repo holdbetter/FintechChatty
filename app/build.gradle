@@ -25,16 +25,24 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
 }
 
 dependencies {
+    implementation "com.github.kirich1409:viewbindingpropertydelegate-noreflection:$rozov_binding"
+
     implementation "com.github.vivid-money.elmslie:elmslie-core:$elmslie"
     implementation "com.github.vivid-money.elmslie:elmslie-android:$elmslie"
 

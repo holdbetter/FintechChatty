@@ -6,7 +6,8 @@
     android:layout_height="wrap_content"
     android:paddingHorizontal="15dp"
     android:paddingVertical="8dp"
-    tools:background="@color/activity_background">
+    tools:background="@color/activity_background"
+    tools:viewBindingIgnore="true">
 
     <View
         android:id="@+id/shimmer_image"

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#B3CFB3">
+    android:background="#B3CFB3"
+    tools:paddingHorizontal="18dp">
 
     <androidx.constraintlayout.helper.widget.Flow
         android:layout_width="match_parent"
@@ -13,204 +14,68 @@
         android:layout_marginTop="60dp"
         android:layout_marginBottom="48dp"
         android:orientation="vertical"
-        app:constraint_referenced_ids="emojiLoading, findingBugs, discoverYou, justOneMoreStep, internetOn"
+        app:constraint_referenced_ids="emojiLoading, finding_bugs, discover_you, just_one_more_step, internetOn"
         app:flow_verticalGap="36dp"
         app:flow_wrapMode="chain"
         app:layout_constraintBottom_toTopOf="@id/checkmark"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.card.MaterialCardView
+    <include
         android:id="@+id/emojiLoading"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:alpha="0"
-        android:elevation="16dp"
-        app:cardCornerRadius="20dp"
-        app:layout_constraintBottom_toTopOf="@id/findingBugs"
+        layout="@layout/loading_item"
+        app:layout_constraintBottom_toTopOf="@id/finding_bugs"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_weight="1"
-        tools:alpha="1">
+        tools:alpha="1" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/emoji_loading_background_selector"
-            android:paddingHorizontal="26dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:drawablePadding="16dp"
-                android:fontFamily="@font/inter_medium"
-                android:gravity="center"
-                android:text="Загружаем смайлы"
-                android:textAlignment="center"
-                android:textColor="#000000"
-                android:textSize="18sp"
-                app:drawableLeftCompat="@drawable/turn_on_emoji_load_screen" />
-
-        </FrameLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/findingBugs"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:alpha="0"
-        android:elevation="16dp"
-        app:cardCornerRadius="20dp"
-        app:layout_constraintBottom_toTopOf="@id/discoverYou"
+    <include
+        android:id="@+id/finding_bugs"
+        layout="@layout/loading_item"
+        app:layout_constraintBottom_toTopOf="@id/discover_you"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/emojiLoading"
         app:layout_constraintVertical_weight="1"
-        tools:alpha="1">
+        tools:alpha="1" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/emoji_loading_background_selector"
-            android:paddingHorizontal="26dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:drawablePadding="16dp"
-                android:fontFamily="@font/inter_medium"
-                android:gravity="center"
-                android:text="Ищем жуков"
-                android:textAlignment="center"
-                android:textColor="#000000"
-                android:textSize="18sp"
-                app:drawableLeftCompat="@drawable/no_bugs_load_screen" />
-
-        </FrameLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/discoverYou"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:alpha="0"
-        android:elevation="16dp"
-        app:cardCornerRadius="20dp"
-        app:layout_constraintBottom_toTopOf="@id/justOneMoreStep"
+    <include
+        android:id="@+id/discover_you"
+        layout="@layout/loading_item"
+        app:layout_constraintBottom_toTopOf="@id/just_one_more_step"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/findingBugs"
+        app:layout_constraintTop_toBottomOf="@id/finding_bugs"
         app:layout_constraintVertical_weight="1"
-        tools:alpha="1">
+        tools:alpha="1" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/emoji_loading_background_selector"
-            android:paddingHorizontal="26dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:drawablePadding="16dp"
-                android:fontFamily="@font/inter_medium"
-                android:gravity="center"
-                android:text="Узнаем кто вы"
-                android:textAlignment="center"
-                android:textColor="#000000"
-                android:textSize="18sp"
-                app:drawableLeftCompat="@drawable/who_are_you_sized_load_screen" />
-
-        </FrameLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/justOneMoreStep"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:alpha="0"
-        android:elevation="16dp"
-        app:cardCornerRadius="20dp"
+    <include
+        android:id="@+id/just_one_more_step"
+        layout="@layout/loading_item"
         app:layout_constraintBottom_toTopOf="@id/internetOn"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/discoverYou"
+        app:layout_constraintTop_toBottomOf="@id/discover_you"
         app:layout_constraintVertical_weight="1"
-        tools:alpha="1">
+        tools:alpha="1" />
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/emoji_loading_background_selector"
-            android:paddingHorizontal="26dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:drawablePadding="16dp"
-                android:fontFamily="@font/inter_medium"
-                android:gravity="center"
-                android:text="Просто еще один шаг"
-                android:textAlignment="center"
-                android:textColor="#000000"
-                android:textSize="18sp"
-                app:drawableLeftCompat="@drawable/one_more_step_load_screen" />
-
-        </FrameLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
+    <include
         android:id="@+id/internetOn"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:alpha="0"
-        android:elevation="16dp"
-        app:cardCornerRadius="20dp"
+        layout="@layout/loading_item"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/justOneMoreStep"
+        app:layout_constraintTop_toBottomOf="@id/just_one_more_step"
         app:layout_constraintVertical_weight="1"
-        tools:alpha="1">
-
-        <FrameLayout
-            android:id="@+id/internetOnContent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/emoji_loading_background_selector"
-            android:paddingHorizontal="26dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:drawablePadding="16dp"
-                android:fontFamily="@font/inter_medium"
-                android:gravity="center"
-                android:text="Включаем интернеты"
-                android:textAlignment="center"
-                android:textColor="#000000"
-                android:textSize="18sp"
-                app:drawableLeftCompat="@drawable/interner_sized_load_screen" />
-
-        </FrameLayout>
-
-    </com.google.android.material.card.MaterialCardView>
+        tools:alpha="1" />
 
     <ImageView
         android:id="@+id/checkmark"
         android:layout_width="wrap_content"
         android:layout_height="24dp"
         android:adjustViewBounds="true"
-        android:contentDescription="@string/loadingisover"
+        android:contentDescription="@string/loading_is_over"
         android:src="@drawable/check_animation_rounded"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -223,7 +88,7 @@
         android:id="@+id/failed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Попробую еще раз"
+        android:text="@string/try_again_ru"
         android:visibility="gone"
         app:backgroundTint="#F47373"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -231,19 +96,4 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/internetOn"
         tools:visibility="visible" />
-
-    <!--    <TextView-->
-    <!--        android:id="@+id/ready"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:backgroundTint="@color/white"-->
-    <!--        android:text="Включаемся!"-->
-    <!--        android:fontFamily="@font/inter_bold"-->
-    <!--        android:textSize="20sp"-->
-    <!--        android:textColor="@color/white"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--        app:layout_constraintRight_toRightOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@id/v5" />-->
-
 </androidx.constraintlayout.widget.ConstraintLayout>

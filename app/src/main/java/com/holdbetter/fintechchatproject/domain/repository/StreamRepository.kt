@@ -2,10 +2,12 @@ package com.holdbetter.fintechchatproject.domain.repository
 
 import android.net.ConnectivityManager
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toHashtagStreamEntity
+import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toTopicEntity
 import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.room.dao.StreamDao
-import com.holdbetter.fintechchatproject.room.entity.HashtagStreamEntity
-import com.holdbetter.fintechchatproject.room.services.DatabaseMapper.toHashtagStream
+import com.holdbetter.fintechchatproject.room.entity.StreamEntity
+import com.holdbetter.fintechchatproject.room.entity.StreamWithTopics
+import com.holdbetter.fintechchatproject.room.services.DatabaseMapper.toStream
 import com.holdbetter.fintechchatproject.services.Util.isConnected
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
@@ -24,22 +26,36 @@ class StreamRepository(
     override val dataAvailabilityNotifier: BehaviorSubject<Boolean> = BehaviorSubject.create()
     private val searchRequest: PublishSubject<String> = PublishSubject.create()
 
-    override fun getStreams(): Maybe<List<Stream>> {
-        return streamDao.getStreams()
+    override fun getStreamsWithTopics(): Maybe<List<Stream>> {
+        return streamDao.getStreamsWithTopics()
             .subscribeOn(Schedulers.io())
-            .map { dboStream -> dboStream.toHashtagStream() }
+            .map { it.toStream() }
     }
 
     override fun getStreamsOnline(): Completable {
         return isConnected(connectivityManager)
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
-            .delay(3000, TimeUnit.MILLISECONDS)
+            .delay(1000, TimeUnit.MILLISECONDS)
             .flatMap { api -> api.getStreams() }
-            .flatMapCompletable { message -> cacheStreams(message.toHashtagStreamEntity()) }
+            .map { message -> message.toHashtagStreamEntity() }
+            .flatMapObservable { streams -> Observable.fromIterable(streams) }
+            .flatMapSingle { stream -> getTopicsOnline(stream) }
+            .toList()
+            .flatMapCompletable { cacheStreamsAndTopics(it) }
     }
 
-    override fun cacheStreams(streamsToCache: List<HashtagStreamEntity>): Completable {
+    override fun getTopicsOnline(stream: StreamEntity): Single<StreamWithTopics> {
+        return isConnected(connectivityManager)
+            .subscribeOn(Schedulers.io())
+            .flatMap { getApi(it) }
+            .delay(1000, TimeUnit.MILLISECONDS)
+            .flatMap { api -> api.getStreamTopics(stream.id) }
+            .map { topicResponse -> topicResponse.toTopicEntity(stream.id, stream.name) }
+            .map { topicEntityList -> StreamWithTopics(stream, topicEntityList) }
+    }
+
+    override fun cacheStreamsAndTopics(streamsToCache: List<StreamWithTopics>): Completable {
         return streamDao.applyStreams(streamsToCache)
     }
 
@@ -59,9 +75,9 @@ class StreamRepository(
 
     private fun getSearchResponse(request: String): Single<List<Stream>> {
         return if (request.isBlank() || request.length < 2) {
-            getStreams().toSingle()
+            getStreamsWithTopics().toSingle()
         } else {
-            return getStreams()
+            return getStreamsWithTopics()
                 .subscribeOn(Schedulers.io())
                 .flatMapObservable { streams -> streams.toObservable() }
                 .filter { s -> isMatchingPattern(request, s.name) }

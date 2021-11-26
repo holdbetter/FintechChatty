@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:background="@color/activity_background">
+    tools:background="@color/activity_background"
+    tools:viewBindingIgnore="true">
 
     <com.holdbetter.fintechchatproject.ui.MySelfMessageLayout
         android:id="@+id/myself_message"
@@ -19,9 +20,9 @@
         <TextView
             android:id="@+id/message"
             style="@style/MessageLayout.Text.Message"
-            android:longClickable="false"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:longClickable="false"
             tools:text="ok" />
 
         <include

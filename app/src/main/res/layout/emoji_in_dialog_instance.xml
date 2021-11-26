@@ -8,4 +8,5 @@
     android:textColor="#FFFFFF"
     android:textSize="36dp"
     tools:ignore="SpUsage"
-    tools:text="😂" />
+    tools:text="😂"
+    tools:viewBindingIgnore="true" />

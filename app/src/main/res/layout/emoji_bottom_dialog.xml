@@ -7,7 +7,8 @@
     android:orientation="vertical"
     tools:background="@drawable/bottom_dialog_background_shape"
     tools:layout_gravity="bottom"
-    tools:layout_height="346dp">
+    tools:layout_height="346dp"
+    tools:viewBindingIgnore="true">
 
     <FrameLayout
         android:layout_width="88dp"

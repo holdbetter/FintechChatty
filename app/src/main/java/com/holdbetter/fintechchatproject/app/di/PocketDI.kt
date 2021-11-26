@@ -72,7 +72,6 @@ class PocketDI private constructor(app: Application) {
 
     val emojiRepository: IEmojiRepository by lazy { EmojiRepository(database.emojiDao(), connectivityManager) }
     val streamRepository: IStreamRepository by lazy { StreamRepository(database.streamDao(), connectivityManager) }
-    val topicRepository: ITopicRepository by lazy { TopicRepository(database.topicDao()) }
 
     companion object {
         lateinit var INSTANCE: PocketDI

@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:background="@color/activity_background">
+    tools:background="@color/activity_background"
+    tools:viewBindingIgnore="true">
 
     <TextView
         android:id="@+id/topic_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="2"
         android:layout_gravity="center"
-        android:text="@string/no_stream"
-        android:drawablePadding="16dp"
         android:layout_marginBottom="56dp"
+        android:drawablePadding="16dp"
+        android:ellipsize="end"
         android:fontFamily="@font/inter_medium"
+        android:maxLines="2"
+        android:text="@string/no_stream"
         android:textAlignment="center"
         android:textColor="@color/chat_text_color_secondary"
         android:textSize="16sp"

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main_host_fragment"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_host_fragment"
+    android:name="com.holdbetter.fintechchatproject.app.hoster.HostFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:name="com.holdbetter.fintechchatproject.app.hoster.HostFragment"
     android:background="@color/activity_background"
-    tools:context=".app.MainActivity"/>
+    tools:context=".app.MainActivity"
+    tools:viewBindingIgnore="true" />

@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.holdbetter.fintechchatproject.room.ChatDatabase
 
 @Entity(tableName = ChatDatabase.STREAM_TABLE_NAME)
-class HashtagStreamEntity(
+class StreamEntity(
     @PrimaryKey val id: Long,
     val name: String
 )

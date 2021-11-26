@@ -1,5 +1,7 @@
 package com.holdbetter.fintechchatproject.navigation.channels.view
 
+import android.os.Bundle
+import android.view.View
 import androidx.core.os.bundleOf
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.app.di.PocketDI
@@ -22,6 +24,11 @@ class AllStreamsFragment : StreamFragment<AllStreamEffect, StreamState>(
                 arguments = bundleOf()
             }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        store.accept(StreamEvent.Ui.Started)
     }
 
     override fun createStore(): Store<StreamEvent, AllStreamEffect, StreamState> {

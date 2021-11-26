@@ -15,6 +15,14 @@
     <string name="log_out">Log out</string>
     <string name="something_went_wrong">Something went wrong</string>
     <string name="try_again">Try again</string>
+    <string name="try_again_ru">Попробуй еще раз</string>
     <string name="no_stream">We couldn\'t find \n any available stream</string>
-    <string name="loadingisover">loadingIsOver</string>
+    <string name="emoji_loading">Загружаем смайлы</string>
+    <string name="finding_bugs">Ищем жуков</string>
+    <string name="discover_you">Узнаем кто вы</string>
+    <string name="just_one_more_step">Просто еще один шаг</string>
+    <string name="internet_on">Включаем интернеты</string>
+    <string name="loading_is_over">loadingIsOver</string>
+    <string name="subscribed">Subscribed</string>
+    <string name="all_streams">All streams</string>
 </resources>

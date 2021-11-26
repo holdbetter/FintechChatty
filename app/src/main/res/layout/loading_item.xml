@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/internetOn"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:alpha="0"
+    android:elevation="16dp"
+    app:cardCornerRadius="20dp"
+    app:layout_constraintVertical_weight="1"
+    tools:alpha="1"
+    tools:layout_height="80dp"
+    tools:layout_width="match_parent">
+
+    <FrameLayout
+        android:id="@+id/frame_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/emoji_loading_background_selector"
+        android:paddingHorizontal="26dp">
+
+        <TextView
+            android:id="@+id/loading_state"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:drawablePadding="16dp"
+            android:fontFamily="@font/inter_medium"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            tools:drawableLeftCompat="@drawable/interner_sized_load_screen"
+            tools:text="Включаем интернеты" />
+
+    </FrameLayout>
+
+</com.google.android.material.card.MaterialCardView>

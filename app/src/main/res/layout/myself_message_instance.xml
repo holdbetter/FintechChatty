@@ -7,7 +7,8 @@
     android:paddingLeft="50dp"
     android:paddingRight="18dp"
     tools:background="@color/activity_background"
-    tools:ignore="RtlHardcoded,RtlSymmetry">
+    tools:ignore="RtlHardcoded,RtlSymmetry"
+    tools:viewBindingIgnore="true">
 
     <TextView
         android:id="@+id/message"

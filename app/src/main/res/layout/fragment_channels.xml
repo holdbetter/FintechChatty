@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/activity_background">
+    tools:background="@color/activity_background"
+    tools:viewBindingIgnore="true">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -15,9 +16,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="20dp"
-            android:paddingHorizontal="20dp"
-            android:focusableInTouchMode="true"
             android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:paddingHorizontal="20dp"
             app:layout_scrollFlags="enterAlways|scroll">
 
             <EditText
@@ -26,6 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="36dp"
                 android:backgroundTint="#323232"
+                android:enabled="false"
                 android:hint="@string/search_input_hint"
                 android:importantForAutofill="no"
                 android:inputType="textShortMessage"
@@ -34,7 +36,6 @@
                 android:textColor="@color/white"
                 android:textColorHint="@color/white"
                 android:textSize="24sp"
-                android:enabled="false"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/search_image"
                 app:layout_constraintTop_toTopOf="parent"

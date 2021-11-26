@@ -4,21 +4,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
-import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
 import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.model.Topic
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import java.io.IOException
 
-class StreamAdapter(/*val viewModel: StreamViewModel*/) :
+class StreamAdapter :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     object DropdownAngle {
         const val TO_COLLAPSE = 0f
@@ -36,14 +30,16 @@ class StreamAdapter(/*val viewModel: StreamViewModel*/) :
         val view: View
         return when (viewType) {
             StreamViewType.EMPTY_LIST.ordinal -> {
-                view = inflater.inflate(R.layout.no_stream_instance,
+                view = inflater.inflate(
+                    R.layout.no_stream_instance,
                     parent,
-                    false)
+                    false
+                )
                 EmptyViewHolder(view)
             }
             else -> {
                 view = inflater.inflate(R.layout.hashtag_stream_instance, parent, false)
-                StreamViewHolder(/*viewModel,*/ view)
+                StreamViewHolder(view)
             }
         }
     }
@@ -55,7 +51,6 @@ class StreamAdapter(/*val viewModel: StreamViewModel*/) :
                 holder.bind(stream)
             }
         }
-
         // TODO: 10/25/2021 Restoring expand state
     }
 
@@ -77,20 +72,22 @@ class StreamAdapter(/*val viewModel: StreamViewModel*/) :
 
     class EmptyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    class StreamViewHolder(/*val viewModel: StreamViewModel,*/ itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class StreamViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         // TODO: 11/2/2021 Animations support
         private val streamView: TextView = itemView.findViewById(R.id.stream_name)
         private val topicsRecycler: RecyclerView = itemView.findViewById(R.id.topic_nested_list)
         private val dropdown: ImageView = itemView.findViewById(R.id.dropdown)
-        private val topicShimmer: LinearLayout = itemView.findViewById(R.id.topics_shimmer)
-        private val compositeDisposable = CompositeDisposable()
 
         init {
             topicsRecycler.apply {
                 addItemDecoration(
                     DividerItemDecoration(itemView.context, DividerItemDecoration.VERTICAL).apply {
-                        setDrawable(ContextCompat.getDrawable(itemView.context,
-                            R.drawable.alpha_recycler_decorator)!!)
+                        setDrawable(
+                            ContextCompat.getDrawable(
+                                itemView.context,
+                                R.drawable.alpha_recycler_decorator
+                            )!!
+                        )
                     }
                 )
 
@@ -104,70 +101,23 @@ class StreamAdapter(/*val viewModel: StreamViewModel*/) :
             }
         }
 
-        private fun updateTopicsForStream(stream: Stream) {
-            topicsRecycler.isVisible = false
-            topicShimmer.isVisible = true
-//            viewModel.getTopics(stream)
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeBy(
-//                    onNext = { submitTopics(it) },
-//                    onError = { handleError(it, stream) }
-//                )
-//                .addTo(compositeDisposable)
+        fun bind(stream: Stream) {
+            streamView.text = stream.name
+            submitTopics(stream.topics)
+            setOnStreamClickListener(stream)
         }
 
-        private fun submitTopics(topics: List<Topic>) {
-            topicShimmer.isVisible = false
-            topicsRecycler.isVisible = true
-            (topicsRecycler.adapter as TopicAdapter).submitList(topics)
-        }
-
-        fun setOnStreamClickListener(stream: Stream) {
+        private fun setOnStreamClickListener(stream: Stream) {
             itemView.setOnClickListener { recyclerItem ->
                 if (!recyclerItem.isSelected) {
-                    updateTopicsForStream(stream)
-
+                    topicsRecycler.isVisible = true
                     animateDropdownIcon(expand = true)
                     recyclerItem.isSelected = true
+                    submitTopics(stream.topics)
                 } else {
-                    compositeDisposable.clear()
-                    topicShimmer.isVisible = false
                     topicsRecycler.isVisible = false
                     animateDropdownIcon(expand = false)
                     recyclerItem.isSelected = false
-                }
-            }
-        }
-
-        private fun handleError(e: Throwable, stream: Stream) {
-            if (topicShimmer.isVisible) {
-                topicShimmer.isVisible = false
-                (topicsRecycler.adapter as TopicAdapter).submitList(emptyList())
-            }
-
-            val appResource = this.itemView.resources
-            val appTheme = this.itemView.context.theme
-
-            val snackbar = Snackbar.make(this.itemView,
-                "Нет подключения к интернету",
-                Snackbar.LENGTH_INDEFINITE).apply {
-                setActionTextColor(appResource.getColor(R.color.blue_and_green, appTheme))
-                setTextColor(appResource.getColor(android.R.color.black, appTheme))
-                setBackgroundTint(appResource.getColor(R.color.white, appTheme))
-
-                view.findViewById<TextView>(com.google.android.material.R.id.snackbar_action)
-                    .apply {
-                        typeface = ResourcesCompat.getFont(context, R.font.inter_medium)
-                    }
-
-                setAction("Повторить") { updateTopicsForStream(stream) }
-            }
-
-            when (e) {
-                is NotConnectedException, is IOException -> {
-                    if (topicsRecycler.adapter!!.itemCount == 0) {
-                        snackbar.show()
-                    }
                 }
             }
         }
@@ -183,9 +133,8 @@ class StreamAdapter(/*val viewModel: StreamViewModel*/) :
             }
         }
 
-        fun bind(stream: Stream) {
-            streamView.text = stream.name
-            setOnStreamClickListener(stream)
+        private fun submitTopics(topics: List<Topic>) {
+            (topicsRecycler.adapter as TopicAdapter).submitList(topics)
         }
     }
 

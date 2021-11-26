@@ -15,7 +15,7 @@ import com.holdbetter.fintechchatproject.app.MainActivity
 import com.holdbetter.fintechchatproject.model.Topic
 
 class TopicAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var wasSomethingSumbitted: Boolean = false
+    private var wasSomethingSubmitted: Boolean = false
     private val emptyListItemCount = 1
     private val asyncDiffer = AsyncListDiffer(this, TopicDiffUtilCallback())
 
@@ -43,7 +43,7 @@ class TopicAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         asyncDiffer.currentList.size != 0 -> {
             asyncDiffer.currentList.size
         }
-        wasSomethingSumbitted -> {
+        wasSomethingSubmitted -> {
             emptyListItemCount
         }
         else -> {
@@ -52,7 +52,7 @@ class TopicAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     fun submitList(topic: List<Topic>) {
-        wasSomethingSumbitted = true
+        wasSomethingSubmitted = true
         asyncDiffer.submitList(topic)
     }
 

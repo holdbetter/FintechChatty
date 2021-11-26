@@ -18,6 +18,7 @@ buildscript {
     ext.room_version = "2.3.0"
     ext.moshi_version = "1.12.0"
     ext.elmslie = "1.2.0"
+    ext.rozov_binding = "1.4.7"
 
     repositories {
         google()

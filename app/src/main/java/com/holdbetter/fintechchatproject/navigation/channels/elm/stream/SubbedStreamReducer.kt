@@ -10,7 +10,7 @@ class SubbedStreamReducer : DslReducer<StreamEvent, StreamState, SubbedStreamEff
                 commands { +StreamCommand.LoadSubbedStreams }
             }
             StreamEvent.Internal.CacheEmpty -> {
-                commands { +StreamCommand.GoOnline }
+                commands { +StreamCommand.GoOnlineForStreams }
             }
             StreamEvent.Internal.DataLoaded -> commands { +StreamCommand.LoadSubbedStreams }
             is StreamEvent.Internal.DataReady -> {

@@ -8,7 +8,8 @@
     android:clipToPadding="false"
     android:paddingBottom="16dp"
     tools:background="@color/activity_background"
-    tools:context=".navigation.profile.ProfileFragment">
+    tools:context=".navigation.profile.ProfileFragment"
+    tools:viewBindingIgnore="true">
 
     <include
         android:id="@+id/shimmer"
@@ -73,11 +74,11 @@
             android:letterSpacing="0"
             android:paddingHorizontal="52dp"
             android:paddingVertical="8dp"
-            android:visibility="gone"
             android:text="@string/log_out"
             android:textAllCaps="false"
             android:textColor="@color/chat_text_color"
             android:textSize="20sp"
+            android:visibility="gone"
             app:backgroundTint="#1B1B1B"
             app:cornerRadius="31dp"
             app:layout_constraintBottom_toBottomOf="parent"

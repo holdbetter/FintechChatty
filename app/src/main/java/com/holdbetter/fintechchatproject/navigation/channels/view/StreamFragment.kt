@@ -59,8 +59,6 @@ abstract class StreamFragment<Effect : Any, State : Any>(
 
             adapter = StreamAdapter()
         }
-
-        store.accept(StreamEvent.Ui.Started)
     }
 
     override val initEvent: StreamEvent
@@ -84,7 +82,6 @@ abstract class StreamFragment<Effect : Any, State : Any>(
 
                     setAction("Повторить") { store.accept(onErrorRetryEvent) }
                 }
-
         when (e) {
             is NotConnectedException, is IOException -> snackbar.show()
         }

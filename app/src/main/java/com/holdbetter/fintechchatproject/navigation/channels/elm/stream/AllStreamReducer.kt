@@ -10,7 +10,7 @@ class AllStreamReducer : DslReducer<StreamEvent, StreamState, AllStreamEffect, S
                 commands { +StreamCommand.LoadStreams }
             }
             StreamEvent.Internal.CacheEmpty -> {
-                commands { +StreamCommand.GoOnline }
+                commands { +StreamCommand.GoOnlineForStreams }
             }
             StreamEvent.Internal.DataLoaded -> commands { +StreamCommand.LoadStreams }
             is StreamEvent.Internal.DataReady -> {

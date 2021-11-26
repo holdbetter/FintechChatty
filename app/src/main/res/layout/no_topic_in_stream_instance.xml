@@ -6,7 +6,8 @@
     android:gravity="center"
     android:paddingHorizontal="41dp"
     android:paddingVertical="10dp"
-    tools:background="@color/activity_background">
+    tools:background="@color/activity_background"
+    tools:viewBindingIgnore="true">
 
     <TextView
         android:id="@+id/topic_name"

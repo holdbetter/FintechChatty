@@ -8,18 +8,19 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import android.widget.FrameLayout
-import android.widget.ImageView
+import android.widget.TextView
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.app.di.PocketDI
 import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadEffect
 import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadEvent
 import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadState
 import com.holdbetter.fintechchatproject.app.main.NavigationFragment
+import com.holdbetter.fintechchatproject.databinding.FragmentLoadingBinding
 import com.holdbetter.fintechchatproject.services.RxExtensions.delayEach
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -48,30 +49,30 @@ class LoadingFragment :
     private val emptyAnimatorListenerAdapter
         get() = object : AnimatorListenerAdapter() {}
 
-    private lateinit var internetOn: MaterialCardView
-    private lateinit var discoverYou: MaterialCardView
-    private lateinit var emojiLoading: MaterialCardView
-    private lateinit var findingBugs: MaterialCardView
-    private lateinit var justOneMoreStep: MaterialCardView
-    private lateinit var internetOnContent: FrameLayout
-    private lateinit var failed: MaterialButton
-    private lateinit var checkmark: ImageView
-
     private lateinit var viewsToAnimate: List<View>
 
+    private val binding by viewBinding(FragmentLoadingBinding::bind)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        internetOn = view.findViewById(R.id.internetOn)
-        discoverYou = view.findViewById(R.id.discoverYou)
-        emojiLoading = view.findViewById(R.id.emojiLoading)
-        findingBugs = view.findViewById(R.id.findingBugs)
-        justOneMoreStep = view.findViewById(R.id.justOneMoreStep)
-        internetOnContent = view.findViewById(R.id.internetOnContent)
-        checkmark = view.findViewById(R.id.checkmark)
-        failed = view.findViewById(R.id.failed)
+        with(binding) {
+            failed.setOnClickListener { store.accept(EmojiLoadEvent.Ui.RetryClicked) }
+            viewsToAnimate =
+                listOf(emojiLoading.root, findingBugs.root, discoverYou.root, justOneMoreStep.root)
 
-        failed.setOnClickListener { store.accept(EmojiLoadEvent.Ui.RetryClicked) }
+            emojiLoading.loadingState.setupLoadingViewState(R.drawable.turn_on_emoji_load_screen, R.string.emoji_loading)
+            findingBugs.loadingState.setupLoadingViewState(R.drawable.no_bugs_load_screen, R.string.finding_bugs)
+            discoverYou.loadingState.setupLoadingViewState(R.drawable.who_are_you_sized_load_screen, R.string.discover_you)
+            justOneMoreStep.loadingState.setupLoadingViewState(R.drawable.one_more_step_load_screen, R.string.just_one_more_step)
+            internetOn.loadingState.setupLoadingViewState(R.drawable.interner_sized_load_screen, R.string.internet_on)
+        }
+    }
 
-        viewsToAnimate = listOf(emojiLoading, findingBugs, discoverYou, justOneMoreStep)
+    private fun TextView.setupLoadingViewState(
+        @DrawableRes drawableLeftRes: Int,
+        @StringRes textRes: Int
+    ) {
+        text = resources.getText(textRes)
+        setCompoundDrawablesWithIntrinsicBounds(drawableLeftRes, 0, 0, 0)
     }
 
     override fun onDestroyView() {
@@ -89,16 +90,18 @@ class LoadingFragment :
     }
 
     override fun handleEffect(effect: EmojiLoadEffect) {
-        when (effect) {
-            EmojiLoadEffect.Started -> runAnimations()
-            EmojiLoadEffect.Loaded -> pushSuccessView(internetOn)
-            is EmojiLoadEffect.ShowError -> {
-                internetOnContent.isEnabled = false
-                pushErrorView(internetOn)
+        with(binding.internetOn) {
+            when (effect) {
+                EmojiLoadEffect.Started -> runAnimations()
+                EmojiLoadEffect.Loaded -> pushSuccessView(root)
+                is EmojiLoadEffect.ShowError -> {
+                    frameContent.isEnabled = false
+                    pushErrorView(root)
+                }
+                EmojiLoadEffect.StartNavigation -> goToNavigationFragment()
+                EmojiLoadEffect.ReloadPage -> reloadPageState()
+                EmojiLoadEffect.CleanUI -> cleanUI()
             }
-            EmojiLoadEffect.StartNavigation -> goToNavigationFragment()
-            EmojiLoadEffect.ReloadPage -> reloadPageState()
-            EmojiLoadEffect.CleanUI -> cleanUI()
         }
     }
 
@@ -113,16 +116,20 @@ class LoadingFragment :
     }
 
     private fun cleanUI() {
-        val startedAlpha = 0f
-        emojiLoading.alpha = startedAlpha
-        findingBugs.alpha = startedAlpha
-        discoverYou.alpha = startedAlpha
-        justOneMoreStep.alpha = startedAlpha
-        internetOn.alpha = startedAlpha
+        with(binding) {
+            val startedAlpha = 0f
+            emojiLoading.root.alpha = startedAlpha
+            findingBugs.root.alpha = startedAlpha
+            discoverYou.root.alpha = startedAlpha
+            justOneMoreStep.root.alpha = startedAlpha
 
-        internetOnContent.isEnabled = true
+            with(internetOn) {
+                root.alpha = startedAlpha
+                frameContent.isEnabled = true
+            }
 
-        failed.isVisible = false
+            failed.isVisible = false
+        }
     }
 
     private fun pushSuccessView(view: View) {
@@ -136,7 +143,7 @@ class LoadingFragment :
     private fun pushErrorView(view: View) {
         subject.onNext(view to object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator?) {
-                failed.isVisible = true
+                binding.failed.isVisible = true
             }
         })
     }
@@ -151,6 +158,7 @@ class LoadingFragment :
     }
 
     private fun runCheckmarkAnimation() {
+        val checkmark = binding.checkmark
         val animatorDuration = 1000L
         val animDrawable = checkmark.drawable
         val avd = animDrawable as AnimatedVectorDrawable

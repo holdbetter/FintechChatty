@@ -4,17 +4,20 @@ import com.holdbetter.fintechchatproject.domain.entity.EmojiApi
 import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.model.Reaction
 import com.holdbetter.fintechchatproject.model.Topic
-import com.holdbetter.fintechchatproject.room.entity.ApiEmojiEntity
-import com.holdbetter.fintechchatproject.room.entity.EmojiEntity
-import com.holdbetter.fintechchatproject.room.entity.HashtagStreamEntity
-import com.holdbetter.fintechchatproject.room.entity.TopicEntity
+import com.holdbetter.fintechchatproject.room.entity.*
 
 object DatabaseMapper {
-    fun List<HashtagStreamEntity>.toHashtagStream(): List<Stream> {
+    fun List<StreamWithTopics>.toStream(): List<Stream> {
         return map {
             Stream(
-                it.id,
-                it.name
+                it.stream.id,
+                it.stream.name,
+                it.topics.map { topic -> Topic(
+                    topic.maxId,
+                    topic.name,
+                    it.stream.id,
+                    it.stream.name
+                ) }
             )
         }
     }

@@ -34,13 +34,12 @@ class ChannelsFragment :
         channelPager = view.findViewById<ViewPager2>(R.id.channel_pager).apply {
             offscreenPageLimit = 2
             adapter = ChannelPagerAdapter(this@ChannelsFragment)
-            currentItem = 1
         }
 
         TabLayoutMediator(tabLayout, channelPager!!) { tab, position ->
             when (position) {
-                0 -> tab.text = "Subscribed"
-                1 -> tab.text = "All streams"
+                0 -> tab.text = getString(R.string.subscribed)
+                1 -> tab.text = getString(R.string.all_streams)
             }
         }.attach()
 

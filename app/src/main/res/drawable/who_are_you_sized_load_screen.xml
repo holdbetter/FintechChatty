@@ -3,5 +3,5 @@
     <item
         android:width="28dp"
         android:height="28dp"
-        android:drawable="@drawable/whoareyou"/>
+        android:drawable="@drawable/who_are_you"/>
 </layer-list>

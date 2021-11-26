@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.chat.EmojiDialogAdapter
 
 class EmojiBottomModalFragment(private val messageId: Long) : BottomSheetDialogFragment(),
     IOnEmojiSelectedListener {
@@ -52,6 +51,4 @@ class EmojiBottomModalFragment(private val messageId: Long) : BottomSheetDialogF
         const val EMOJI_SELECTED_NAME_KEY = "emojiName"
         const val MESSAGE_ID_KEY = "messageId"
     }
-
-
 }

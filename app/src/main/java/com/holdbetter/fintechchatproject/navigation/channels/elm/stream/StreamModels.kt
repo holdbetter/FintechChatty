@@ -43,7 +43,7 @@ sealed class SubbedStreamEffect {
 
 sealed class StreamCommand {
     object LoadStreams : StreamCommand()
-    object GoOnline : StreamCommand()
+    object GoOnlineForStreams : StreamCommand()
     object DataIsAvailable : StreamCommand()
     object LoadSubbedStreams : StreamCommand()
 }

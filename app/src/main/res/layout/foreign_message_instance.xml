@@ -7,7 +7,8 @@
     android:paddingLeft="12dp"
     android:paddingRight="50dp"
     tools:background="@color/activity_background"
-    tools:ignore="RtlHardcoded,RtlSymmetry">
+    tools:ignore="RtlHardcoded,RtlSymmetry"
+    tools:viewBindingIgnore="true">
 
     <ImageView
         android:layout_width="37dp"
