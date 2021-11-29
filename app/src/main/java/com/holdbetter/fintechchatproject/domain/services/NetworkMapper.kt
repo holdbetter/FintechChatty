@@ -38,6 +38,7 @@ object NetworkMapper {
     fun TopicResponse.toTopicEntity(streamId: Long, streamName: String): List<TopicEntity> {
         return topics.map {
             TopicEntity(
+                0,
                 it.maxId,
                 it.name,
                 streamId,

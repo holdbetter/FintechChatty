@@ -8,8 +8,9 @@ import com.holdbetter.fintechchatproject.room.ChatDatabase
 
 @Entity(tableName = ChatDatabase.TOPIC_TABLE_NAME)
 class TopicEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "max_id") val maxId: Long,
-    @PrimaryKey val name: String,
+    val name: String,
     @ColumnInfo(name = "stream_id") val streamId: Long,
     @ColumnInfo(name = "stream_name") val streamName: String,
     @ColumnInfo(defaultValue = Topic.TOPIC_DEFAULT_HEX) val color: String = Topic.TOPIC_DEFAULT_HEX
