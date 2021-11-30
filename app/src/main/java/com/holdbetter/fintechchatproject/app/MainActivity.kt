@@ -1,18 +1,23 @@
 package com.holdbetter.fintechchatproject.app
 
+import android.net.ConnectivityManager
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.services.ContextExtensions.app
 import com.holdbetter.fintechchatproject.services.connectivity.ChatNetworkCallback
-import com.holdbetter.fintechchatproject.services.connectivity.NetworkState
-import com.holdbetter.fintechchatproject.services.connectivity.NetworkStateHolder
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var networkState: NetworkState
-    private lateinit var networkCallback: ChatNetworkCallback
+    @Inject
+    lateinit var networkCallback: ChatNetworkCallback
+
+    @Inject
+    lateinit var connectivityManager: ConnectivityManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        app.appComponent.inject(this)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
     }
@@ -20,15 +25,12 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        networkState = NetworkState()
-        networkCallback = ChatNetworkCallback(networkState)
-        NetworkStateHolder.bindState(networkState)
-        app.connectivityManager.registerDefaultNetworkCallback(networkCallback)
+        connectivityManager.registerDefaultNetworkCallback(networkCallback)
     }
 
     override fun onPause() {
         super.onPause()
 
-        app.connectivityManager.unregisterNetworkCallback(networkCallback)
+        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 }

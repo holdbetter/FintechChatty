@@ -7,7 +7,7 @@ import com.holdbetter.fintechchatproject.model.Message
 import io.reactivex.rxjava3.core.Single
 import okhttp3.ResponseBody
 
-interface IChatRepository {
+interface IChatRepository: IRepository {
     fun getMessages(narrow: Narrow): Single<List<Message>>
     fun sendMessage(streamId: Long, topicName: String, textMessage: String): Single<SentMessageResponse>
     fun sendReaction(messageId: Long, emojiApi: EmojiApi): Single<ResponseBody>

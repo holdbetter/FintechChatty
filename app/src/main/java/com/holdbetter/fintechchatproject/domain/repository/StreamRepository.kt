@@ -1,6 +1,6 @@
 package com.holdbetter.fintechchatproject.domain.repository
 
-import android.net.ConnectivityManager
+import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toHashtagStreamEntity
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toTopicEntity
 import com.holdbetter.fintechchatproject.model.Stream
@@ -8,7 +8,7 @@ import com.holdbetter.fintechchatproject.room.dao.StreamDao
 import com.holdbetter.fintechchatproject.room.entity.StreamEntity
 import com.holdbetter.fintechchatproject.room.entity.StreamWithTopics
 import com.holdbetter.fintechchatproject.room.services.DatabaseMapper.toStream
-import com.holdbetter.fintechchatproject.services.Util.isConnected
+import com.holdbetter.fintechchatproject.services.connectivity.MyConnectivityManager
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
@@ -18,10 +18,12 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.BehaviorSubject
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class StreamRepository(
+class StreamRepository @Inject constructor(
     private val streamDao: StreamDao,
-    private val connectivityManager: ConnectivityManager
+    private val connectivityManager: MyConnectivityManager,
+    override val api: TinkoffZulipApi
 ) : IStreamRepository {
     override val dataAvailabilityNotifier: BehaviorSubject<Boolean> = BehaviorSubject.create()
     private val searchRequest: PublishSubject<String> = PublishSubject.create()
@@ -33,7 +35,7 @@ class StreamRepository(
     }
 
     override fun getStreamsOnline(): Completable {
-        return isConnected(connectivityManager)
+        return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
             .delay(1000, TimeUnit.MILLISECONDS)
@@ -46,7 +48,7 @@ class StreamRepository(
     }
 
     override fun getTopicsOnline(stream: StreamEntity): Single<StreamWithTopics> {
-        return isConnected(connectivityManager)
+        return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
             .delay(1000, TimeUnit.MILLISECONDS)

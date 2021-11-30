@@ -5,8 +5,9 @@ import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.util.Log
+import javax.inject.Inject
 
-class ChatNetworkCallback(private val networkState: NetworkState): ConnectivityManager.NetworkCallback()  {
+class ChatNetworkCallback @Inject constructor(private val networkState: NetworkState): ConnectivityManager.NetworkCallback()  {
     override fun onAvailable(network: Network) {
         networkState.network = network
         networkState.isNetworkConnected = true

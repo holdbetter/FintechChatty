@@ -1,0 +1,22 @@
+package com.holdbetter.fintechchatproject.services.connectivity
+
+import android.net.ConnectivityManager
+import com.holdbetter.fintechchatproject.services.ContextExtensions.checkConnectionStatusSynchronously
+import io.reactivex.rxjava3.core.Single
+import javax.inject.Inject
+
+class MyConnectivityManager @Inject constructor(
+    private val connectivityManager: ConnectivityManager,
+    private val networkState: INetworkState
+) {
+    val isConnected: Single<Boolean>
+        get() {
+            return Single.just(
+                if (networkState.network != null) {
+                    networkState.isNetworkConnected
+                } else {
+                    connectivityManager.checkConnectionStatusSynchronously()
+                }
+            )
+        }
+}

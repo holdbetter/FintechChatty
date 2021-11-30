@@ -2,6 +2,7 @@ package com.holdbetter.fintechchatproject.app.load
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.content.Context
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
 import android.os.Handler
@@ -15,12 +16,13 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.di.PocketDI
 import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadEffect
 import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadEvent
 import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadState
-import com.holdbetter.fintechchatproject.app.main.NavigationFragment
+import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadingStore
+import com.holdbetter.fintechchatproject.app.bottomnavigation.NavigationFragment
 import com.holdbetter.fintechchatproject.databinding.FragmentLoadingBinding
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
 import com.holdbetter.fintechchatproject.services.RxExtensions.delayEach
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -31,6 +33,7 @@ import io.reactivex.rxjava3.subjects.ReplaySubject
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class LoadingFragment :
     ElmFragment<EmojiLoadEvent, EmojiLoadEffect, EmojiLoadState>(R.layout.fragment_loading) {
@@ -41,6 +44,15 @@ class LoadingFragment :
             }
         }
     }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        app.appComponent.loadingComponent().create().inject(this)
+    }
+
+    @Inject
+    lateinit var loadingElmProvide: EmojiLoadingStore
 
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var subject: ReplaySubject<Pair<View, AnimatorListenerAdapter>> =
@@ -83,8 +95,7 @@ class LoadingFragment :
     override val initEvent: EmojiLoadEvent
         get() = EmojiLoadEvent.Ui.Started
 
-    override fun createStore(): Store<EmojiLoadEvent, EmojiLoadEffect, EmojiLoadState> =
-        PocketDI.LoadingElmProvider.store.provide()
+    override fun createStore(): Store<EmojiLoadEvent, EmojiLoadEffect, EmojiLoadState> = loadingElmProvide.provide()
 
     override fun render(state: EmojiLoadState) {
     }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".navigation.channels.view.AllStreamsFragment"
+    tools:context=".app.bottomnavigation.navigation.channels.view.AllStreamsFragment"
     tools:viewBindingIgnore="true">
 
     <LinearLayout

@@ -1,17 +1,10 @@
 package com.holdbetter.fintechchatproject.app
 
 import android.app.Application
-import android.net.ConnectivityManager
-import androidx.core.content.getSystemService
-import com.holdbetter.fintechchatproject.app.di.PocketDI
-import com.holdbetter.fintechchatproject.room.ChatDatabase
+import com.holdbetter.fintechchatproject.di.DaggerAppComponent
 
 class ChatApplication : Application() {
-    val database by lazy { ChatDatabase.getDatabase(this) }
-    val connectivityManager by lazy { getSystemService<ConnectivityManager>()!! }
-
-    override fun onCreate() {
-        super.onCreate()
-        PocketDI.init(this)
+    val appComponent by lazy {
+        DaggerAppComponent.factory().create(this)
     }
 }

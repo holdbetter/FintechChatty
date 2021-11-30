@@ -1,8 +1,8 @@
 package com.holdbetter.fintechchatproject.domain.repository
 
-import android.net.ConnectivityManager
 import com.holdbetter.fintechchatproject.domain.entity.EmojiApi
 import com.holdbetter.fintechchatproject.domain.entity.EmojiListResponse
+import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toApiEmojiEntityList
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toEmojiApiList
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toEmojiEntityList
@@ -13,14 +13,16 @@ import com.holdbetter.fintechchatproject.room.entity.ApiEmojiEntity
 import com.holdbetter.fintechchatproject.room.entity.EmojiEntity
 import com.holdbetter.fintechchatproject.room.services.DatabaseMapper.toEmojiApiList
 import com.holdbetter.fintechchatproject.room.services.DatabaseMapper.toReactionList
-import com.holdbetter.fintechchatproject.services.Util
+import com.holdbetter.fintechchatproject.services.connectivity.MyConnectivityManager
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
+import javax.inject.Inject
 
-class EmojiRepository(
+class EmojiRepository @Inject constructor(
     private val emojiDao: EmojiDao,
-    private val connectivityManager: ConnectivityManager
+    private val connectivityManager: MyConnectivityManager,
+    override val api: TinkoffZulipApi
 ) : IEmojiRepository {
     override var originalEmojiList: List<EmojiApi> = emptyList()
     override var cleanedEmojiList: List<Reaction> = emptyList()
@@ -30,7 +32,7 @@ class EmojiRepository(
     }
 
     override fun getAllEmojiOnline(): Completable {
-        return Util.isConnected(connectivityManager)
+        return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
             .flatMap { api -> api.getAllEmoji() }

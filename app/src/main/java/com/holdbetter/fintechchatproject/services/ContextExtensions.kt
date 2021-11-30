@@ -8,9 +8,6 @@ import android.util.TypedValue
 import com.holdbetter.fintechchatproject.app.ChatApplication
 
 object ContextExtensions {
-    val Activity.app: ChatApplication
-        get() = application as ChatApplication
-
     fun Context.dpToPx(dp: Float): Int {
         val px = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
@@ -37,4 +34,10 @@ object ContextExtensions {
                         networksCapability.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
             }
     }
+
+    val Context.app
+        get() = when (this) {
+            is Activity -> (application as ChatApplication)
+            else -> (applicationContext as ChatApplication)
+        }
 }
