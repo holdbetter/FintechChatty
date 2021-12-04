@@ -6,6 +6,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
 import dagger.Provides
+import dagger.Reusable
 import okhttp3.Credentials
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -32,6 +33,7 @@ class DomainModule {
         Credentials.basic(TinkoffZulipCredentials.MAIL, TinkoffZulipCredentials.API_KEY)
 
     @Provides
+    @Reusable
     fun getAuthInterceptor(
         @AuthHeader header: String,
         @ApiCredentials credentials: String
@@ -52,25 +54,39 @@ class DomainModule {
     }
 
     @Provides
+    @Reusable
     fun getOkHttpClient(interceptor: Interceptor): OkHttpClient {
         return OkHttpClient.Builder().addInterceptor(interceptor).build()
     }
 
     @Provides
     @ApplicationScope
-    fun getRetrofit(@BaseApiUrl chatApiBaseUrl: String, authClient: OkHttpClient): Retrofit {
+    fun getRetrofit(
+        @BaseApiUrl chatApiBaseUrl: String,
+        authClient: OkHttpClient,
+        moshiConverterFactory: MoshiConverterFactory,
+        rxJava3CallAdapterFactory: RxJava3CallAdapterFactory
+    ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(chatApiBaseUrl)
-            .addConverterFactory(
-                MoshiConverterFactory.create(
-                    Moshi.Builder()
-                        .add(KotlinJsonAdapterFactory())
-                        .build()
-                )
-            )
-            .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+            .addConverterFactory(moshiConverterFactory)
+            .addCallAdapterFactory(rxJava3CallAdapterFactory)
             .client(authClient)
             .build()
+    }
+
+    @Provides
+    fun getMoshiFactory(): MoshiConverterFactory {
+        return MoshiConverterFactory.create(
+            Moshi.Builder()
+                .add(KotlinJsonAdapterFactory())
+                .build()
+        )
+    }
+
+    @Provides
+    fun getCallAdapter(): RxJava3CallAdapterFactory {
+        return RxJava3CallAdapterFactory.create()
     }
 
     @Provides
