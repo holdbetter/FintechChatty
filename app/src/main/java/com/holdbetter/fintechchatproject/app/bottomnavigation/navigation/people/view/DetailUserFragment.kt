@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.appbar.MaterialToolbar
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.databinding.FragmentUserDetailBinding
 
 class DetailUserFragment : Fragment(R.layout.fragment_user_detail) {
     companion object {
@@ -18,10 +20,12 @@ class DetailUserFragment : Fragment(R.layout.fragment_user_detail) {
         }
     }
 
+    private val binding by viewBinding(FragmentUserDetailBinding::bind)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val userId = requireArguments().getLong(USER_ID)
 
-        view.findViewById<MaterialToolbar>(R.id.profile_toolbar).apply {
+        binding.profileToolbar.apply {
             setNavigationOnClickListener {
                 requireActivity().supportFragmentManager.popBackStack()
             }

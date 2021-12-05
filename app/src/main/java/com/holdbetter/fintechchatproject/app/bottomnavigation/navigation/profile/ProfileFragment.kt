@@ -10,6 +10,7 @@ import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -21,6 +22,7 @@ import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile
 import com.holdbetter.fintechchatproject.model.User
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.view.IUserViewer
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.view.UserNotFoundFragment
+import com.holdbetter.fintechchatproject.databinding.FragmentProfileBinding
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
@@ -39,20 +41,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
     private val viewModel: PersonalViewModel by activityViewModels()
     private val compositeDisposable = CompositeDisposable()
 
-    private var shimmer: ConstraintLayout? = null
-    private var content: ConstraintLayout? = null
-    private var avatar: ImageView? = null
-    private var nameView: TextView? = null
-    private var statusView: TextView? = null
+    private val binding by viewBinding(FragmentProfileBinding::bind)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        shimmer = view.findViewById(R.id.shimmer)
-        content = view.findViewById(R.id.profile_content)
-        avatar = view.findViewById(R.id.user_image)
-        nameView = view.findViewById(R.id.user_name)
-        statusView = view.findViewById(R.id.user_online_status)
-
-        view.findViewById<MaterialButton>(R.id.log_out).setOnClickListener {
+        binding.logOut.setOnClickListener {
             Toast.makeText(it.context, "No action yet!", Toast.LENGTH_SHORT).show()
         }
 
@@ -65,21 +57,25 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
     }
 
     override fun startShimming() {
-        content!!.isVisible = false
-        shimmer!!.isVisible = true
+        with(binding) {
+            profileContent.isVisible = false
+            shimmer.root.isVisible = true
 
-        shimmer!!.children.filter { it is ShimmerFrameLayout }
-            .map { it as ShimmerFrameLayout }
-            .forEach { it.startShimmer() }
+            shimmer.root.children.filter { it is ShimmerFrameLayout }
+                .map { it as ShimmerFrameLayout }
+                .forEach { it.startShimmer() }
+        }
     }
 
     override fun stopShimming() {
-        shimmer!!.children.filter { it is ShimmerFrameLayout }
-            .map { it as ShimmerFrameLayout }
-            .forEach { it.stopShimmer() }
+        with(binding) {
+            shimmer.root.children.filter { it is ShimmerFrameLayout }
+                .map { it as ShimmerFrameLayout }
+                .forEach { it.stopShimmer() }
 
-        shimmer!!.isVisible = false
-        content!!.isVisible = true
+            shimmer.root.isVisible = false
+            profileContent.isVisible = true
+        }
     }
 
     override fun setImage(avatarUrl: String) {
@@ -87,7 +83,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
             .load(avatarUrl)
             .transform(CenterInside(), RoundedCorners(15))
             .override(Target.SIZE_ORIGINAL)
-            .into(avatar!!)
+            .into(binding.userImage)
     }
 
     override fun bind() {
@@ -111,12 +107,14 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
     }
 
     override fun setUserName(name: String) {
-        this.nameView!!.text = name
+        binding.userName.text = name
     }
 
     override fun setStatus(isOnline: Boolean, statusText: String) {
-        this.statusView!!.text = statusText
-        this.statusView!!.isEnabled = isOnline
+        with(binding) {
+            userOnlineStatus.text = statusText
+            userOnlineStatus.isEnabled = isOnline
+        }
     }
 
     override fun handleError(throwable: Throwable) {

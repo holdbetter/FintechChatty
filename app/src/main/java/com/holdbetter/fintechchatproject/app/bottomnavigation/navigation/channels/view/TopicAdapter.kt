@@ -5,16 +5,18 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.chat.ChatFragment
 import com.holdbetter.fintechchatproject.app.MainActivity
+import com.holdbetter.fintechchatproject.app.chat.ChatFragment
+import com.holdbetter.fintechchatproject.databinding.TopicInstanceBinding
 import com.holdbetter.fintechchatproject.model.Topic
 
-class TopicAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class TopicAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private var wasSomethingSubmitted: Boolean = false
     private val emptyListItemCount = 1
     private val asyncDiffer = AsyncListDiffer(this, TopicDiffUtilCallback())
@@ -22,13 +24,20 @@ class TopicAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         when (viewType) {
-            TopicViewType.TOPIC_INSTANCE.ordinal -> return TopicViewHolder(inflater.inflate(R.layout.topic_instance,
-                parent,
-                false))
-            TopicViewType.NO_TOPICS_IN_THIS_STREAM.ordinal -> return EmptyViewHolder(inflater.inflate(
-                R.layout.no_topic_in_stream_instance,
-                parent,
-                false))
+            TopicViewType.TOPIC_INSTANCE.ordinal -> return TopicViewHolder(
+                TopicInstanceBinding.inflate(
+                    inflater,
+                    parent,
+                    false
+                ), onTopicClicked
+            )
+            TopicViewType.NO_TOPICS_IN_THIS_STREAM.ordinal -> return EmptyViewHolder(
+                inflater.inflate(
+                    R.layout.no_topic_in_stream_instance,
+                    parent,
+                    false
+                )
+            )
         }
         throw Exception("No corresponding viewType for $viewType value")
     }
@@ -62,32 +71,19 @@ class TopicAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         TopicViewType.TOPIC_INSTANCE.ordinal
     }
 
-    class TopicViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val name: TextView = itemView.findViewById(R.id.topic_name)
-        val count: TextView = itemView.findViewById(R.id.topic_messages_count)
-
+    class TopicViewHolder(
+        private val binding: TopicInstanceBinding,
+        private val onTopicClicked: (Context, Topic) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(topic: Topic) {
-            name.text = topic.name
-            itemView.setBackgroundColor(Color.parseColor(topic.color))
+            with(binding) {
+                topicName.text = topic.name
+                root.setBackgroundColor(Color.parseColor(topic.color))
 
-            itemView.setOnClickListener {
-                navigateToChat(it.context, topic)
+                root.setOnClickListener {
+                    onTopicClicked(it.context, topic)
+                }
             }
-        }
-
-        private fun navigateToChat(
-            context: Context,
-            topic: Topic,
-        ) {
-            val mainActivity = context as MainActivity
-            val chatFragment =
-                ChatFragment.newInstance(topic.streamId, topic.streamName, topic.name)
-
-            mainActivity.supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.main_host_fragment, chatFragment)
-                .addToBackStack(null)
-                .commitAllowingStateLoss()
         }
     }
 

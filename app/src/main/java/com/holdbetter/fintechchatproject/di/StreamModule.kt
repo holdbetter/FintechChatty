@@ -8,5 +8,6 @@ import dagger.Module
 @Module
 interface StreamModule {
     @Binds
+    @ApplicationScope
     fun getStreamRepository(streamRepository: StreamRepository): IStreamRepository
 }

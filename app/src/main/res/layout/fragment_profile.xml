@@ -9,7 +9,7 @@
     android:paddingBottom="16dp"
     tools:background="@color/activity_background"
     tools:context=".app.bottomnavigation.navigation.profile.ProfileFragment"
-    tools:viewBindingIgnore="true">
+    >
 
     <include
         android:id="@+id/shimmer"

@@ -8,8 +8,7 @@
     android:clipToPadding="false"
     android:paddingBottom="16dp"
     tools:background="@color/activity_background"
-    tools:context=".app.chat.ChatFragment"
-    tools:viewBindingIgnore="true">
+    tools:context=".app.chat.ChatFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"

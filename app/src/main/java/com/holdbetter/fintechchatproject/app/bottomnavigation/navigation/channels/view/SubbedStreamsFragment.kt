@@ -14,8 +14,7 @@ import vivid.money.elmslie.core.store.Store
 import javax.inject.Inject
 
 class SubbedStreamsFragment : StreamFragment<SubbedStreamEffect, StreamState>(
-    StreamEvent.Ui.Started,
-    R.layout.fragment_streams_sub_or_not
+    StreamEvent.Ui.Started
 ), IStreamFragment {
 
     companion object {

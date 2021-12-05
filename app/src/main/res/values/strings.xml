@@ -25,4 +25,6 @@
     <string name="loading_is_over">loadingIsOver</string>
     <string name="subscribed">Subscribed</string>
     <string name="all_streams">All streams</string>
+    <string name="no_connection">Нет подключения к интернету</string>
+    <string name="no_connection_try_again">Повторить</string>
 </resources>

@@ -10,13 +10,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.app.MainActivity
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.view.DetailUserFragment
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.view.IPeopleViewer
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.view.ShimmerPlaceholderUserListAdapter
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.view.UserAdapter
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.viewmodel.PeopleViewModel
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.viewmodel.PeopleViewModelFactory
+import com.holdbetter.fintechchatproject.databinding.FragmentPeopleBinding
 import com.holdbetter.fintechchatproject.model.User
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -43,9 +47,7 @@ class PeopleFragment : Fragment(R.layout.fragment_people), IPeopleViewer {
 
     private val compositeDisposable = CompositeDisposable()
 
-    private var userRecycler: RecyclerView? = null
-    private var content: View? = null
-    private var shimmer: ShimmerFrameLayout? = null
+    private val binding by viewBinding(FragmentPeopleBinding::bind)
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -54,24 +56,36 @@ class PeopleFragment : Fragment(R.layout.fragment_people), IPeopleViewer {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        content = view.findViewById(R.id.people_content)
-        shimmer = view.findViewById(R.id.shimmer)
+        with(binding) {
+            shimmerContent.apply {
+                adapter = ShimmerPlaceholderUserListAdapter(this.context)
+            }
 
-        val shimmerContent = view.findViewById<ListView>(R.id.shimmer_content).apply {
-            adapter = ShimmerPlaceholderUserListAdapter(this.context)
-        }
-
-        userRecycler = view.findViewById(R.id.users_list)
-        userRecycler?.apply {
-            addItemDecoration(DividerItemDecoration(view.context,
-                DividerItemDecoration.VERTICAL).apply {
-                setDrawable(ContextCompat.getDrawable(view.context,
-                    R.drawable.user_divider_empty_background)!!)
-            })
-            adapter = UserAdapter()
+            usersList.apply {
+                addItemDecoration(DividerItemDecoration(view.context,
+                    DividerItemDecoration.VERTICAL).apply {
+                    setDrawable(ContextCompat.getDrawable(view.context,
+                        R.drawable.user_divider_empty_background)!!)
+                })
+                adapter = UserAdapter(::navigateToUser)
+            }
         }
 
         this.bind()
+    }
+
+    private fun navigateToUser(
+        context: Context,
+        user: User,
+    ) {
+        val mainActivity = context as MainActivity
+        val detailUserFragment = DetailUserFragment.newInstance(user.id)
+
+        mainActivity.supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.main_host_fragment, detailUserFragment)
+            .addToBackStack(null)
+            .commitAllowingStateLoss()
     }
 
     override fun bind() {
@@ -85,15 +99,19 @@ class PeopleFragment : Fragment(R.layout.fragment_people), IPeopleViewer {
     }
 
     override fun startShimmer() {
-        content!!.isVisible = false
-        shimmer!!.isVisible = true
-        shimmer!!.startShimmer()
+        with(binding) {
+            peopleContent.isVisible = false
+            shimmer.isVisible = true
+            shimmer.startShimmer()
+        }
     }
 
     override fun stopShimmer() {
-        shimmer!!.stopShimmer()
-        shimmer!!.isVisible = false
-        content!!.isVisible = true
+        with(binding) {
+            shimmer.stopShimmer()
+            shimmer.isVisible = false
+            peopleContent.isVisible = true
+        }
     }
 
     override fun onDestroyView() {
@@ -106,6 +124,6 @@ class PeopleFragment : Fragment(R.layout.fragment_people), IPeopleViewer {
     }
 
     override fun setUsers(users: List<User>) {
-        (userRecycler!!.adapter as UserAdapter).submitList(users)
+        (binding.usersList.adapter as UserAdapter).submitList(users)
     }
 }

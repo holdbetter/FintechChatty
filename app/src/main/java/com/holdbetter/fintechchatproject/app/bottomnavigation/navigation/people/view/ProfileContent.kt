@@ -2,28 +2,28 @@ package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people
 
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.target.Target
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.model.User
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.viewmodel.PeopleViewModel
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.view.IUserViewer
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.view.UserNotFoundFragment
+import com.holdbetter.fintechchatproject.databinding.UserDetailInstanceBinding
+import com.holdbetter.fintechchatproject.model.User
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlin.properties.Delegates.notNull
 
 class ProfileContent : Fragment(R.layout.user_detail_instance), IUserViewer {
     companion object {
@@ -36,33 +36,20 @@ class ProfileContent : Fragment(R.layout.user_detail_instance), IUserViewer {
         }
     }
 
-    private var userId: Long? = null
+    private var userId: Long by notNull()
+
     private val viewModel: PeopleViewModel by activityViewModels()
     private val compositeDisposable = CompositeDisposable()
 
-    private var content: ConstraintLayout? = null
-    private var shimmer: ConstraintLayout? = null
-
-    private var avatar: ImageView? = null
-    private var nameView: TextView? = null
-    private var statusView: TextView? = null
+    private val binding by viewBinding(UserDetailInstanceBinding::bind)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         userId = requireArguments().getLong(DetailUserFragment.USER_ID)
-
-        shimmer = view.findViewById(R.id.shimmer)
-        content = view.findViewById(R.id.profile_content)
-
-        avatar = view.findViewById(R.id.user_image)
-        nameView = view.findViewById(R.id.user_name)
-        statusView = view.findViewById(R.id.user_online_status)
-
         this.bind()
     }
 
     override fun bind() {
         startShimming()
-        val userId = userId!!
         viewModel.getUsersById(userId)
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess { stopShimming() }
@@ -91,41 +78,49 @@ class ProfileContent : Fragment(R.layout.user_detail_instance), IUserViewer {
             .load(avatarUrl)
             .transform(CenterInside(), RoundedCorners(15))
             .override(Target.SIZE_ORIGINAL)
-            .into(avatar!!)
+            .into(binding.userImage)
     }
 
     override fun setUserName(name: String) {
-        this.nameView!!.text = name
+        binding.userName.text = name
     }
 
     override fun startShimming() {
-        content!!.isVisible = false
-        shimmer!!.isVisible = true
+        with(binding) {
+            profileContent.isVisible = false
+            shimmer.root.isVisible = true
 
-        shimmer!!.children.filter { it is ShimmerFrameLayout }
-            .map { it as ShimmerFrameLayout }
-            .forEach { it.startShimmer() }
+            shimmer.root.children.filter { it is ShimmerFrameLayout }
+                .map { it as ShimmerFrameLayout }
+                .forEach { it.startShimmer() }
+        }
     }
 
     override fun stopShimming() {
-        shimmer!!.children.filter { it is ShimmerFrameLayout }
-            .map { it as ShimmerFrameLayout }
-            .forEach { it.stopShimmer() }
+        with(binding) {
+            shimmer.root.children.filter { it is ShimmerFrameLayout }
+                .map { it as ShimmerFrameLayout }
+                .forEach { it.stopShimmer() }
 
-        shimmer!!.isVisible = false
-        content!!.isVisible = true
+            shimmer.root.isVisible = false
+            profileContent.isVisible = true
+        }
     }
 
     override fun setStatus(isOnline: Boolean, statusText: String) {
-        this.statusView!!.text = statusText
-        this.statusView!!.isEnabled = isOnline
+        with(binding) {
+            userOnlineStatus.text = statusText
+            userOnlineStatus.isEnabled = isOnline
+        }
     }
 
     override fun handleError(throwable: Throwable) {
         parentFragmentManager.beginTransaction()
-            .replace(R.id.container,
-                UserNotFoundFragment.newInstance(userId!!),
-                UserNotFoundFragment::class.java.name)
+            .replace(
+                R.id.container,
+                UserNotFoundFragment.newInstance(userId),
+                UserNotFoundFragment::class.java.name
+            )
             .commitAllowingStateLoss()
     }
 }

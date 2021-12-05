@@ -7,8 +7,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-    tools:context=".app.bottomnavigation.navigation.channels.view.AllStreamsFragment"
-    tools:viewBindingIgnore="true">
+    tools:context=".app.bottomnavigation.navigation.channels.view.StreamFragment">
 
     <LinearLayout
         android:layout_width="match_parent"

@@ -9,8 +9,7 @@
     android:focusable="true"
     android:paddingHorizontal="15dp"
     android:paddingVertical="4dp"
-    tools:background="@color/activity_background"
-    tools:viewBindingIgnore="true">
+    tools:background="@color/activity_background">
 
     <ImageView
         android:id="@+id/user_image"

@@ -1,18 +1,18 @@
 package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.view
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.databinding.HashtagStreamInstanceBinding
 import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.model.Topic
 
-class StreamAdapter :
+class StreamAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     object DropdownAngle {
         const val TO_COLLAPSE = 0f
@@ -27,19 +27,25 @@ class StreamAdapter :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val view: View
         return when (viewType) {
             StreamViewType.EMPTY_LIST.ordinal -> {
-                view = inflater.inflate(
-                    R.layout.no_stream_instance,
-                    parent,
-                    false
+                EmptyViewHolder(
+                    inflater.inflate(
+                        R.layout.no_stream_instance,
+                        parent,
+                        false
+                    )
                 )
-                EmptyViewHolder(view)
             }
             else -> {
-                view = inflater.inflate(R.layout.hashtag_stream_instance, parent, false)
-                StreamViewHolder(view)
+                StreamViewHolder(
+                    HashtagStreamInstanceBinding.inflate(
+                        inflater,
+                        parent,
+                        false
+                    ),
+                    onTopicClicked
+                )
             }
         }
     }
@@ -72,58 +78,66 @@ class StreamAdapter :
 
     class EmptyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    class StreamViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class StreamViewHolder(
+        private val binding: HashtagStreamInstanceBinding,
+        onTopicClicked: (Context, Topic) -> Unit
+    ) :
+        RecyclerView.ViewHolder(binding.root) {
         // TODO: 11/2/2021 Animations support
-        private val streamView: TextView = itemView.findViewById(R.id.stream_name)
-        private val topicsRecycler: RecyclerView = itemView.findViewById(R.id.topic_nested_list)
-        private val dropdown: ImageView = itemView.findViewById(R.id.dropdown)
 
         init {
-            topicsRecycler.apply {
-                addItemDecoration(
-                    DividerItemDecoration(itemView.context, DividerItemDecoration.VERTICAL).apply {
-                        setDrawable(
-                            ContextCompat.getDrawable(
-                                itemView.context,
-                                R.drawable.alpha_recycler_decorator
-                            )!!
-                        )
-                    }
-                )
+            with(binding) {
+                topicNestedList.apply {
+                    addItemDecoration(
+                        DividerItemDecoration(
+                            itemView.context,
+                            DividerItemDecoration.VERTICAL
+                        ).apply {
+                            setDrawable(
+                                ContextCompat.getDrawable(
+                                    itemView.context,
+                                    R.drawable.alpha_recycler_decorator
+                                )!!
+                            )
+                        }
+                    )
 
-                layoutManager = object : LinearLayoutManager(this.context, VERTICAL, false) {
-                    override fun supportsPredictiveItemAnimations(): Boolean {
-                        return false
+                    layoutManager = object : LinearLayoutManager(this.context, VERTICAL, false) {
+                        override fun supportsPredictiveItemAnimations(): Boolean {
+                            return false
+                        }
                     }
+
+                    adapter = TopicAdapter(onTopicClicked)
                 }
-
-                topicsRecycler.adapter = TopicAdapter()
             }
         }
 
         fun bind(stream: Stream) {
-            streamView.text = stream.name
+            binding.streamName.text = stream.name
             submitTopics(stream.topics)
             setOnStreamClickListener(stream)
         }
 
         private fun setOnStreamClickListener(stream: Stream) {
-            itemView.setOnClickListener { recyclerItem ->
-                if (!recyclerItem.isSelected) {
-                    topicsRecycler.isVisible = true
-                    animateDropdownIcon(expand = true)
-                    recyclerItem.isSelected = true
-                    submitTopics(stream.topics)
-                } else {
-                    topicsRecycler.isVisible = false
-                    animateDropdownIcon(expand = false)
-                    recyclerItem.isSelected = false
+            with(binding) {
+                root.setOnClickListener { recyclerItem ->
+                    if (!recyclerItem.isSelected) {
+                        topicNestedList.isVisible = true
+                        animateDropdownIcon(expand = true)
+                        recyclerItem.isSelected = true
+                        submitTopics(stream.topics)
+                    } else {
+                        topicNestedList.isVisible = false
+                        animateDropdownIcon(expand = false)
+                        recyclerItem.isSelected = false
+                    }
                 }
             }
         }
 
         private fun animateDropdownIcon(expand: Boolean) {
-            val dropdownAnimator = dropdown.animate()
+            val dropdownAnimator = binding.dropdown.animate()
             dropdownAnimator.duration = 200
 
             if (expand) {
@@ -134,7 +148,7 @@ class StreamAdapter :
         }
 
         private fun submitTopics(topics: List<Topic>) {
-            (topicsRecycler.adapter as TopicAdapter).submitList(topics)
+            (binding.topicNestedList.adapter as TopicAdapter).submitList(topics)
         }
     }
 
