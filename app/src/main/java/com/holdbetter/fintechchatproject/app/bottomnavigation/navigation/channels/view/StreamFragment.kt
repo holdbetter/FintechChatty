@@ -3,9 +3,7 @@ package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channe
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +17,7 @@ import com.holdbetter.fintechchatproject.databinding.FragmentStreamsSubOrNotBind
 import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
 import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.model.Topic
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.createStyledSnackbar
 import vivid.money.elmslie.android.base.ElmFragment
 import java.io.IOException
 
@@ -62,31 +61,13 @@ abstract class StreamFragment<Effect : Any, State : Any>(
         get() = StreamEvent.Ui.Init
 
     fun handleError(e: Throwable) {
-        val appResource = resources
-        val appTheme = requireActivity().theme
-
-        val snackbar = Snackbar.make(
-            requireView(),
-            getString(R.string.no_connection),
-            Snackbar.LENGTH_INDEFINITE
-        ).apply {
-            setActionTextColor(appResource.getColor(R.color.blue_and_green, appTheme))
-            setTextColor(appResource.getColor(android.R.color.black, appTheme))
-            setBackgroundTint(appResource.getColor(R.color.white, appTheme))
-
-            view.findViewById<TextView>(com.google.android.material.R.id.snackbar_action)
-                .apply {
-                    typeface = ResourcesCompat.getFont(context, R.font.inter_medium)
-                }
-
-            setAction(getString(R.string.no_connection_try_again)) {
-                store.accept(
-                    onErrorRetryEvent
-                )
-            }
-        }
         when (e) {
-            is NotConnectedException, is IOException -> snackbar.show()
+            is NotConnectedException, is IOException -> createStyledSnackbar(
+                R.string.no_connection,
+                actionTextId = R.string.try_again,
+                action = { store.accept(onErrorRetryEvent) },
+                length = Snackbar.LENGTH_INDEFINITE
+            ).show()
         }
     }
 

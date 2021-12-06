@@ -2,6 +2,7 @@ package com.holdbetter.fintechchatproject.di
 
 import com.holdbetter.fintechchatproject.room.ChatDatabase
 import com.holdbetter.fintechchatproject.room.dao.EmojiDao
+import com.holdbetter.fintechchatproject.room.dao.PeopleDao
 import com.holdbetter.fintechchatproject.room.dao.StreamDao
 import dagger.Module
 import dagger.Provides
@@ -10,6 +11,9 @@ import dagger.Provides
 class DaoModule {
     @Provides
     fun getEmojiDao(chatDatabase: ChatDatabase): EmojiDao = chatDatabase.emojiDao()
+
+    @Provides
+    fun getPeopleDao(chatDatabase: ChatDatabase): PeopleDao = chatDatabase.peopleDao()
 
     @Provides
     fun getStreamDao(chatDatabase: ChatDatabase): StreamDao = chatDatabase.streamDao()

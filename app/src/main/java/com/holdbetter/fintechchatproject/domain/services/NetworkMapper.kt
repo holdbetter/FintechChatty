@@ -5,10 +5,7 @@ import com.holdbetter.fintechchatproject.model.*
 import com.holdbetter.fintechchatproject.model.Message
 import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.model.Topic
-import com.holdbetter.fintechchatproject.room.entity.ApiEmojiEntity
-import com.holdbetter.fintechchatproject.room.entity.EmojiEntity
-import com.holdbetter.fintechchatproject.room.entity.StreamEntity
-import com.holdbetter.fintechchatproject.room.entity.TopicEntity
+import com.holdbetter.fintechchatproject.room.entity.*
 
 object NetworkMapper {
     fun StreamResponse.toHashtagStream(): MutableList<Stream> {
@@ -73,8 +70,8 @@ object NetworkMapper {
         )
     }
 
-    fun Member.toUser(): User {
-        return User(
+    fun Member.toUserEntity(): UserEntity {
+        return UserEntity(
             this.userID,
             this.fullName,
             this.email,

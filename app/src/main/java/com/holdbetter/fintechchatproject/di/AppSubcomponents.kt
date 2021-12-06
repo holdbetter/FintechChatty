@@ -2,6 +2,7 @@ package com.holdbetter.fintechchatproject.di
 
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.ChannelsSubcomponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.StreamSubcomponent
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di.DetailUserSubcomponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di.PeopleSubcomponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.di.NavigationSubcomponent
 import com.holdbetter.fintechchatproject.app.chat.di.ChatSubcomponent
@@ -17,7 +18,8 @@ import dagger.Module
         StreamSubcomponent::class,
         PeopleSubcomponent::class,
         NavigationSubcomponent::class,
-        ChatSubcomponent::class
+        ChatSubcomponent::class,
+        DetailUserSubcomponent::class
     ]
 )
 class AppSubcomponents

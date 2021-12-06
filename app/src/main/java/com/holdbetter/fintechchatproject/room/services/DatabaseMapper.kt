@@ -4,6 +4,7 @@ import com.holdbetter.fintechchatproject.domain.entity.EmojiApi
 import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.model.Reaction
 import com.holdbetter.fintechchatproject.model.Topic
+import com.holdbetter.fintechchatproject.model.User
 import com.holdbetter.fintechchatproject.room.entity.*
 
 object DatabaseMapper {
@@ -50,5 +51,18 @@ object DatabaseMapper {
                 it.emojiCode
             )
         }
+    }
+
+    fun List<UserEntity>.toUserList(): List<User> {
+        return map { it.toUser() }
+    }
+
+    fun UserEntity.toUser(): User {
+        return User(
+            this.id,
+            this.name,
+            this.mail,
+            this.avatarUrl
+        )
     }
 }

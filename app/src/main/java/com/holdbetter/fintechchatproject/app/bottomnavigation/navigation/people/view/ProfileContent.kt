@@ -1,12 +1,11 @@
 package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.view
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterInside
@@ -14,18 +13,21 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.target.Target
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.viewmodel.PeopleViewModel
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserEffect
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserEvent
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserState
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserStore
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.view.IUserViewer
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.view.UserNotFoundFragment
 import com.holdbetter.fintechchatproject.databinding.UserDetailInstanceBinding
 import com.holdbetter.fintechchatproject.model.User
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
+import vivid.money.elmslie.android.base.ElmFragment
+import vivid.money.elmslie.core.store.Store
+import javax.inject.Inject
 import kotlin.properties.Delegates.notNull
 
-class ProfileContent : Fragment(R.layout.user_detail_instance), IUserViewer {
+class ProfileContent : ElmFragment<DetailUserEvent, DetailUserEffect, DetailUserState>(R.layout.user_detail_instance), IUserViewer {
     companion object {
         private const val USER_ID = "user"
 
@@ -38,39 +40,42 @@ class ProfileContent : Fragment(R.layout.user_detail_instance), IUserViewer {
 
     private var userId: Long by notNull()
 
-    private val viewModel: PeopleViewModel by activityViewModels()
-    private val compositeDisposable = CompositeDisposable()
-
     private val binding by viewBinding(UserDetailInstanceBinding::bind)
+
+    @Inject
+    lateinit var detailELmStore: DetailUserStore
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        app.appComponent.detailUserComponent().create().inject(this)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         userId = requireArguments().getLong(DetailUserFragment.USER_ID)
-        this.bind()
+        store.accept(DetailUserEvent.Ui.Started(userId))
     }
 
-    override fun bind() {
-        startShimming()
-        viewModel.getUsersById(userId)
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess { stopShimming() }
-            .subscribeBy(
-                onSuccess = ::bindUser,
-                onError = ::handleError
-            ).addTo(compositeDisposable)
+    override val initEvent: DetailUserEvent
+        get() = DetailUserEvent.Ui.Init
+
+    override fun createStore(): Store<DetailUserEvent, DetailUserEffect, DetailUserState> {
+        return detailELmStore.provide()
+    }
+
+    override fun render(state: DetailUserState) {
+        shimming(state.isLoading)
+        state.user?.let(::bindUser)
+    }
+
+    override fun handleEffect(effect: DetailUserEffect): Unit {
+        return when(effect) {
+            DetailUserEffect.ShowError -> handleError()
+        }
     }
 
     private fun bindUser(user: User) {
         setUserName(user.name)
         setImage(user.avatarUrl)
-    }
-
-    override fun unbind() {
-        compositeDisposable.clear()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        this.unbind()
     }
 
     override fun setImage(avatarUrl: String) {
@@ -85,25 +90,14 @@ class ProfileContent : Fragment(R.layout.user_detail_instance), IUserViewer {
         binding.userName.text = name
     }
 
-    override fun startShimming() {
+    override fun shimming(turnOn: Boolean) {
         with(binding) {
-            profileContent.isVisible = false
-            shimmer.root.isVisible = true
-
+            shimmer.root.isVisible = turnOn
             shimmer.root.children.filter { it is ShimmerFrameLayout }
                 .map { it as ShimmerFrameLayout }
-                .forEach { it.startShimmer() }
-        }
-    }
+                .forEach { if (turnOn) it.startShimmer() else it.stopShimmer() }
 
-    override fun stopShimming() {
-        with(binding) {
-            shimmer.root.children.filter { it is ShimmerFrameLayout }
-                .map { it as ShimmerFrameLayout }
-                .forEach { it.stopShimmer() }
-
-            shimmer.root.isVisible = false
-            profileContent.isVisible = true
+            profileContent.isVisible = !turnOn
         }
     }
 
@@ -114,7 +108,7 @@ class ProfileContent : Fragment(R.layout.user_detail_instance), IUserViewer {
         }
     }
 
-    override fun handleError(throwable: Throwable) {
+    override fun handleError() {
         parentFragmentManager.beginTransaction()
             .replace(
                 R.id.container,

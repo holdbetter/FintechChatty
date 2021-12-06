@@ -38,9 +38,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
         }
     }
 
-    private val viewModel: PersonalViewModel by activityViewModels()
-    private val compositeDisposable = CompositeDisposable()
-
+//    private val viewModel: PersonalViewModel by activityViewModels()
     private val binding by viewBinding(FragmentProfileBinding::bind)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -48,34 +46,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
             Toast.makeText(it.context, "No action yet!", Toast.LENGTH_SHORT).show()
         }
 
-        this.bind()
+//        this.bind()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        this.unbind()
-    }
-
-    override fun startShimming() {
-        with(binding) {
-            profileContent.isVisible = false
-            shimmer.root.isVisible = true
-
-            shimmer.root.children.filter { it is ShimmerFrameLayout }
-                .map { it as ShimmerFrameLayout }
-                .forEach { it.startShimmer() }
-        }
-    }
-
-    override fun stopShimming() {
-        with(binding) {
-            shimmer.root.children.filter { it is ShimmerFrameLayout }
-                .map { it as ShimmerFrameLayout }
-                .forEach { it.stopShimmer() }
-
-            shimmer.root.isVisible = false
-            profileContent.isVisible = true
-        }
+    override fun shimming(turnOn: Boolean) {
+//        TODO("Not yet implemented")
     }
 
     override fun setImage(avatarUrl: String) {
@@ -86,20 +61,16 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
             .into(binding.userImage)
     }
 
-    override fun bind() {
-        startShimming()
-        viewModel.getMyself()
-            .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess { stopShimming() }
-            .subscribeBy(
-                onSuccess = ::bindUser,
-                onError = ::handleError
-            ).addTo(compositeDisposable)
-    }
-
-    override fun unbind() {
-        compositeDisposable.clear()
-    }
+//    override fun bind() {
+//        startShimming()
+//        viewModel.getMyself()
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .doOnSuccess { stopShimming() }
+//            .subscribeBy(
+//                onSuccess = ::bindUser,
+//                onError = ::handleError
+//            ).addTo(compositeDisposable)
+//    }
 
     private fun bindUser(user: User) {
         setUserName(user.name)
@@ -117,7 +88,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
         }
     }
 
-    override fun handleError(throwable: Throwable) {
+    override fun handleError() {
         parentFragmentManager.beginTransaction()
             .replace(R.id.bottom_navigation_container,
                 UserNotFoundFragment.newInstance(),

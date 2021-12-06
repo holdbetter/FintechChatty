@@ -9,5 +9,4 @@ import dagger.Module
 interface PeopleModule {
     @Binds
     fun getPeopleRepository(peopleRepository: PeopleRepository): IPeopleRepository
-
 }

@@ -5,11 +5,7 @@ interface IUserViewer {
     fun setUserName(name: String)
     fun setStatus(isOnline: Boolean, statusText: String)
 
-    fun startShimming()
-    fun stopShimming()
+    fun shimming(turnOn: Boolean)
 
-    fun handleError(throwable: Throwable)
-
-    fun bind()
-    fun unbind()
+    fun handleError()
 }

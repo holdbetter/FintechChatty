@@ -4,6 +4,7 @@ import android.app.Application
 import com.holdbetter.fintechchatproject.app.MainActivity
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.ChannelsSubcomponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.StreamSubcomponent
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di.DetailUserSubcomponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di.PeopleSubcomponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.di.NavigationSubcomponent
 import com.holdbetter.fintechchatproject.app.chat.di.ChatSubcomponent
@@ -38,4 +39,5 @@ abstract class AppComponent {
     abstract fun peopleComponent(): PeopleSubcomponent.Factory
     abstract fun navigationComponent(): NavigationSubcomponent.Factory
     abstract fun chatComponent(): ChatSubcomponent.Factory
+    abstract fun detailUserComponent(): DetailUserSubcomponent.Factory
 }
