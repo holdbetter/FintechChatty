@@ -1,6 +1,7 @@
-package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.di
+package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.di
 
 import com.holdbetter.fintechchatproject.app.bottomnavigation.NavigationFragment
+import com.holdbetter.fintechchatproject.di.ProfileModule
 import dagger.Subcomponent
 
 @Subcomponent(modules = [ProfileModule::class])

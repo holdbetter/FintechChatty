@@ -61,8 +61,8 @@ object NetworkMapper {
         }
     }
 
-    fun UserResponse.toUser(): User {
-        return User(
+    fun UserResponse.toPersonalEntity(): PersonalEntity {
+        return PersonalEntity(
             this.userID,
             this.fullName,
             this.email,

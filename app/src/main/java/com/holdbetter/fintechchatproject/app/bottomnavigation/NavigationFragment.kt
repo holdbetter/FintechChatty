@@ -5,17 +5,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.ChannelsFragment
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.PeopleFragment
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.ProfileFragment
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.viewmodel.PersonalViewModel
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.viewmodel.PersonalViewModelFactory
 import com.holdbetter.fintechchatproject.databinding.FragmentNavigationBinding
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
-import javax.inject.Inject
 
 class NavigationFragment : Fragment(R.layout.fragment_navigation) {
     companion object {
@@ -23,16 +19,15 @@ class NavigationFragment : Fragment(R.layout.fragment_navigation) {
 
         fun newInstance(defaultBottomNavigationViewSelectedId: Int): NavigationFragment {
             return NavigationFragment().apply {
-                arguments = bundleOf(Pair(
-                    DEFAULT_BOTTOM_NAV_SELECTED_ID_KEY,
-                    defaultBottomNavigationViewSelectedId))
+                arguments = bundleOf(
+                    Pair(
+                        DEFAULT_BOTTOM_NAV_SELECTED_ID_KEY,
+                        defaultBottomNavigationViewSelectedId
+                    )
+                )
             }
         }
     }
-
-    // initialize point for continuous sharing
-    @Inject
-    lateinit var personalViewModelFactory: PersonalViewModelFactory
 
     private val binding by viewBinding(FragmentNavigationBinding::bind)
 
@@ -40,7 +35,6 @@ class NavigationFragment : Fragment(R.layout.fragment_navigation) {
         super.onAttach(context)
 
         app.appComponent.navigationComponent().create().inject(this)
-        ViewModelProvider(requireActivity().viewModelStore, personalViewModelFactory).get(PersonalViewModel::class.java)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,30 +62,36 @@ class NavigationFragment : Fragment(R.layout.fragment_navigation) {
     private fun navigateToChannels() {
         if (childFragmentManager.findFragmentByTag(ChannelsFragment::class.java.name) == null) {
             childFragmentManager.beginTransaction()
-                .replace(R.id.bottom_navigation_container,
+                .replace(
+                    R.id.bottom_navigation_container,
                     ChannelsFragment.newInstance(),
-                    ChannelsFragment::class.java.name)
-                .commit()
+                    ChannelsFragment::class.java.name
+                )
+                .commitAllowingStateLoss()
         }
     }
 
     private fun navigateToPeople() {
         if (childFragmentManager.findFragmentByTag(PeopleFragment::class.java.name) == null) {
             childFragmentManager.beginTransaction()
-                .replace(R.id.bottom_navigation_container,
+                .replace(
+                    R.id.bottom_navigation_container,
                     PeopleFragment.newInstance(),
-                    PeopleFragment::class.java.name)
-                .commit()
+                    PeopleFragment::class.java.name
+                )
+                .commitAllowingStateLoss()
         }
     }
 
     private fun navigateToProfile() {
         if (childFragmentManager.findFragmentByTag(ProfileFragment::class.java.name) == null) {
             childFragmentManager.beginTransaction()
-                .replace(R.id.bottom_navigation_container,
+                .replace(
+                    R.id.bottom_navigation_container,
                     ProfileFragment.newInstance(),
-                    ProfileFragment::class.java.name)
-                .commit()
+                    ProfileFragment::class.java.name
+                )
+                .commitAllowingStateLoss()
         }
     }
 }

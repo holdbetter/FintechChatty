@@ -1,6 +1,5 @@
 package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.view
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -8,12 +7,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.MainActivity
 import com.holdbetter.fintechchatproject.databinding.UserListInstanceBinding
 import com.holdbetter.fintechchatproject.model.User
 
-class UserAdapter(val onUserClicked: (Context, User) -> Unit) : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
+class UserAdapter(val onUserClicked: (User) -> Unit) :
+    RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
     private val asyncDiffer = AsyncListDiffer(this, UserDiffUtil())
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
@@ -50,7 +48,7 @@ class UserAdapter(val onUserClicked: (Context, User) -> Unit) : RecyclerView.Ada
 
     class UserViewHolder(
         private val binding: UserListInstanceBinding,
-        private val onUserClicked: (Context, User) -> Unit
+        private val onUserClicked: (User) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(user: User) {
             with(binding) {
@@ -63,7 +61,7 @@ class UserAdapter(val onUserClicked: (Context, User) -> Unit) : RecyclerView.Ada
                 userMail.text = user.mail
 
                 root.setOnClickListener {
-                   onUserClicked(root.context, user)
+                    onUserClicked(user)
                 }
             }
         }

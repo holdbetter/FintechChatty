@@ -4,9 +4,10 @@ import android.app.Application
 import com.holdbetter.fintechchatproject.app.MainActivity
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.ChannelsSubcomponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.StreamSubcomponent
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.di.NavigationSubcomponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di.DetailUserSubcomponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di.PeopleSubcomponent
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.di.NavigationSubcomponent
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.di.ProfileSubcomponent
 import com.holdbetter.fintechchatproject.app.chat.di.ChatSubcomponent
 import com.holdbetter.fintechchatproject.app.hoster.di.HostSubcomponent
 import com.holdbetter.fintechchatproject.app.load.di.LoadingSubcomponent
@@ -21,7 +22,8 @@ import dagger.Component
         DaoModule::class,
         EmojiModule::class,
         StreamModule::class,
-        DomainModule::class
+        DomainModule::class,
+        ProfileModule::class
     ]
 )
 abstract class AppComponent {
@@ -40,4 +42,5 @@ abstract class AppComponent {
     abstract fun navigationComponent(): NavigationSubcomponent.Factory
     abstract fun chatComponent(): ChatSubcomponent.Factory
     abstract fun detailUserComponent(): DetailUserSubcomponent.Factory
+    abstract fun profileComponent(): ProfileSubcomponent.Factory
 }

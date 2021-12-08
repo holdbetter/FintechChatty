@@ -17,8 +17,6 @@ import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserEvent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserState
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserStore
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.view.IUserViewer
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.view.UserNotFoundFragment
 import com.holdbetter.fintechchatproject.databinding.UserDetailInstanceBinding
 import com.holdbetter.fintechchatproject.model.User
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
@@ -27,12 +25,14 @@ import vivid.money.elmslie.core.store.Store
 import javax.inject.Inject
 import kotlin.properties.Delegates.notNull
 
-class ProfileContent : ElmFragment<DetailUserEvent, DetailUserEffect, DetailUserState>(R.layout.user_detail_instance), IUserViewer {
+class DetailUserContent :
+    ElmFragment<DetailUserEvent, DetailUserEffect, DetailUserState>(R.layout.user_detail_instance),
+    IDetailUserViewer {
     companion object {
         private const val USER_ID = "user"
 
-        fun newInstance(userId: Long): ProfileContent {
-            return ProfileContent().apply {
+        fun newInstance(userId: Long): DetailUserContent {
+            return DetailUserContent().apply {
                 arguments = bundleOf(USER_ID to userId)
             }
         }
@@ -64,30 +64,31 @@ class ProfileContent : ElmFragment<DetailUserEvent, DetailUserEffect, DetailUser
 
     override fun render(state: DetailUserState) {
         shimming(state.isLoading)
-        state.user?.let(::bindUser)
+        bindUser(state.user)
     }
 
     override fun handleEffect(effect: DetailUserEffect): Unit {
-        return when(effect) {
+        return when (effect) {
             DetailUserEffect.ShowError -> handleError()
         }
     }
 
-    private fun bindUser(user: User) {
-        setUserName(user.name)
-        setImage(user.avatarUrl)
-    }
+    override fun bindUser(user: User?) {
+        with(binding) {
+            if (user != null) {
+                binding.userName.text = user.name
 
-    override fun setImage(avatarUrl: String) {
-        Glide.with(this)
-            .load(avatarUrl)
-            .transform(CenterInside(), RoundedCorners(15))
-            .override(Target.SIZE_ORIGINAL)
-            .into(binding.userImage)
-    }
+                Glide.with(this@DetailUserContent)
+                    .load(user.avatarUrl)
+                    .transform(CenterInside(), RoundedCorners(15))
+                    .override(Target.SIZE_ORIGINAL)
+                    .into(binding.userImage)
 
-    override fun setUserName(name: String) {
-        binding.userName.text = name
+                profileContent.isVisible = true
+            } else {
+                profileContent.isVisible = false
+            }
+        }
     }
 
     override fun shimming(turnOn: Boolean) {
@@ -96,15 +97,6 @@ class ProfileContent : ElmFragment<DetailUserEvent, DetailUserEffect, DetailUser
             shimmer.root.children.filter { it is ShimmerFrameLayout }
                 .map { it as ShimmerFrameLayout }
                 .forEach { if (turnOn) it.startShimmer() else it.stopShimmer() }
-
-            profileContent.isVisible = !turnOn
-        }
-    }
-
-    override fun setStatus(isOnline: Boolean, statusText: String) {
-        with(binding) {
-            userOnlineStatus.text = statusText
-            userOnlineStatus.isEnabled = isOnline
         }
     }
 

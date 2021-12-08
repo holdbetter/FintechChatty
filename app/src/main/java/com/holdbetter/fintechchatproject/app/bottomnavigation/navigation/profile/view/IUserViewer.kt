@@ -1,11 +1,10 @@
 package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.view
 
+import com.holdbetter.fintechchatproject.model.User
+
 interface IUserViewer {
-    fun setImage(avatarUrl: String)
-    fun setUserName(name: String)
-    fun setStatus(isOnline: Boolean, statusText: String)
+    fun bindUser(user: User?)
 
     fun shimming(turnOn: Boolean)
-
-    fun handleError()
+    fun handleError(error: Throwable)
 }

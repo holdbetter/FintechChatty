@@ -1,34 +1,37 @@
 package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterInside
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.target.Target
 import com.facebook.shimmer.ShimmerFrameLayout
-import com.google.android.material.button.MaterialButton
+import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.viewmodel.PersonalViewModel
-import com.holdbetter.fintechchatproject.model.User
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.elm.ProfileEffect
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.elm.ProfileEvent
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.elm.ProfileState
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.elm.ProfileStore
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.view.IUserViewer
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.view.UserNotFoundFragment
 import com.holdbetter.fintechchatproject.databinding.FragmentProfileBinding
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.kotlin.addTo
-import io.reactivex.rxjava3.kotlin.subscribeBy
+import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
+import com.holdbetter.fintechchatproject.model.User
+import com.holdbetter.fintechchatproject.room.services.UnexpectedRoomException
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.createStyledSnackbar
+import vivid.money.elmslie.android.base.ElmFragment
+import vivid.money.elmslie.core.store.Store
+import java.io.IOException
+import javax.inject.Inject
 
-class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
+class ProfileFragment :
+    ElmFragment<ProfileEvent, ProfileEffect, ProfileState>(R.layout.fragment_profile), IUserViewer {
     companion object {
         fun newInstance(): ProfileFragment {
             val bundle = Bundle()
@@ -38,61 +41,97 @@ class ProfileFragment : Fragment(R.layout.fragment_profile), IUserViewer {
         }
     }
 
-//    private val viewModel: PersonalViewModel by activityViewModels()
     private val binding by viewBinding(FragmentProfileBinding::bind)
+
+    @Inject
+    lateinit var profileElmProvider: ProfileStore
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        app.appComponent.profileComponent().create().inject(this)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.logOut.setOnClickListener {
             Toast.makeText(it.context, "No action yet!", Toast.LENGTH_SHORT).show()
         }
 
-//        this.bind()
-    }
-
-    override fun shimming(turnOn: Boolean) {
-//        TODO("Not yet implemented")
-    }
-
-    override fun setImage(avatarUrl: String) {
-        Glide.with(this)
-            .load(avatarUrl)
-            .transform(CenterInside(), RoundedCorners(15))
-            .override(Target.SIZE_ORIGINAL)
-            .into(binding.userImage)
-    }
-
-//    override fun bind() {
-//        startShimming()
-//        viewModel.getMyself()
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .doOnSuccess { stopShimming() }
-//            .subscribeBy(
-//                onSuccess = ::bindUser,
-//                onError = ::handleError
-//            ).addTo(compositeDisposable)
-//    }
-
-    private fun bindUser(user: User) {
-        setUserName(user.name)
-        setImage(user.avatarUrl)
-    }
-
-    override fun setUserName(name: String) {
-        binding.userName.text = name
-    }
-
-    override fun setStatus(isOnline: Boolean, statusText: String) {
-        with(binding) {
-            userOnlineStatus.text = statusText
-            userOnlineStatus.isEnabled = isOnline
+        if (store.currentState.user == null) {
+            store.accept(ProfileEvent.Ui.Started)
         }
     }
 
-    override fun handleError() {
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.bottom_navigation_container,
-                UserNotFoundFragment.newInstance(),
-                UserNotFoundFragment::class.java.name)
-            .commitAllowingStateLoss()
+    override val initEvent: ProfileEvent
+        get() = ProfileEvent.Ui.Init
+
+    override fun createStore(): Store<ProfileEvent, ProfileEffect, ProfileState> {
+        return profileElmProvider.provide()
+    }
+
+    override fun render(state: ProfileState) {
+        shimming(state.isLoading)
+        bindUser(state.user)
+        cacheEmptyUi(state.isCacheEmpty)
+    }
+
+    private fun cacheEmptyUi(isCacheEmpty: Boolean) {
+        with(binding) {
+            cacheEmptyText.isVisible = isCacheEmpty
+        }
+    }
+
+    override fun shimming(turnOn: Boolean) {
+        with(binding) {
+            shimmer.root.isVisible = turnOn
+            shimmer.root.children.filter { it is ShimmerFrameLayout }
+                .map { it as ShimmerFrameLayout }
+                .forEach { if (turnOn) it.startShimmer() else it.stopShimmer() }
+        }
+    }
+
+    override fun bindUser(user: User?) {
+        with(binding) {
+            if (user != null) {
+                binding.userName.text = user.name
+
+                Glide.with(this@ProfileFragment)
+                    .load(user.avatarUrl)
+                    .transform(CenterInside(), RoundedCorners(15))
+                    .override(Target.SIZE_ORIGINAL)
+                    .into(binding.userImage)
+
+                profileContent.isVisible = true
+            } else {
+                profileContent.isVisible = false
+            }
+        }
+    }
+
+    override fun handleEffect(effect: ProfileEffect): Unit {
+        return when (effect) {
+            is ProfileEffect.ShowError -> handleError(effect.error)
+        }
+    }
+
+    override fun handleError(error: Throwable) {
+        val snackbar = createStyledSnackbar()
+        when (error) {
+            is UnexpectedRoomException -> {
+                snackbar.setText(R.string.unexpected_room_exception)
+            }
+            is IOException, is NotConnectedException -> {
+                snackbar.setText(R.string.no_connection)
+                snackbar.duration = Snackbar.LENGTH_INDEFINITE
+                snackbar.setAction(R.string.try_again) { store.accept(ProfileEvent.Ui.Retry) }
+            }
+            else -> {
+                snackbar.setText(R.string.undefined_error_message)
+                snackbar.duration = Snackbar.LENGTH_INDEFINITE
+                snackbar.setAction(R.string.reload) { store.accept(ProfileEvent.Ui.Retry) }
+            }
+        }
+
+        snackbar.show()
     }
 }

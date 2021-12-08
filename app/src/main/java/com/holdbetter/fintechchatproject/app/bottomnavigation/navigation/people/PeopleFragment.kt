@@ -68,7 +68,7 @@ class PeopleFragment :
                         )!!
                     )
                 })
-                adapter = UserAdapter(::navigateToUser)
+                adapter = UserAdapter(::userOnClick)
             }
         }
 
@@ -101,8 +101,7 @@ class PeopleFragment :
 
     override fun handleEffect(effect: PeopleEffect): Unit {
         return when (effect) {
-            is PeopleEffect.NavigateToUser -> {
-            }
+            is PeopleEffect.NavigateToUser -> navigateToUser(requireActivity(), effect.user)
             is PeopleEffect.ShowError -> handleError(effect.error)
         }
     }
@@ -111,11 +110,11 @@ class PeopleFragment :
         val snackbar = createStyledSnackbar()
         when (error) {
             is UnexpectedRoomException -> {
-                snackbar.setText(R.string.unexpeteced_room_exception)
+                snackbar.setText(R.string.unexpected_room_exception)
             }
             is IOException, is NotConnectedException -> {
                 snackbar.setText(R.string.no_connection)
-                snackbar.duration = Snackbar.LENGTH_INDEFINITE
+                snackbar.duration = Snackbar.LENGTH_LONG
                 snackbar.setAction(R.string.try_again) { store.accept(PeopleEvent.Ui.Retry) }
             }
             else -> {
@@ -126,6 +125,10 @@ class PeopleFragment :
         }
 
         snackbar.show()
+    }
+
+    private fun userOnClick(user: User) {
+        store.accept(PeopleEvent.Ui.UserClicked(user))
     }
 
     private fun navigateToUser(

@@ -7,6 +7,7 @@ import android.graphics.drawable.AnimatedVectorDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.TextView
@@ -16,11 +17,11 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadEffect
-import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadEvent
-import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadState
-import com.holdbetter.fintechchatproject.app.load.elm.EmojiLoadingStore
 import com.holdbetter.fintechchatproject.app.bottomnavigation.NavigationFragment
+import com.holdbetter.fintechchatproject.app.load.elm.DataPrefetchEffect
+import com.holdbetter.fintechchatproject.app.load.elm.DataPrefetchEvent
+import com.holdbetter.fintechchatproject.app.load.elm.DataPrefetchState
+import com.holdbetter.fintechchatproject.app.load.elm.DataPrefetchStore
 import com.holdbetter.fintechchatproject.databinding.FragmentLoadingBinding
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
 import com.holdbetter.fintechchatproject.services.RxExtensions.delayEach
@@ -36,7 +37,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class LoadingFragment :
-    ElmFragment<EmojiLoadEvent, EmojiLoadEffect, EmojiLoadState>(R.layout.fragment_loading) {
+    ElmFragment<DataPrefetchEvent, DataPrefetchEffect, DataPrefetchState>(R.layout.fragment_loading) {
     companion object {
         fun newInstance(): LoadingFragment {
             return LoadingFragment().apply {
@@ -45,14 +46,8 @@ class LoadingFragment :
         }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-
-        app.appComponent.loadingComponent().create().inject(this)
-    }
-
     @Inject
-    lateinit var loadingElmProvide: EmojiLoadingStore
+    lateinit var prefetchElmProvide: DataPrefetchStore
 
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var subject: ReplaySubject<Pair<View, AnimatorListenerAdapter>> =
@@ -65,17 +60,38 @@ class LoadingFragment :
 
     private val binding by viewBinding(FragmentLoadingBinding::bind)
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        app.appComponent.loadingComponent().create().inject(this)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
-            failed.setOnClickListener { store.accept(EmojiLoadEvent.Ui.RetryClicked) }
+            failed.setOnClickListener { store.accept(DataPrefetchEvent.Ui.RetryClicked) }
             viewsToAnimate =
                 listOf(emojiLoading.root, findingBugs.root, discoverYou.root, justOneMoreStep.root)
 
-            emojiLoading.loadingState.setupLoadingViewState(R.drawable.turn_on_emoji_load_screen, R.string.emoji_loading)
-            findingBugs.loadingState.setupLoadingViewState(R.drawable.no_bugs_load_screen, R.string.finding_bugs)
-            discoverYou.loadingState.setupLoadingViewState(R.drawable.who_are_you_sized_load_screen, R.string.discover_you)
-            justOneMoreStep.loadingState.setupLoadingViewState(R.drawable.one_more_step_load_screen, R.string.just_one_more_step)
-            internetOn.loadingState.setupLoadingViewState(R.drawable.interner_sized_load_screen, R.string.internet_on)
+            emojiLoading.loadingState.setupLoadingViewState(
+                R.drawable.turn_on_emoji_load_screen,
+                R.string.emoji_loading
+            )
+            findingBugs.loadingState.setupLoadingViewState(
+                R.drawable.no_bugs_load_screen,
+                R.string.finding_bugs
+            )
+            discoverYou.loadingState.setupLoadingViewState(
+                R.drawable.who_are_you_sized_load_screen,
+                R.string.discover_you
+            )
+            justOneMoreStep.loadingState.setupLoadingViewState(
+                R.drawable.one_more_step_load_screen,
+                R.string.just_one_more_step
+            )
+            internetOn.loadingState.setupLoadingViewState(
+                R.drawable.internet_sized_load_screen,
+                R.string.internet_on
+            )
         }
     }
 
@@ -92,26 +108,30 @@ class LoadingFragment :
         compositeDisposable.dispose()
     }
 
-    override val initEvent: EmojiLoadEvent
-        get() = EmojiLoadEvent.Ui.Started
+    override val initEvent: DataPrefetchEvent
+        get() = DataPrefetchEvent.Ui.Started
 
-    override fun createStore(): Store<EmojiLoadEvent, EmojiLoadEffect, EmojiLoadState> = loadingElmProvide.provide()
+    override fun createStore(): Store<DataPrefetchEvent, DataPrefetchEffect, DataPrefetchState> =
+        prefetchElmProvide.provide()
 
-    override fun render(state: EmojiLoadState) {
+    override fun render(state: DataPrefetchState) {
+        if (state.error != null) {
+            Log.d("error", "handle")
+        }
     }
 
-    override fun handleEffect(effect: EmojiLoadEffect) {
+    override fun handleEffect(effect: DataPrefetchEffect) {
         with(binding.internetOn) {
             when (effect) {
-                EmojiLoadEffect.Started -> runAnimations()
-                EmojiLoadEffect.Loaded -> pushSuccessView(root)
-                is EmojiLoadEffect.ShowError -> {
+                DataPrefetchEffect.Started -> runAnimations()
+                DataPrefetchEffect.Loaded -> pushSuccessView(root)
+                is DataPrefetchEffect.ShowError -> {
                     frameContent.isEnabled = false
                     pushErrorView(root)
                 }
-                EmojiLoadEffect.StartNavigation -> goToNavigationFragment()
-                EmojiLoadEffect.ReloadPage -> reloadPageState()
-                EmojiLoadEffect.CleanUI -> cleanUI()
+                DataPrefetchEffect.StartNavigation -> goToNavigationFragment()
+                DataPrefetchEffect.ReloadPage -> reloadPageState()
+                DataPrefetchEffect.CleanUI -> cleanUI()
             }
         }
     }
@@ -181,12 +201,15 @@ class LoadingFragment :
 
     private fun postAnimationOver(delayInMillis: Long) {
         Handler(Looper.getMainLooper())
-            .postDelayed({ store.accept(EmojiLoadEvent.Ui.SuccessAnimationsOver) }, delayInMillis)
+            .postDelayed(
+                { store.accept(DataPrefetchEvent.Ui.SuccessAnimationsOver) },
+                delayInMillis
+            )
     }
 
     private fun reloadPageState() {
         subject = ReplaySubject.create()
-        store.accept(EmojiLoadEvent.Ui.Started)
+        store.accept(DataPrefetchEvent.Ui.Started)
     }
 
     private fun goToNavigationFragment() {

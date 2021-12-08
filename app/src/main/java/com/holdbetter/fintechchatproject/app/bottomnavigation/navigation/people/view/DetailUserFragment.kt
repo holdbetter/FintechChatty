@@ -5,7 +5,6 @@ import android.view.View
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.google.android.material.appbar.MaterialToolbar
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.databinding.FragmentUserDetailBinding
 
@@ -32,7 +31,7 @@ class DetailUserFragment : Fragment(R.layout.fragment_user_detail) {
         }
 
         childFragmentManager.beginTransaction()
-            .add(R.id.container, ProfileContent.newInstance(userId))
+            .add(R.id.container, DetailUserContent.newInstance(userId))
             .commitAllowingStateLoss()
     }
 }

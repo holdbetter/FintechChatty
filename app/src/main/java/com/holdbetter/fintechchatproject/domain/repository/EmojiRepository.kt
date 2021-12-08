@@ -1,5 +1,6 @@
 package com.holdbetter.fintechchatproject.domain.repository
 
+import com.holdbetter.fintechchatproject.di.ApplicationScope
 import com.holdbetter.fintechchatproject.domain.entity.EmojiApi
 import com.holdbetter.fintechchatproject.domain.entity.EmojiListResponse
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
@@ -19,6 +20,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import javax.inject.Inject
 
+@ApplicationScope
 class EmojiRepository @Inject constructor(
     private val emojiDao: EmojiDao,
     private val connectivityManager: MyConnectivityManager,
@@ -29,6 +31,7 @@ class EmojiRepository @Inject constructor(
 
     override fun getEmojiCached(): Single<Pair<List<EmojiEntity>, List<ApiEmojiEntity>>> {
         return emojiDao.getEmojiVariations()
+            .subscribeOn(Schedulers.io())
     }
 
     override fun getAllEmojiOnline(): Completable {

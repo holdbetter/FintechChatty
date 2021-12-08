@@ -1,6 +1,6 @@
 package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di
 
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.view.ProfileContent
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.view.DetailUserContent
 import dagger.Subcomponent
 
 @Subcomponent(modules = [PeopleModule::class])
@@ -10,5 +10,5 @@ interface DetailUserSubcomponent {
         fun create(): DetailUserSubcomponent
     }
 
-    fun inject(profileContent: ProfileContent)
+    fun inject(detailUserContent: DetailUserContent)
 }

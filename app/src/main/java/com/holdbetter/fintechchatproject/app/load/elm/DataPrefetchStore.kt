@@ -3,11 +3,11 @@ package com.holdbetter.fintechchatproject.app.load.elm
 import vivid.money.elmslie.core.store.ElmStore
 import javax.inject.Inject
 
-class EmojiLoadingStore @Inject constructor(private val actor: EmojiActor) {
+class DataPrefetchStore @Inject constructor(private val actor: DataPrefetchActor) {
     private val store by lazy {
         ElmStore(
-            initialState = EmojiLoadState(error = null),
-            reducer = EmojiReducer(),
+            initialState = DataPrefetchState(error = null),
+            reducer = DataPrefetchReducer(),
             actor = actor
         )
     }
