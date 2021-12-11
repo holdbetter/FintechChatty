@@ -3,13 +3,12 @@ package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channe
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
 import androidx.core.widget.doOnTextChanged
-import androidx.viewpager2.widget.ViewPager2
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.ChannelsComponent
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.DaggerChannelsComponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.channel.ChannelModel
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.channel.ChannelStore
 import com.holdbetter.fintechchatproject.databinding.FragmentChannelsBinding
@@ -34,12 +33,22 @@ class ChannelsFragment :
     @Inject
     lateinit var channelsElmProvider: ChannelStore
 
+    lateinit var channelComponent: ChannelsComponent
+
     private val binding by viewBinding(FragmentChannelsBinding::bind)
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        app.appComponent.channelsComponent().create().inject(this)
+        with(app.appComponent) {
+            channelComponent = DaggerChannelsComponent.factory().create(
+                androidDependencies = this,
+                domainDependencies = this,
+                repositoryDependencies = this
+            )
+        }
+
+        channelComponent.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -69,9 +78,23 @@ class ChannelsFragment :
     override val initEvent: ChannelModel.ChannelEvent
         get() = ChannelModel.ChannelEvent.Ui.Started
 
-    override fun createStore(): Store<ChannelModel.ChannelEvent, ChannelModel.ChannelEffect, ChannelModel.ChannelState> = channelsElmProvider.provide()
+    override fun createStore(): Store<ChannelModel.ChannelEvent, ChannelModel.ChannelEffect, ChannelModel.ChannelState> =
+        channelsElmProvider.provide()
 
-    override fun render(state: ChannelModel.ChannelState) {
-        binding.streamSearchInput.isEnabled = state.isReadyToSearch
+    override fun render(state: ChannelModel.ChannelState) {}
+
+    override fun handleEffect(effect: ChannelModel.ChannelEffect): Unit {
+        return when (effect) {
+            ChannelModel.ChannelEffect.DataNotEmpty -> enableSearch()
+        }
+    }
+
+    private fun enableSearch() {
+        with(binding) {
+            streamSearchInput.isEnabled = true
+            store.currentState.lastSearchRequest?.let {
+                streamSearchInput.setText(it)
+            }
+        }
     }
 }

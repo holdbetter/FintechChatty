@@ -15,7 +15,6 @@ class HostActor @Inject constructor(
     override fun execute(command: CacheCommand): Observable<InitializerCacheEvent.Internal> {
         return when (command) {
             CacheCommand.Initialize -> emojiRepository.getEmojiCached()
-                .doOnSuccess { emojiRepository.applyCacheIfNotEmpty(it) }
                 .filter { continueIfListNotEmpty(it) }
                 .flatMap { personalRepository.getCachedMyself() }
                 .isEmpty

@@ -10,6 +10,8 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.app.MainActivity
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di.DaggerPeopleComponent
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di.PeopleComponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.PeopleEffect
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.PeopleEvent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.PeopleState
@@ -45,9 +47,20 @@ class PeopleFragment :
     @Inject
     lateinit var peopleStore: PeopleStore
 
+    lateinit var peopleComponent: PeopleComponent
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        app.appComponent.peopleComponent().create().inject(this)
+
+        with(app.appComponent) {
+            peopleComponent = DaggerPeopleComponent.factory().create(
+                androidDependencies = this,
+                domainDependencies = this,
+                repositoryDependencies = this
+            )
+        }
+
+        peopleComponent.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -140,8 +153,8 @@ class PeopleFragment :
 
         mainActivity.supportFragmentManager
             .beginTransaction()
-            .replace(R.id.main_host_fragment, detailUserFragment)
-            .addToBackStack(null)
+            .replace(R.id.main_host_fragment, detailUserFragment, DetailUserFragment::class.qualifiedName)
+            .addToBackStack("test")
             .commitAllowingStateLoss()
     }
 

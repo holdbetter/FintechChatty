@@ -13,13 +13,14 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.target.Target
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.PeopleFragment
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di.PeopleComponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserEffect
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserEvent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserState
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserStore
 import com.holdbetter.fintechchatproject.databinding.UserDetailInstanceBinding
 import com.holdbetter.fintechchatproject.model.User
-import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
 import javax.inject.Inject
@@ -33,7 +34,9 @@ class DetailUserContent :
 
         fun newInstance(userId: Long): DetailUserContent {
             return DetailUserContent().apply {
-                arguments = bundleOf(USER_ID to userId)
+                arguments = bundleOf(
+                    USER_ID to userId
+                )
             }
         }
     }
@@ -45,9 +48,12 @@ class DetailUserContent :
     @Inject
     lateinit var detailELmStore: DetailUserStore
 
+    lateinit var peopleComponent: PeopleComponent
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        app.appComponent.detailUserComponent().create().inject(this)
+
+        (parentFragment as DetailUserFragment).detailUserComponent.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -22,7 +22,7 @@ interface IStreamRepository : IRepository {
 //    fun getSubbedStreamsOnline(): Completable
 
     fun startHandleSearchRequests() : Observable<List<Stream>>
-    fun search(input: String)
+    fun search(request: String): Single<String>
 
     fun cacheStreamsAndTopics(streamsToCache: List<StreamWithTopics>): Completable
     fun notifyParentsAboutDataAvailability()

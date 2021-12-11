@@ -33,6 +33,7 @@
                 android:inputType="textShortMessage"
                 android:paddingStart="24dp"
                 android:paddingBottom="18dp"
+                android:saveEnabled="false"
                 android:textColor="@color/white"
                 android:textColorHint="@color/white"
                 android:textSize="24sp"

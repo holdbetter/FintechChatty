@@ -26,6 +26,7 @@ class StreamRepository @Inject constructor(
     override val api: TinkoffZulipApi
 ) : IStreamRepository {
     override val dataAvailabilityNotifier: BehaviorSubject<Boolean> = BehaviorSubject.create()
+
     private val searchRequest: PublishSubject<String> = PublishSubject.create()
 
     override fun getStreamsWithTopics(): Maybe<List<Stream>> {
@@ -38,7 +39,6 @@ class StreamRepository @Inject constructor(
         return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
-            .delay(1000, TimeUnit.MILLISECONDS)
             .flatMap { api -> api.getStreams() }
             .map { message -> message.toHashtagStreamEntity() }
             .flatMapObservable { streams -> Observable.fromIterable(streams) }
@@ -51,7 +51,6 @@ class StreamRepository @Inject constructor(
         return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
-            .delay(1000, TimeUnit.MILLISECONDS)
             .flatMap { api -> api.getStreamTopics(stream.id) }
             .map { topicResponse -> topicResponse.toTopicEntity(stream.id, stream.name) }
             .map { topicEntityList -> StreamWithTopics(stream, topicEntityList) }
@@ -71,8 +70,11 @@ class StreamRepository @Inject constructor(
             .switchMapSingle(::getSearchResponse)
     }
 
-    override fun search(input: String) {
-        searchRequest.onNext(input)
+    override fun search(request: String): Single<String> {
+        return Single.create {
+            searchRequest.onNext(request)
+            it.onSuccess(request)
+        }
     }
 
     private fun getSearchResponse(request: String): Single<List<Stream>> {
@@ -88,7 +90,8 @@ class StreamRepository @Inject constructor(
     }
 
     private fun isMatchingPattern(searchInput: String, streamNameToCheck: String): Boolean {
-        return if (searchInput.length < 4) {
+        val notUsefulLength = 4
+        return if (searchInput.length < notUsefulLength) {
             Regex("^#?$searchInput", RegexOption.IGNORE_CASE)
         } else {
             // Vil(en)*

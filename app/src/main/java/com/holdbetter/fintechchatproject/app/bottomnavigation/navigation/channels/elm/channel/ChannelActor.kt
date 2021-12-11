@@ -12,10 +12,10 @@ class ChannelActor @Inject constructor(private val streamRepository: IStreamRepo
             ChannelModel.ChannelCommand.StartObservingCache -> streamRepository.dataAvailabilityNotifier.mapSuccessEvent {
                 ChannelModel.ChannelEvent.Internal.DataNotEmpty
             }
-            is ChannelModel.ChannelCommand.RunSearch -> {
-                streamRepository.search(command.searchRequest)
-                Observable.empty()
-            }
+            is ChannelModel.ChannelCommand.RunSearch -> streamRepository.search(command.searchRequest)
+                .mapSuccessEvent {
+                    ChannelModel.ChannelEvent.Internal.SearchRequested(it)
+                }
         }
     }
 }

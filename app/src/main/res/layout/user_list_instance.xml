@@ -9,7 +9,8 @@
     android:focusable="true"
     android:paddingHorizontal="15dp"
     android:paddingVertical="4dp"
-    tools:background="@color/activity_background">
+    tools:background="@color/activity_background"
+    tools:context=".app.bottomnavigation.navigation.people.view.UserAdapter">
 
     <ImageView
         android:id="@+id/user_image"

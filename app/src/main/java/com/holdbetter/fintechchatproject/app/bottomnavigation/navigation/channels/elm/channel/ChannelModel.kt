@@ -2,10 +2,13 @@ package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channe
 
 object ChannelModel {
     data class ChannelState(
-        val isReadyToSearch: Boolean
+        val lastSearchRequest: String? = null
     )
 
-    object ChannelEffect
+    sealed class ChannelEffect {
+        object DataNotEmpty: ChannelEffect()
+    }
+
     sealed class ChannelCommand {
         object StartObservingCache : ChannelCommand()
         class RunSearch(val searchRequest: String) : ChannelCommand()
@@ -19,6 +22,7 @@ object ChannelModel {
 
         sealed class Internal : ChannelEvent() {
             object DataNotEmpty : Internal()
+            class SearchRequested(val request: String) : Internal()
         }
     }
 }

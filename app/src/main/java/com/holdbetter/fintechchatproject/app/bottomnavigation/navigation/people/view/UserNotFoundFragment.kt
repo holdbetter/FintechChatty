@@ -41,7 +41,7 @@ class UserNotFoundFragment : Fragment(R.layout.fragment_user_not_found) {
                     .replace(
                         R.id.bottom_navigation_container,
                         ProfileFragment.newInstance()
-                    ).commit()
+                    ).commitAllowingStateLoss()
                 else -> parentFragmentManager.popBackStack()
             }
         }

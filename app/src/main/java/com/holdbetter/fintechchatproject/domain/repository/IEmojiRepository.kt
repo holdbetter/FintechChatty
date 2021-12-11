@@ -8,8 +8,7 @@ import com.holdbetter.fintechchatproject.room.entity.EmojiEntity
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 
-interface
-IEmojiRepository : IRepository {
+interface IEmojiRepository : IRepository {
     var originalEmojiList: List<EmojiApi>
     var cleanedEmojiList: List<Reaction>
 

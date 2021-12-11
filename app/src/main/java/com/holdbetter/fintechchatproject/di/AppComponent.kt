@@ -2,15 +2,15 @@ package com.holdbetter.fintechchatproject.di
 
 import android.app.Application
 import com.holdbetter.fintechchatproject.app.MainActivity
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.ChannelsSubcomponent
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.StreamSubcomponent
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.di.NavigationSubcomponent
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di.DetailUserSubcomponent
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di.PeopleSubcomponent
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.di.ProfileSubcomponent
 import com.holdbetter.fintechchatproject.app.chat.di.ChatSubcomponent
-import com.holdbetter.fintechchatproject.app.hoster.di.HostSubcomponent
-import com.holdbetter.fintechchatproject.app.load.di.LoadingSubcomponent
+import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository
+import com.holdbetter.fintechchatproject.domain.repository.IPeopleRepository
+import com.holdbetter.fintechchatproject.domain.repository.IPersonalRepository
+import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
+import com.holdbetter.fintechchatproject.room.ChatDatabase
+import com.holdbetter.fintechchatproject.room.dao.PeopleDao
+import com.holdbetter.fintechchatproject.room.dao.StreamDao
+import com.holdbetter.fintechchatproject.services.connectivity.MyConnectivityManager
 import dagger.BindsInstance
 import dagger.Component
 
@@ -20,27 +20,50 @@ import dagger.Component
         AppModule::class,
         AppSubcomponents::class,
         DaoModule::class,
-        EmojiModule::class,
-        StreamModule::class,
         DomainModule::class,
-        ProfileModule::class
+        RepositoryModule::class
     ]
 )
-abstract class AppComponent {
+interface AppComponent : AndroidDependencies, DomainDependencies, RepositoryDependencies {
+    override fun getEmojiRepository(): IEmojiRepository
+
+    override fun getPersonalRepository(): IPersonalRepository
+
+    override fun getPeopleRepository(): IPeopleRepository
+
+    override fun getConnectivityManager(): MyConnectivityManager
+
+    override fun getDatabase(): ChatDatabase
+
+    override fun getApi(): TinkoffZulipApi
+
+    override fun getStreamDao(): StreamDao
+
+    override fun getPeopleDao(): PeopleDao
+
     @Component.Factory
     interface Factory {
         fun create(@BindsInstance app: Application): AppComponent
     }
 
-    abstract fun inject(mainActivity: MainActivity)
+    fun inject(mainActivity: MainActivity)
 
-    abstract fun loadingComponent(): LoadingSubcomponent.Factory
-    abstract fun hostComponent(): HostSubcomponent.Factory
-    abstract fun channelsComponent(): ChannelsSubcomponent.Factory
-    abstract fun streamComponent(): StreamSubcomponent.Factory
-    abstract fun peopleComponent(): PeopleSubcomponent.Factory
-    abstract fun navigationComponent(): NavigationSubcomponent.Factory
-    abstract fun chatComponent(): ChatSubcomponent.Factory
-    abstract fun detailUserComponent(): DetailUserSubcomponent.Factory
-    abstract fun profileComponent(): ProfileSubcomponent.Factory
+    fun chatComponent(): ChatSubcomponent.Factory
+}
+
+interface RepositoryDependencies {
+    fun getEmojiRepository(): IEmojiRepository
+    fun getPersonalRepository(): IPersonalRepository
+    fun getPeopleRepository(): IPeopleRepository
+}
+
+interface AndroidDependencies {
+    fun getConnectivityManager(): MyConnectivityManager
+    fun getDatabase(): ChatDatabase
+    fun getStreamDao(): StreamDao
+    fun getPeopleDao(): PeopleDao
+}
+
+interface DomainDependencies {
+    fun getApi(): TinkoffZulipApi
 }

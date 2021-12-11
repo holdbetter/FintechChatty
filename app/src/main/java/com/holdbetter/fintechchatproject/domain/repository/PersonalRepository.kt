@@ -8,6 +8,7 @@ import com.holdbetter.fintechchatproject.room.dao.PersonalDao
 import com.holdbetter.fintechchatproject.room.entity.PersonalEntity
 import com.holdbetter.fintechchatproject.room.services.DatabaseMapper.toUser
 import com.holdbetter.fintechchatproject.services.connectivity.MyConnectivityManager
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -37,7 +38,9 @@ class PersonalRepository @Inject constructor(
         return personalDao.getMyself()
             .subscribeOn(Schedulers.io())
             .map { it.toUser() }
+            .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess { saveIdLocally(it.id) }
+            .observeOn(Schedulers.io())
     }
 
     private fun saveIdLocally(userId: Long) {
@@ -47,9 +50,12 @@ class PersonalRepository @Inject constructor(
     }
 
     override fun cacheMyself(me: PersonalEntity): Completable {
-        return personalDao.applyMyself(me).andThen(Completable.create {
-            saveIdLocally(me.id)
-            it.onComplete()
-        })
+        return personalDao.applyMyself(me)
+            .observeOn(AndroidSchedulers.mainThread())
+            .andThen(Completable.create {
+                saveIdLocally(me.id)
+                it.onComplete()
+            })
+            .observeOn(Schedulers.io())
     }
 }

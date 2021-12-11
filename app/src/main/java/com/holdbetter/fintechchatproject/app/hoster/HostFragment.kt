@@ -3,6 +3,7 @@ package com.holdbetter.fintechchatproject.app.hoster
 import android.content.Context
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.app.bottomnavigation.NavigationFragment
+import com.holdbetter.fintechchatproject.app.hoster.di.DaggerHostComponent
 import com.holdbetter.fintechchatproject.app.hoster.elm.CacheEffect
 import com.holdbetter.fintechchatproject.app.hoster.elm.HostStore
 import com.holdbetter.fintechchatproject.app.hoster.elm.InitializerCacheEvent
@@ -21,7 +22,9 @@ class HostFragment :
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        app.appComponent.hostComponent().create().inject(this)
+        DaggerHostComponent.factory()
+            .create(repositoryDependencies = app.appComponent)
+            .inject(this)
     }
 
     override val initEvent: InitializerCacheEvent

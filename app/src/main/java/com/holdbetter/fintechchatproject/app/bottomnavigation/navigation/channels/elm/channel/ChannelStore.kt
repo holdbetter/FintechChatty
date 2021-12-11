@@ -6,7 +6,7 @@ import javax.inject.Inject
 class ChannelStore @Inject constructor(private val actor: ChannelActor) {
     private val store by lazy {
         ElmStore(
-            initialState = ChannelModel.ChannelState(isReadyToSearch = false),
+            initialState = ChannelModel.ChannelState(),
             reducer = ChannelReducer(),
             actor = actor
         )

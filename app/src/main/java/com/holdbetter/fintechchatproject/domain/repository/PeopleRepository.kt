@@ -11,6 +11,7 @@ import com.holdbetter.fintechchatproject.services.connectivity.MyConnectivityMan
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class PeopleRepository @Inject constructor(

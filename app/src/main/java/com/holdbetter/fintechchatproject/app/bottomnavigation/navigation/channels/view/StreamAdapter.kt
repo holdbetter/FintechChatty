@@ -2,7 +2,6 @@ package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channe
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -13,7 +12,7 @@ import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.model.Topic
 
 class StreamAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    RecyclerView.Adapter<StreamAdapter.StreamViewHolder>() {
     object DropdownAngle {
         const val TO_COLLAPSE = 0f
         const val TO_EXPAND = 180f
@@ -25,58 +24,29 @@ class StreamAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
         submitList(emptyList())
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StreamViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return when (viewType) {
-            StreamViewType.EMPTY_LIST.ordinal -> {
-                EmptyViewHolder(
-                    inflater.inflate(
-                        R.layout.no_stream_instance,
-                        parent,
-                        false
-                    )
-                )
-            }
-            else -> {
-                StreamViewHolder(
-                    HashtagStreamInstanceBinding.inflate(
-                        inflater,
-                        parent,
-                        false
-                    ),
-                    onTopicClicked
-                )
-            }
-        }
+        return StreamViewHolder(
+            HashtagStreamInstanceBinding.inflate(
+                inflater,
+                parent,
+                false
+            ),
+            onTopicClicked
+        )
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder) {
-            is StreamViewHolder -> {
-                val stream = asyncDiffer.currentList[position]
-                holder.bind(stream)
-            }
-        }
+    override fun onBindViewHolder(holder: StreamViewHolder, position: Int) {
         // TODO: 10/25/2021 Restoring expand state
+        val stream = asyncDiffer.currentList[position]
+        holder.bind(stream)
     }
 
-    override fun getItemCount() = if (asyncDiffer.currentList.isEmpty()) {
-        1
-    } else {
-        asyncDiffer.currentList.size
-    }
-
-    override fun getItemViewType(position: Int): Int = if (asyncDiffer.currentList.isEmpty()) {
-        StreamViewType.EMPTY_LIST.ordinal
-    } else {
-        StreamViewType.NON_EMPTY_LIST.ordinal
-    }
+    override fun getItemCount() = asyncDiffer.currentList.size
 
     fun submitList(streams: List<Stream>) {
         asyncDiffer.submitList(streams)
     }
-
-    class EmptyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     class StreamViewHolder(
         private val binding: HashtagStreamInstanceBinding,
@@ -160,10 +130,5 @@ class StreamAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
         override fun areContentsTheSame(oldItem: Stream, newItem: Stream): Boolean {
             return oldItem == newItem
         }
-    }
-
-    enum class StreamViewType {
-        EMPTY_LIST,
-        NON_EMPTY_LIST
     }
 }

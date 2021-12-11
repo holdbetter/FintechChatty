@@ -3,7 +3,7 @@ package com.holdbetter.fintechchatproject.app.chat.di
 import com.holdbetter.fintechchatproject.app.chat.ChatFragment
 import dagger.Subcomponent
 
-@Subcomponent(modules = [ChatModule::class])
+@Subcomponent
 interface ChatSubcomponent {
     @Subcomponent.Factory
     interface Factory {

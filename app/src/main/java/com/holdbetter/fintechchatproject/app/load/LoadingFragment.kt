@@ -18,6 +18,7 @@ import androidx.core.view.isVisible
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.app.bottomnavigation.NavigationFragment
+import com.holdbetter.fintechchatproject.app.load.di.DaggerLoadingComponent
 import com.holdbetter.fintechchatproject.app.load.elm.DataPrefetchEffect
 import com.holdbetter.fintechchatproject.app.load.elm.DataPrefetchEvent
 import com.holdbetter.fintechchatproject.app.load.elm.DataPrefetchState
@@ -47,7 +48,7 @@ class LoadingFragment :
     }
 
     @Inject
-    lateinit var prefetchElmProvide: DataPrefetchStore
+    lateinit var prefetchElmProvider: DataPrefetchStore
 
     private val compositeDisposable: CompositeDisposable = CompositeDisposable()
     private var subject: ReplaySubject<Pair<View, AnimatorListenerAdapter>> =
@@ -63,7 +64,10 @@ class LoadingFragment :
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        app.appComponent.loadingComponent().create().inject(this)
+        val appComponent = app.appComponent
+        DaggerLoadingComponent.factory().create(
+            repositoryDependencies = appComponent
+        ).inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -112,7 +116,7 @@ class LoadingFragment :
         get() = DataPrefetchEvent.Ui.Started
 
     override fun createStore(): Store<DataPrefetchEvent, DataPrefetchEffect, DataPrefetchState> =
-        prefetchElmProvide.provide()
+        prefetchElmProvider.provide()
 
     override fun render(state: DataPrefetchState) {
         if (state.error != null) {

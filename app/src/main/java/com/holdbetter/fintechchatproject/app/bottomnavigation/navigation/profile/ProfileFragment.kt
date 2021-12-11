@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -14,6 +15,8 @@ import com.bumptech.glide.request.target.Target
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.di.DaggerProfileComponent
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.di.ProfileComponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.elm.ProfileEffect
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.elm.ProfileEvent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profile.elm.ProfileState
@@ -34,9 +37,8 @@ class ProfileFragment :
     ElmFragment<ProfileEvent, ProfileEffect, ProfileState>(R.layout.fragment_profile), IUserViewer {
     companion object {
         fun newInstance(): ProfileFragment {
-            val bundle = Bundle()
             return ProfileFragment().apply {
-                arguments = bundle
+                arguments = bundleOf()
             }
         }
     }
@@ -46,10 +48,20 @@ class ProfileFragment :
     @Inject
     lateinit var profileElmProvider: ProfileStore
 
+    lateinit var profileComponent: ProfileComponent
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        app.appComponent.profileComponent().create().inject(this)
+        with(app.appComponent) {
+            profileComponent = DaggerProfileComponent.factory().create(
+                androidDependencies = this,
+                domainDependencies = this,
+                repositoryDependencies = this
+            )
+        }
+
+        profileComponent.inject(this)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

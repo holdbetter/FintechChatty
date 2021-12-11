@@ -15,6 +15,7 @@ import com.holdbetter.fintechchatproject.room.entity.EmojiEntity
 import com.holdbetter.fintechchatproject.room.services.DatabaseMapper.toEmojiApiList
 import com.holdbetter.fintechchatproject.room.services.DatabaseMapper.toReactionList
 import com.holdbetter.fintechchatproject.services.connectivity.MyConnectivityManager
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -31,6 +32,7 @@ class EmojiRepository @Inject constructor(
 
     override fun getEmojiCached(): Single<Pair<List<EmojiEntity>, List<ApiEmojiEntity>>> {
         return emojiDao.getEmojiVariations()
+            .doOnSuccess { applyCacheIfNotEmpty(it) }
             .subscribeOn(Schedulers.io())
     }
 
@@ -39,7 +41,9 @@ class EmojiRepository @Inject constructor(
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
             .flatMap { api -> api.getAllEmoji() }
+            .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess { saveLocal(it) }
+            .observeOn(Schedulers.io())
             .flatMapCompletable { message ->
                 cacheEmoji(
                     message.toEmojiEntityList(),
