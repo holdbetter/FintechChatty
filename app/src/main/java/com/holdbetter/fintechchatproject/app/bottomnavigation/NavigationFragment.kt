@@ -78,7 +78,7 @@ class NavigationFragment : Fragment(R.layout.fragment_navigation), INavigationAs
             addNewPage(fragmentMenuId, transaction)
         } else {
             attachCachedPage(fragmentMenuId, transaction)
-        }.commitNowAllowingStateLoss()
+        }.commitAllowingStateLoss()
     }
 
     private fun addNewPage(

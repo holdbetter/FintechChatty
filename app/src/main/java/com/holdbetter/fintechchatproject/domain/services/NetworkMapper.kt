@@ -3,32 +3,24 @@ package com.holdbetter.fintechchatproject.domain.services
 import com.holdbetter.fintechchatproject.domain.entity.*
 import com.holdbetter.fintechchatproject.model.*
 import com.holdbetter.fintechchatproject.model.Message
-import com.holdbetter.fintechchatproject.model.Stream
-import com.holdbetter.fintechchatproject.model.Topic
 import com.holdbetter.fintechchatproject.room.entity.*
 
 object NetworkMapper {
-    fun StreamResponse.toHashtagStream(): MutableList<Stream> {
-        return ArrayList(streams.map {
-            Stream(
-                it.id,
-                it.name
-            )
-        })
-    }
-
-    fun StreamResponse.toHashtagStreamEntity(): List<StreamEntity> {
+    fun StreamResponse.toStreamEntity(): List<StreamEntity> {
         return streams.map {
             StreamEntity(
                 it.id,
-                it.name
+                it.name,
             )
         }
     }
 
-    fun TopicResponse.toTopics(streamId: Long, streamName: String): List<Topic> {
-        return topics.map {
-            Topic(it.maxId, it.name, streamId, streamName)
+    fun SubbedStreamResponse.toStreamEntity(): List<StreamEntity> {
+        return subscriptions.map {
+            StreamEntity(
+                it.id,
+                it.name,
+            )
         }
     }
 

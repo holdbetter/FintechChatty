@@ -9,6 +9,9 @@ interface TinkoffZulipApi {
     @GET("streams")
     fun getStreams(): Single<StreamResponse>
 
+    @GET("users/me/subscriptions")
+    fun getSubbedStreams(): Single<SubbedStreamResponse>
+
     @GET("users/me/{stream_id}/topics")
     fun getStreamTopics(@Path("stream_id") streamId: Long): Single<TopicResponse>
 

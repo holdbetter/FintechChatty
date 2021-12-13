@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.ChannelsFragment
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.stream.*
 import vivid.money.elmslie.core.store.Store
@@ -30,7 +31,8 @@ class AllStreamsFragment : StreamFragment<AllStreamEffect, StreamState>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (store.currentState.streamList.isNullOrEmpty()) {
+
+        if (store.currentState.streamList == null) {
             store.accept(StreamEvent.Ui.Started)
         }
     }
@@ -41,16 +43,23 @@ class AllStreamsFragment : StreamFragment<AllStreamEffect, StreamState>(
     override fun render(state: StreamState) {
         shimming(state.isLoading)
 
-        if (state.streamList.isNotEmpty()) {
-            setStreams(state.streamList)
-            store.accept(AllStreamEvent.Ui.DataReady)
+        state.streamList?.let {
+            binding.noStream.root.isVisible = it.isEmpty()
+            binding.streamsList.isVisible = it.isNotEmpty()
+            setStreams(it)
+            store.accept(AllStreamEvent.Ui.DataWasSet)
         }
     }
 
     override fun handleEffect(effect: AllStreamEffect) {
         when (effect) {
-            is AllStreamEffect.ShowDataError -> handleError(effect.error)
-            is AllStreamEffect.ShowSearchedData -> setStreams(effect.streamList)
+            is AllStreamEffect.ShowSearchedData -> {
+                with(effect.streamList) {
+                    binding.noStream.root.isVisible = this.isEmpty()
+                    binding.streamsList.isVisible = this.isNotEmpty()
+                    setStreams(this)
+                }
+            }
         }
     }
 }

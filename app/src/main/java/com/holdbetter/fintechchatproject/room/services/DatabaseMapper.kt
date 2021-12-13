@@ -13,12 +13,8 @@ object DatabaseMapper {
             Stream(
                 it.stream.id,
                 it.stream.name,
-                it.topics.map { topic -> Topic(
-                    topic.maxId,
-                    topic.name,
-                    it.stream.id,
-                    it.stream.name
-                ) }
+                it.stream.subscribed,
+                topics = it.topics.toTopics()
             )
         }
     }

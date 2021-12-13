@@ -4,11 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/activity_background"
-    tools:viewBindingIgnore="true">
+    tools:background="@color/activity_background">
 
     <TextView
-        android:id="@+id/topic_name"
+        android:id="@+id/error_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -21,6 +20,6 @@
         android:textAlignment="center"
         android:textColor="@color/chat_text_color_secondary"
         android:textSize="16sp"
-        app:drawableBottomCompat="@drawable/error_man_sized" />
+        app:drawableTopCompat="@drawable/who_are_you_sized" />
 
 </FrameLayout>

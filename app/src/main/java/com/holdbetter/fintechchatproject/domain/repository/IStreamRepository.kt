@@ -11,18 +11,21 @@ import io.reactivex.rxjava3.subjects.BehaviorSubject
 
 interface IStreamRepository : IRepository {
     val dataAvailabilityNotifier: BehaviorSubject<Boolean>
+    val dataNotifier: BehaviorSubject<List<Stream>>
 
-    fun getStreamsWithTopics(): Maybe<List<Stream>>
-    // TODO: 11/25/2021
-//    fun getSubbedStreams(): Maybe<List<Stream>>
+    val streamHolder: List<Stream
+            >?
 
-    fun getStreamsOnline(): Completable
+    fun getCachedStreams(): Maybe<List<Stream>>
+
+    fun getStreamsOnline(): Maybe<Any>
     fun getTopicsOnline(stream: StreamEntity): Single<StreamWithTopics>
-    // TODO: 11/25/2021
-//    fun getSubbedStreamsOnline(): Completable
+    fun startObservingStreams(): Observable<List<Stream>>
 
-    fun startHandleSearchRequests() : Observable<List<Stream>>
+    fun startHandleSearchResults() : Observable<List<Stream>>
     fun search(request: String): Single<String>
+
+    fun pushStreams(streamList: List<Stream>)
 
     fun cacheStreamsAndTopics(streamsToCache: List<StreamWithTopics>): Completable
     fun notifyParentsAboutDataAvailability()

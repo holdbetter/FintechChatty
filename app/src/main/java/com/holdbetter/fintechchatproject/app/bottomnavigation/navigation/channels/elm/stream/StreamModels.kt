@@ -4,8 +4,7 @@ import com.holdbetter.fintechchatproject.model.Stream
 
 data class StreamState(
     val isLoading: Boolean,
-    val streamList: List<Stream> = emptyList(),
-    val error: Throwable? = null
+    val streamList: List<Stream>? = null,
 )
 
 sealed class StreamEvent {
@@ -15,16 +14,13 @@ sealed class StreamEvent {
     }
 
     sealed class Internal : StreamEvent() {
-        object CacheEmpty : Internal()
-        object DataLoaded : Internal()
-        class DataReady(val streamList: List<Stream>) : Internal()
-        class DataLoadError(val error: Throwable) : Internal()
+        class DataReceived(val streamsList: List<Stream>) : Internal()
     }
 }
 
 sealed class AllStreamEvent : StreamEvent() {
     sealed class Ui : AllStreamEvent() {
-        object DataReady : Ui()
+        object DataWasSet : Ui()
     }
 
     sealed class Internal : AllStreamEvent() {
@@ -33,17 +29,16 @@ sealed class AllStreamEvent : StreamEvent() {
 }
 
 sealed class AllStreamEffect {
-    class ShowDataError(val error: Throwable) : AllStreamEffect()
     class ShowSearchedData(val streamList: List<Stream>) : AllStreamEffect()
 }
 
-sealed class SubbedStreamEffect {
-    class ShowDataError(val error: Throwable) : SubbedStreamEffect()
+sealed class SubbedStreamEffect
+
+sealed class SubbedStreamCommand {
+    object StartObserving : SubbedStreamCommand()
 }
 
-sealed class StreamCommand {
-    object LoadStreams : StreamCommand()
-    object GoOnlineForStreams : StreamCommand()
-    object DataIsAvailable : StreamCommand()
-    object LoadSubbedStreams : StreamCommand()
+sealed class AllStreamCommand {
+    object StartObserving : AllStreamCommand()
+    object DataIsAvailable : AllStreamCommand()
 }

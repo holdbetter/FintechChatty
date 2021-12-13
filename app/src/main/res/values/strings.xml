@@ -16,7 +16,7 @@
     <string name="something_went_wrong">Something went wrong,\n we can\'t find this user</string>
     <string name="try_again">Повторить</string>
     <string name="try_again_longer">Попробуй еще раз</string>
-    <string name="no_stream">We couldn\'t find \n any available stream</string>
+    <string name="no_stream">We couldn\'t find \n any stream</string>
     <string name="emoji_loading">Загружаем смайлы</string>
     <string name="finding_bugs">Ищем жуков</string>
     <string name="discover_you">Узнаем кто вы</string>
@@ -25,7 +25,7 @@
     <string name="loading_is_over">loadingIsOver</string>
     <string name="subscribed">Subscribed</string>
     <string name="all_streams">All streams</string>
-    <string name="no_connection">Нет подключения к интернету</string>
+    <string name="no_connection">Работает без интернета</string>
     <string name="default_error">Error</string>
     <string name="unexpected_room_exception">Произошло что-то страшное с базой данных, попробуйте переустановить приложение</string>
     <string name="reload">Перезагрузить</string>

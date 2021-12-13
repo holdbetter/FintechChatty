@@ -1,7 +1,7 @@
 package com.holdbetter.fintechchatproject.domain.repository
 
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
-import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toHashtagStreamEntity
+import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toStreamEntity
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toTopicEntity
 import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.room.dao.StreamDao
@@ -9,6 +9,7 @@ import com.holdbetter.fintechchatproject.room.entity.StreamEntity
 import com.holdbetter.fintechchatproject.room.entity.StreamWithTopics
 import com.holdbetter.fintechchatproject.room.services.DatabaseMapper.toStream
 import com.holdbetter.fintechchatproject.services.connectivity.MyConnectivityManager
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.core.Observable
@@ -25,26 +26,40 @@ class StreamRepository @Inject constructor(
     private val connectivityManager: MyConnectivityManager,
     override val api: TinkoffZulipApi
 ) : IStreamRepository {
+    override val dataNotifier: BehaviorSubject<List<Stream>> = BehaviorSubject.create()
     override val dataAvailabilityNotifier: BehaviorSubject<Boolean> = BehaviorSubject.create()
+    override var streamHolder: List<Stream>? = null
 
     private val searchRequest: PublishSubject<String> = PublishSubject.create()
 
-    override fun getStreamsWithTopics(): Maybe<List<Stream>> {
+    override fun getCachedStreams(): Maybe<List<Stream>> {
         return streamDao.getStreamsWithTopics()
             .subscribeOn(Schedulers.io())
             .map { it.toStream() }
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSuccess { saveLocally(it) }
+            .observeOn(Schedulers.io())
     }
 
-    override fun getStreamsOnline(): Completable {
+    private fun saveLocally(streamList: List<Stream>) {
+        streamHolder = streamList
+    }
+
+    override fun getStreamsOnline(): Maybe<Any> {
         return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
             .flatMap { api -> api.getStreams() }
-            .map { message -> message.toHashtagStreamEntity() }
+            .map { message -> message.toStreamEntity() }
+            .filter { streamList -> streamList.isNotEmpty() }
             .flatMapObservable { streams -> Observable.fromIterable(streams) }
             .flatMapSingle { stream -> getTopicsOnline(stream) }
             .toList()
+            .observeOn(Schedulers.computation())
+            .flatMap { applySubbedInfoTo(it) }
+            .observeOn(Schedulers.io())
             .flatMapCompletable { cacheStreamsAndTopics(it) }
+            .andThen(Maybe.just("success"))
     }
 
     override fun getTopicsOnline(stream: StreamEntity): Single<StreamWithTopics> {
@@ -64,10 +79,14 @@ class StreamRepository @Inject constructor(
         dataAvailabilityNotifier.onNext(true)
     }
 
-    override fun startHandleSearchRequests(): Observable<List<Stream>> {
+    override fun startHandleSearchResults(): Observable<List<Stream>> {
         return searchRequest.subscribeOn(Schedulers.io())
             .debounce(100, TimeUnit.MILLISECONDS)
             .switchMapSingle(::getSearchResponse)
+    }
+
+    override fun startObservingStreams(): Observable<List<Stream>> {
+        return dataNotifier.subscribeOn(Schedulers.io())
     }
 
     override fun search(request: String): Single<String> {
@@ -77,16 +96,43 @@ class StreamRepository @Inject constructor(
         }
     }
 
+    override fun pushStreams(streamList: List<Stream>) {
+        dataNotifier.onNext(streamList)
+    }
+
     private fun getSearchResponse(request: String): Single<List<Stream>> {
         return if (request.isBlank() || request.length < 2) {
-            getStreamsWithTopics().toSingle()
+            Single.just(streamHolder!!)
         } else {
-            return getStreamsWithTopics()
+            Single.just(streamHolder!!)
                 .subscribeOn(Schedulers.io())
                 .flatMapObservable { streams -> streams.toObservable() }
                 .filter { s -> isMatchingPattern(request, s.name) }
                 .toList()
         }
+    }
+
+    private fun applySubbedInfoTo(allStreamWithTopics: MutableList<StreamWithTopics>): Single<List<StreamWithTopics>> {
+        return connectivityManager.isConnected
+            .subscribeOn(Schedulers.io())
+            .flatMap { getApi(it) }
+            .flatMap { api -> api.getSubbedStreams() }
+            .map { subbedList -> subbedList.toStreamEntity() }
+            .map { subbedList -> addSubbedInfoToAllStreams(subbedList, allStreamWithTopics) }
+    }
+
+    private fun addSubbedInfoToAllStreams(
+        subbedList: List<StreamEntity>,
+        allStreamWithTopics: MutableList<StreamWithTopics>
+    ): List<StreamWithTopics> {
+        for (subbedStream in subbedList) {
+            val shouldBeSubbedStream = allStreamWithTopics.find { it.stream.id == subbedStream.id }
+            if (shouldBeSubbedStream != null) {
+                allStreamWithTopics.remove(shouldBeSubbedStream)
+                allStreamWithTopics.add(shouldBeSubbedStream.partialCopy(true))
+            }
+        }
+        return allStreamWithTopics
     }
 
     private fun isMatchingPattern(searchInput: String, streamNameToCheck: String): Boolean {

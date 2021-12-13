@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.core.os.bundleOf
+import androidx.core.view.isVisible
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.ChannelsFragment
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.stream.StreamEvent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.stream.StreamState
@@ -34,7 +35,8 @@ class SubbedStreamsFragment : StreamFragment<SubbedStreamEffect, StreamState>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (store.currentState.streamList.isNullOrEmpty()) {
+
+        if (store.currentState.streamList == null) {
             store.accept(StreamEvent.Ui.Started)
         }
     }
@@ -45,8 +47,10 @@ class SubbedStreamsFragment : StreamFragment<SubbedStreamEffect, StreamState>(
     override fun render(state: StreamState) {
         shimming(state.isLoading)
 
-        if (state.streamList.isNotEmpty()) {
-            setStreams(state.streamList)
+        state.streamList?.let {
+            binding.noStream.root.isVisible = it.isEmpty()
+            binding.streamsList.isVisible = it.isNotEmpty()
+            setStreams(it)
         }
     }
 }

@@ -10,4 +10,11 @@ class StreamWithTopics(
         entityColumn = "stream_id"
     )
     val topics: List<TopicEntity>
-)
+) {
+    fun partialCopy(isSubscribed: Boolean): StreamWithTopics {
+        return StreamWithTopics(
+            this.stream.partialCopy(isSubscribed),
+            this.topics
+        )
+    }
+}

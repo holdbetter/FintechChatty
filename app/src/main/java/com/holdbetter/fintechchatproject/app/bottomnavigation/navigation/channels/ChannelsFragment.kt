@@ -5,16 +5,22 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.widget.doOnTextChanged
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.tabs.TabLayoutMediator
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.ChannelsComponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.DaggerChannelsComponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.channel.ChannelModel
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.channel.ChannelStore
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.PeopleEvent
 import com.holdbetter.fintechchatproject.databinding.FragmentChannelsBinding
+import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
+import com.holdbetter.fintechchatproject.room.services.UnexpectedRoomException
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.createStyledSnackbar
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
+import java.io.IOException
 import javax.inject.Inject
 
 class ChannelsFragment :
@@ -81,12 +87,42 @@ class ChannelsFragment :
     override fun createStore(): Store<ChannelModel.ChannelEvent, ChannelModel.ChannelEffect, ChannelModel.ChannelState> =
         channelsElmProvider.provide()
 
-    override fun render(state: ChannelModel.ChannelState) {}
+    override fun render(state: ChannelModel.ChannelState) {
+        if (state.isDataLoaded) {
+            binding.streamSearchShimmer.stopShimmer()
+            binding.streamSearchShimmer.hideShimmer()
+        } else {
+            binding.streamSearchShimmer.startShimmer()
+            binding.streamSearchShimmer.showShimmer(true)
+        }
+    }
 
     override fun handleEffect(effect: ChannelModel.ChannelEffect): Unit {
         return when (effect) {
             ChannelModel.ChannelEffect.DataNotEmpty -> enableSearch()
+            is ChannelModel.ChannelEffect.ShowError -> handleError(effect.error)
         }
+    }
+
+    private fun handleError(error: Throwable) {
+        val snackbar = createStyledSnackbar()
+        when (error) {
+            is UnexpectedRoomException -> {
+                snackbar.setText(R.string.unexpected_room_exception)
+            }
+            is IOException, is NotConnectedException -> {
+                snackbar.setText(R.string.no_connection)
+                snackbar.duration = Snackbar.LENGTH_LONG
+                snackbar.setAction(R.string.try_again) { store.accept(ChannelModel.ChannelEvent.Ui.Retry) }
+            }
+            else -> {
+                snackbar.setText(R.string.undefined_error_message)
+                snackbar.duration = Snackbar.LENGTH_INDEFINITE
+                snackbar.setAction(R.string.reload) { store.accept(ChannelModel.ChannelEvent.Ui.Retry) }
+            }
+        }
+
+        snackbar.show()
     }
 
     private fun enableSearch() {

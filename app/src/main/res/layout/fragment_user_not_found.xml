@@ -16,7 +16,7 @@
         android:textAlignment="center"
         android:textColor="@color/chat_text_color"
         android:textSize="24sp"
-        app:drawableBottomCompat="@drawable/error_man_sized"
+        app:drawableBottomCompat="@drawable/who_are_you_sized"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

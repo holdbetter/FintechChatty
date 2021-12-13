@@ -3,11 +3,11 @@ package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channe
 import vivid.money.elmslie.core.store.ElmStore
 import javax.inject.Inject
 
-class AllStreamStore @Inject constructor(private val actor: StreamActor) {
+class AllStreamStore @Inject constructor(private val actor: AllStreamActor, private val reducer: AllStreamReducer) {
     private val store by lazy {
         ElmStore(
             initialState = StreamState(isLoading = false),
-            reducer = AllStreamReducer(),
+            reducer = reducer,
             actor = actor
         )
     }
