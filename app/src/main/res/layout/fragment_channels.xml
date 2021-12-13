@@ -72,17 +72,25 @@
             android:layout_marginTop="4dp"
             android:background="@drawable/tabs_layout_empty_background"
             android:paddingBottom="15dp"
-            app:tabIndicatorColor="#219653"
+            app:tabIndicatorColor="@color/green_accent"
             app:tabMode="fixed"
             app:tabPadding="4dp"
             app:tabTextColor="@color/chat_text_color" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/channel_pager"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_to_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/channel_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

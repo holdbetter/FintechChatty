@@ -46,6 +46,8 @@ dependencies {
 
     implementation "com.github.kirich1409:viewbindingpropertydelegate-noreflection:$rozov_binding"
 
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipe_to_refresh_version"
+
     implementation "com.github.vivid-money.elmslie:elmslie-core:$elmslie"
     implementation "com.github.vivid-money.elmslie:elmslie-android:$elmslie"
 

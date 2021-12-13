@@ -43,6 +43,8 @@ class AllStreamsFragment : StreamFragment<AllStreamEffect, StreamState>(
     override fun render(state: StreamState) {
         shimming(state.isLoading)
 
+        if (state.isLoading) binding.noStream.root.isVisible = false
+
         state.streamList?.let {
             binding.noStream.root.isVisible = it.isEmpty()
             binding.streamsList.isVisible = it.isNotEmpty()

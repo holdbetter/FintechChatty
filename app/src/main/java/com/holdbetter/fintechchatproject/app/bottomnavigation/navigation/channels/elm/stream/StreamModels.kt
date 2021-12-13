@@ -11,6 +11,7 @@ sealed class StreamEvent {
     sealed class Ui : StreamEvent() {
         object Init : Ui()
         object Started : Ui()
+        object Refreshing : Ui()
     }
 
     sealed class Internal : StreamEvent() {

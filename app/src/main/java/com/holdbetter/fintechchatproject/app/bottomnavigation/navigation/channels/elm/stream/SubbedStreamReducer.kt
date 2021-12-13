@@ -19,6 +19,7 @@ class SubbedStreamReducer @Inject constructor() :
                 )
             }
             is AllStreamEvent -> throw IllegalArgumentException("Unsupported event: ${event.javaClass.name}")
+            StreamEvent.Ui.Refreshing -> state { copy(isLoading = true, streamList = null) }
         }
     }
 }

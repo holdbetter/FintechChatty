@@ -47,7 +47,10 @@ class ChannelReducer :
                 commands { +ChannelModel.ChannelCommand.GetCachedStreams }
                 effects { +ChannelModel.ChannelEffect.ShowError(event.error) }
             }
-            ChannelModel.ChannelEvent.Ui.Retry -> commands { +ChannelModel.ChannelCommand.LoadStreams }
+            ChannelModel.ChannelEvent.Ui.Retry -> {
+                state { copy(isDataLoaded = false, error = null) }
+                commands { +ChannelModel.ChannelCommand.LoadStreams }
+            }
         }
     }
 }

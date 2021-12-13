@@ -12,7 +12,8 @@ import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channel
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.di.DaggerChannelsComponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.channel.ChannelModel
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.channel.ChannelStore
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.PeopleEvent
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.stream.StreamEvent
+import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.view.StreamFragment
 import com.holdbetter.fintechchatproject.databinding.FragmentChannelsBinding
 import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
 import com.holdbetter.fintechchatproject.room.services.UnexpectedRoomException
@@ -59,6 +60,16 @@ class ChannelsFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
+            with(swipeToRefresh) {
+                isEnabled = false
+                setColorSchemeResources(R.color.white)
+                setProgressBackgroundColorSchemeResource(R.color.green_accent)
+                setOnRefreshListener {
+                    swipeToRefresh.isEnabled = false
+                    refreshPage()
+                }
+            }
+
             with(channelPager) {
                 offscreenPageLimit = 2
                 adapter = ChannelPagerAdapter(this@ChannelsFragment)
@@ -81,6 +92,14 @@ class ChannelsFragment :
         }
     }
 
+    private fun notifyChildFragmentsAboutRefreshing() {
+        val childFragmentItemCount = binding.channelPager.adapter!!.itemCount
+        for (i in 0 until childFragmentItemCount) {
+            (childFragmentManager.findFragmentByTag("f$i") as StreamFragment<*, *>)
+                .storeHolder.store.accept(StreamEvent.Ui.Refreshing)
+        }
+    }
+
     override val initEvent: ChannelModel.ChannelEvent
         get() = ChannelModel.ChannelEvent.Ui.Started
 
@@ -88,16 +107,20 @@ class ChannelsFragment :
         channelsElmProvider.provide()
 
     override fun render(state: ChannelModel.ChannelState) {
-        if (state.isDataLoaded) {
-            binding.streamSearchShimmer.stopShimmer()
-            binding.streamSearchShimmer.hideShimmer()
-        } else {
-            binding.streamSearchShimmer.startShimmer()
-            binding.streamSearchShimmer.showShimmer(true)
+        with(binding) {
+            if (state.isDataLoaded) {
+                streamSearchShimmer.stopShimmer()
+                streamSearchShimmer.hideShimmer()
+            } else {
+                swipeToRefresh.isRefreshing = false
+                streamSearchShimmer.startShimmer()
+                streamSearchShimmer.showShimmer(true)
+            }
         }
     }
 
     override fun handleEffect(effect: ChannelModel.ChannelEffect): Unit {
+        binding.swipeToRefresh.isEnabled = true
         return when (effect) {
             ChannelModel.ChannelEffect.DataNotEmpty -> enableSearch()
             is ChannelModel.ChannelEffect.ShowError -> handleError(effect.error)
@@ -113,16 +136,21 @@ class ChannelsFragment :
             is IOException, is NotConnectedException -> {
                 snackbar.setText(R.string.no_connection)
                 snackbar.duration = Snackbar.LENGTH_LONG
-                snackbar.setAction(R.string.try_again) { store.accept(ChannelModel.ChannelEvent.Ui.Retry) }
+                snackbar.setAction(R.string.try_again) { refreshPage() }
             }
             else -> {
                 snackbar.setText(R.string.undefined_error_message)
                 snackbar.duration = Snackbar.LENGTH_INDEFINITE
-                snackbar.setAction(R.string.reload) { store.accept(ChannelModel.ChannelEvent.Ui.Retry) }
+                snackbar.setAction(R.string.reload) { refreshPage() }
             }
         }
 
         snackbar.show()
+    }
+
+    private fun refreshPage() {
+        notifyChildFragmentsAboutRefreshing()
+        store.accept(ChannelModel.ChannelEvent.Ui.Retry)
     }
 
     private fun enableSearch() {
