@@ -35,7 +35,7 @@ class DetailUserFragment : Fragment(R.layout.fragment_user_detail) {
                 .create(
                     androidDependencies = this,
                     domainDependencies = this,
-                    repositoryDependencies = this
+                    repositoryDependencies = this,
                 )
         }
     }

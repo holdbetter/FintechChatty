@@ -10,12 +10,13 @@ class AllStreamActor @Inject constructor(
 ) : Actor<AllStreamCommand, StreamEvent> {
     override fun execute(command: AllStreamCommand): Observable<StreamEvent> {
         return when (command) {
+            AllStreamCommand.ObserveSearching -> streamRepository.startHandleSearchResults()
+                .mapSuccessEvent { streams -> AllStreamEvent.Internal.Searched(streams) }
             AllStreamCommand.DataIsAvailable -> {
                 streamRepository.notifyParentsAboutDataAvailability()
-                streamRepository.startHandleSearchResults()
-                    .mapSuccessEvent { streams -> AllStreamEvent.Internal.Searched(streams) }
+                Observable.empty()
             }
-            AllStreamCommand.StartObserving -> streamRepository.dataNotifier.mapSuccessEvent(
+            AllStreamCommand.StartObservingData -> streamRepository.dataNotifier.mapSuccessEvent(
                 successEventMapper = { streamsList -> StreamEvent.Internal.DataReceived(streamsList) }
             )
         }

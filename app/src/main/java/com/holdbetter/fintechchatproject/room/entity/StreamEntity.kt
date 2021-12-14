@@ -1,6 +1,5 @@
 package com.holdbetter.fintechchatproject.room.entity
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.holdbetter.fintechchatproject.room.ChatDatabase

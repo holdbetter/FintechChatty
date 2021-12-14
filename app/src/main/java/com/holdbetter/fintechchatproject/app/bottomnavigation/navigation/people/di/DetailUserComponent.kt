@@ -8,14 +8,17 @@ import com.holdbetter.fintechchatproject.di.RepositoryDependencies
 import dagger.Component
 
 @FragmentScope
-@Component(dependencies = [AndroidDependencies::class, DomainDependencies::class, RepositoryDependencies::class])
+@Component(
+    modules = [DetailUserModule::class],
+    dependencies = [AndroidDependencies::class, DomainDependencies::class, RepositoryDependencies::class]
+)
 interface DetailUserComponent {
     @Component.Factory
     interface Factory {
         fun create(
             androidDependencies: AndroidDependencies,
             domainDependencies: DomainDependencies,
-            repositoryDependencies: RepositoryDependencies
+            repositoryDependencies: RepositoryDependencies,
         ): DetailUserComponent
     }
 

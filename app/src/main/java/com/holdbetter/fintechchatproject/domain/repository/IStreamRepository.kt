@@ -13,8 +13,7 @@ interface IStreamRepository : IRepository {
     val dataAvailabilityNotifier: BehaviorSubject<Boolean>
     val dataNotifier: BehaviorSubject<List<Stream>>
 
-    val streamHolder: List<Stream
-            >?
+    val streamHolder: List<Stream>?
 
     fun getCachedStreams(): Maybe<List<Stream>>
 

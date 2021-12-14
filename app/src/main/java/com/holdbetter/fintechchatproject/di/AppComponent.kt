@@ -4,7 +4,6 @@ import android.app.Application
 import com.holdbetter.fintechchatproject.app.MainActivity
 import com.holdbetter.fintechchatproject.app.chat.di.ChatSubcomponent
 import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository
-import com.holdbetter.fintechchatproject.domain.repository.IPeopleRepository
 import com.holdbetter.fintechchatproject.domain.repository.IPersonalRepository
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
 import com.holdbetter.fintechchatproject.room.ChatDatabase
@@ -29,8 +28,6 @@ interface AppComponent : AndroidDependencies, DomainDependencies, RepositoryDepe
 
     override fun getPersonalRepository(): IPersonalRepository
 
-    override fun getPeopleRepository(): IPeopleRepository
-
     override fun getConnectivityManager(): MyConnectivityManager
 
     override fun getDatabase(): ChatDatabase
@@ -54,7 +51,6 @@ interface AppComponent : AndroidDependencies, DomainDependencies, RepositoryDepe
 interface RepositoryDependencies {
     fun getEmojiRepository(): IEmojiRepository
     fun getPersonalRepository(): IPersonalRepository
-    fun getPeopleRepository(): IPeopleRepository
 }
 
 interface AndroidDependencies {

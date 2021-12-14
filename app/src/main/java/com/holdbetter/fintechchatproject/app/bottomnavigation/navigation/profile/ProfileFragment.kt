@@ -48,7 +48,7 @@ class ProfileFragment :
     @Inject
     lateinit var profileElmProvider: ProfileStore
 
-    lateinit var profileComponent: ProfileComponent
+    private lateinit var profileComponent: ProfileComponent
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

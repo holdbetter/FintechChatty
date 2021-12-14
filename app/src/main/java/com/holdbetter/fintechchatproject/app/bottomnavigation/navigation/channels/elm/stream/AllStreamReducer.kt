@@ -8,9 +8,14 @@ class AllStreamReducer @Inject constructor(): DslReducer<StreamEvent, StreamStat
         return when (event) {
             StreamEvent.Ui.Started -> {
                 state { copy(isLoading = true) }
-                commands { +AllStreamCommand.StartObserving }
+                commands {
+                    +AllStreamCommand.StartObservingData
+                }
             }
-            StreamEvent.Ui.Init -> state { copy(isLoading = false) }
+            StreamEvent.Ui.Init -> {
+                state { copy(isLoading = false) }
+                commands { +AllStreamCommand.ObserveSearching }
+            }
             StreamEvent.Ui.Refreshing -> state { copy(isLoading = true, streamList = null) }
             AllStreamEvent.Ui.DataWasSet -> commands { +AllStreamCommand.DataIsAvailable }
             is AllStreamEvent.Internal.Searched -> effects { +AllStreamEffect.ShowSearchedData(event.streamList) }

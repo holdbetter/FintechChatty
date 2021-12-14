@@ -15,8 +15,5 @@ interface RepositoryModule {
     fun getPersonalRepository(personalRepository: PersonalRepository): IPersonalRepository
 
     @Binds
-    fun getPeopleRepository(peopleRepository: PeopleRepository): IPeopleRepository
-
-    @Binds
     fun getChatRepository(chatRepository: ChatRepository): IChatRepository
 }

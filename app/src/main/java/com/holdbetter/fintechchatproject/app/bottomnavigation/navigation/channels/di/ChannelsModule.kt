@@ -3,10 +3,8 @@ package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channe
 import com.holdbetter.fintechchatproject.di.FragmentScope
 import com.holdbetter.fintechchatproject.domain.repository.IStreamRepository
 import com.holdbetter.fintechchatproject.domain.repository.StreamRepository
-import com.holdbetter.fintechchatproject.room.ChatDatabase
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 
 @Module
 interface ChannelsModule {

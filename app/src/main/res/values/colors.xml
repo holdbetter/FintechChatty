@@ -25,4 +25,5 @@
     <color name="shimmer_background_color_dark">#303030</color>
     <color name="invisible">#00FFFFFF</color>
     <color name="green_accent">#219653</color>
+    <color name="green_accent_alpha">#40219653</color>
 </resources>

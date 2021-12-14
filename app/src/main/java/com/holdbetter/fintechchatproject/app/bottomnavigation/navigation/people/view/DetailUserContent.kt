@@ -13,8 +13,6 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.target.Target
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.PeopleFragment
-import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.di.PeopleComponent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserEffect
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserEvent
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.elm.DetailUserState
@@ -47,8 +45,6 @@ class DetailUserContent :
 
     @Inject
     lateinit var detailELmStore: DetailUserStore
-
-    lateinit var peopleComponent: PeopleComponent
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

@@ -40,6 +40,7 @@ sealed class SubbedStreamCommand {
 }
 
 sealed class AllStreamCommand {
-    object StartObserving : AllStreamCommand()
+    object StartObservingData : AllStreamCommand()
     object DataIsAvailable : AllStreamCommand()
+    object ObserveSearching : AllStreamCommand()
 }

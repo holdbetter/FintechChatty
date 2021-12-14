@@ -81,7 +81,7 @@ class StreamRepository @Inject constructor(
 
     override fun startHandleSearchResults(): Observable<List<Stream>> {
         return searchRequest.subscribeOn(Schedulers.io())
-            .debounce(100, TimeUnit.MILLISECONDS)
+            .debounce(150, TimeUnit.MILLISECONDS)
             .switchMapSingle(::getSearchResponse)
     }
 
@@ -101,12 +101,12 @@ class StreamRepository @Inject constructor(
     }
 
     private fun getSearchResponse(request: String): Single<List<Stream>> {
-        return if (request.isBlank() || request.length < 2) {
+        val minimumLengthForSearch = 2
+        return if (request.isBlank() || request.length < minimumLengthForSearch) {
             Single.just(streamHolder!!)
         } else {
-            Single.just(streamHolder!!)
-                .subscribeOn(Schedulers.io())
-                .flatMapObservable { streams -> streams.toObservable() }
+            streamHolder!!.toObservable()
+                .subscribeOn(Schedulers.computation())
                 .filter { s -> isMatchingPattern(request, s.name) }
                 .toList()
         }

@@ -3,9 +3,12 @@ package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.EdgeEffect
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
@@ -22,6 +25,7 @@ import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.view.UserAdapter
 import com.holdbetter.fintechchatproject.databinding.FragmentPeopleBinding
 import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
+import com.holdbetter.fintechchatproject.domain.repository.IPeopleRepository
 import com.holdbetter.fintechchatproject.model.User
 import com.holdbetter.fintechchatproject.room.services.UnexpectedRoomException
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
@@ -46,6 +50,9 @@ class PeopleFragment :
 
     @Inject
     lateinit var peopleStore: PeopleStore
+
+    @Inject
+    lateinit var peopleRepository: IPeopleRepository
 
     lateinit var peopleComponent: PeopleComponent
 
@@ -81,12 +88,25 @@ class PeopleFragment :
                         )!!
                     )
                 })
+
+                edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
+                    override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
+                        return EdgeEffect(view.context).apply {
+                            color = resources.getColor(R.color.green_accent_alpha, app.theme)
+                        }
+                    }
+                }
+
                 adapter = UserAdapter(::userOnClick)
             }
-        }
 
-        if (store.currentState.users == null) {
-            store.accept(PeopleEvent.Ui.Started)
+            userSearchInput.doOnTextChanged { input, _, _, _ ->
+                store.accept(PeopleEvent.Ui.Searching(input.toString()))
+            }
+
+            if (store.currentState.users == null) {
+                store.accept(PeopleEvent.Ui.Started)
+            }
         }
     }
 
@@ -101,13 +121,30 @@ class PeopleFragment :
 
     override fun render(state: PeopleState) {
         shimming(state.isLoading)
-        state.users?.let(::setUsers)
+        state.users?.let {
+            setUsers(it)
+            enableSearch()
+        }
     }
 
     override fun shimming(turnOn: Boolean) {
         with(binding) {
-            shimmer.isVisible = turnOn
-            if (turnOn) shimmer.startShimmer() else shimmer.stopShimmer()
+            listShimmer.isVisible = turnOn
+
+            if (turnOn) {
+                listShimmer.startShimmer()
+                listShimmer.showShimmer(turnOn)
+
+                userSearchShimmer.startShimmer()
+                userSearchShimmer.showShimmer(turnOn)
+            } else {
+                listShimmer.hideShimmer()
+                listShimmer.stopShimmer()
+
+                userSearchShimmer.stopShimmer()
+                userSearchShimmer.hideShimmer()
+            }
+
             usersList.isVisible = !turnOn
         }
     }
@@ -116,6 +153,19 @@ class PeopleFragment :
         return when (effect) {
             is PeopleEffect.NavigateToUser -> navigateToUser(requireActivity(), effect.user)
             is PeopleEffect.ShowError -> handleError(effect.error)
+            is PeopleEffect.ShowSearchedData -> setUsers(effect.users)
+            PeopleEffect.EnableSearch -> enableSearch()
+        }
+    }
+
+    private fun enableSearch() {
+        with(binding) {
+            userSearchInput.isEnabled = true
+            peopleRepository.lastSearchRequest?.let {
+                userSearchInput.setText(it)
+            }.also {
+                peopleRepository.lastSearchRequest = null
+            }
         }
     }
 
@@ -153,8 +203,12 @@ class PeopleFragment :
 
         mainActivity.supportFragmentManager
             .beginTransaction()
-            .replace(R.id.main_host_fragment, detailUserFragment, DetailUserFragment::class.qualifiedName)
-            .addToBackStack("test")
+            .replace(
+                R.id.main_host_fragment,
+                detailUserFragment,
+                DetailUserFragment::class.qualifiedName
+            )
+            .addToBackStack(null)
             .commitAllowingStateLoss()
     }
 

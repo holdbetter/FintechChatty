@@ -3,10 +3,12 @@ package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channe
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.EdgeEffect
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
@@ -14,12 +16,15 @@ import com.holdbetter.fintechchatproject.app.MainActivity
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.stream.StreamEvent
 import com.holdbetter.fintechchatproject.app.chat.ChatFragment
 import com.holdbetter.fintechchatproject.databinding.FragmentStreamsSubOrNotBinding
+import com.holdbetter.fintechchatproject.databinding.NoStreamInstanceBinding
 import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
 import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.model.Topic
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.createStyledSnackbar
 import vivid.money.elmslie.android.base.ElmFragment
 import java.io.IOException
+import javax.inject.Inject
 
 abstract class StreamFragment<Effect : Any, State : Any>(
     private val onErrorRetryEvent: StreamEvent
@@ -27,6 +32,7 @@ abstract class StreamFragment<Effect : Any, State : Any>(
     ElmFragment<StreamEvent, Effect, State>(R.layout.fragment_streams_sub_or_not), IStreamFragment {
 
     val binding by viewBinding(FragmentStreamsSubOrNotBinding::bind)
+    val noStream by viewBinding(NoStreamInstanceBinding::bind)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
@@ -45,6 +51,14 @@ abstract class StreamFragment<Effect : Any, State : Any>(
                             )!!
                         )
                     })
+
+                edgeEffectFactory = object : RecyclerView.EdgeEffectFactory() {
+                    override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
+                        return EdgeEffect(view.context).apply {
+                            color = resources.getColor(R.color.green_accent_alpha, app.theme)
+                        }
+                    }
+                }
 
                 layoutManager = object : LinearLayoutManager(this.context, VERTICAL, false) {
                     override fun supportsPredictiveItemAnimations(): Boolean {
@@ -77,8 +91,8 @@ abstract class StreamFragment<Effect : Any, State : Any>(
 
     override fun shimming(turnOn: Boolean) {
         with(binding) {
-            shimmer.isVisible = turnOn
-            if (turnOn) shimmer.startShimmer() else shimmer.stopShimmer()
+            listShimmer.isVisible = turnOn
+            if (turnOn) listShimmer.startShimmer() else listShimmer.stopShimmer()
             streamsList.isVisible = !turnOn
         }
     }

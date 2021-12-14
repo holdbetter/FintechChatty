@@ -5,13 +5,10 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.MainActivity
-import com.holdbetter.fintechchatproject.app.chat.ChatFragment
 import com.holdbetter.fintechchatproject.databinding.TopicInstanceBinding
 import com.holdbetter.fintechchatproject.model.Topic
 

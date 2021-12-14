@@ -22,6 +22,13 @@ class PeopleActor @Inject constructor(private val peopleRepository: IPeopleRepos
                 successEvent = PeopleEvent.Internal.DataReady,
                 failureEventMapper = { error -> PeopleEvent.Internal.OnlineDataError(error) }
             )
+            PeopleCommand.ObserveSearching -> peopleRepository.startHandleSearchResults().mapSuccessEvent {
+                PeopleEvent.Internal.Searched(it)
+            }
+            is PeopleCommand.RunSearch -> {
+                peopleRepository.search(command.request)
+                Observable.empty()
+            }
         }
     }
 }
