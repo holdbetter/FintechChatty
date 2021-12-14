@@ -22,6 +22,7 @@ import com.holdbetter.fintechchatproject.services.FragmentExtensions.createStyle
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
 import java.io.IOException
+import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 class ChannelsFragment :
@@ -135,6 +136,11 @@ class ChannelsFragment :
             }
             is IOException, is NotConnectedException -> {
                 snackbar.setText(R.string.no_connection)
+                snackbar.duration = Snackbar.LENGTH_LONG
+                snackbar.setAction(R.string.try_again) { refreshPage() }
+            }
+            is TimeoutException -> {
+                snackbar.setText(R.string.timeout_connection)
                 snackbar.duration = Snackbar.LENGTH_LONG
                 snackbar.setAction(R.string.try_again) { refreshPage() }
             }

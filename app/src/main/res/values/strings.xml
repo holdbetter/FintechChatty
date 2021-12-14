@@ -26,6 +26,7 @@
     <string name="subscribed">Subscribed</string>
     <string name="all_streams">All streams</string>
     <string name="no_connection">Работает без интернета</string>
+    <string name="timeout_connection">Нестабильное соединение, ничего не получилось</string>
     <string name="default_error">Error</string>
     <string name="unexpected_room_exception">Произошло что-то страшное с базой данных, попробуйте переустановить приложение</string>
     <string name="reload">Перезагрузить</string>

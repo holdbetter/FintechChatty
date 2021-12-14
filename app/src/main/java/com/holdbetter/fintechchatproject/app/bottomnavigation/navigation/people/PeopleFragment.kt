@@ -33,6 +33,7 @@ import com.holdbetter.fintechchatproject.services.FragmentExtensions.createStyle
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
 import java.io.IOException
+import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 class PeopleFragment :
@@ -111,9 +112,7 @@ class PeopleFragment :
     }
 
     override val initEvent: PeopleEvent
-        get() {
-            return PeopleEvent.Ui.Init
-        }
+        get() = PeopleEvent.Ui.Init
 
     override fun createStore(): Store<PeopleEvent, PeopleEffect, PeopleState> {
         return peopleStore.provide()
@@ -177,6 +176,11 @@ class PeopleFragment :
             }
             is IOException, is NotConnectedException -> {
                 snackbar.setText(R.string.no_connection)
+                snackbar.duration = Snackbar.LENGTH_LONG
+                snackbar.setAction(R.string.try_again) { store.accept(PeopleEvent.Ui.Retry) }
+            }
+            is TimeoutException -> {
+                snackbar.setText(R.string.timeout_connection)
                 snackbar.duration = Snackbar.LENGTH_LONG
                 snackbar.setAction(R.string.try_again) { store.accept(PeopleEvent.Ui.Retry) }
             }

@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.holdbetter.fintechchatproject.di.ApplicationScope
+import com.holdbetter.fintechchatproject.domain.repository.IRepository.Companion.TIMEOUT_MILLIS
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toPersonalEntity
 import com.holdbetter.fintechchatproject.model.User
@@ -17,6 +18,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @ApplicationScope
@@ -38,6 +40,7 @@ class PersonalRepository @Inject constructor(
             .flatMap { it.getMyself() }
             .map { it.toPersonalEntity() }
             .doOnSuccess { preloadPersonalAvatar(it.avatarUrl, app.applicationContext) }
+            .timeout(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
             .flatMapCompletable { cacheMyself(it) }
     }
 

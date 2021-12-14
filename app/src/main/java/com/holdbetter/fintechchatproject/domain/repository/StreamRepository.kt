@@ -1,5 +1,6 @@
 package com.holdbetter.fintechchatproject.domain.repository
 
+import com.holdbetter.fintechchatproject.domain.repository.IRepository.Companion.TIMEOUT_MILLIS
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toStreamEntity
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toTopicEntity
@@ -55,6 +56,7 @@ class StreamRepository @Inject constructor(
             .flatMapObservable { streams -> Observable.fromIterable(streams) }
             .flatMapSingle { stream -> getTopicsOnline(stream) }
             .toList()
+            .timeout(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
             .observeOn(Schedulers.computation())
             .flatMap { applySubbedInfoTo(it) }
             .observeOn(Schedulers.io())

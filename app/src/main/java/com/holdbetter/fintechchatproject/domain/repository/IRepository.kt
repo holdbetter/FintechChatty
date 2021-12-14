@@ -6,7 +6,7 @@ import io.reactivex.rxjava3.core.Single
 
 interface IRepository {
     companion object {
-        const val TIMEOUT_MILLIS = 5000L
+        const val TIMEOUT_MILLIS = 7000L
     }
 
     val api: TinkoffZulipApi

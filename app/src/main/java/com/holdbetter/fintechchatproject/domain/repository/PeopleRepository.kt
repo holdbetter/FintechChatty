@@ -1,5 +1,6 @@
 package com.holdbetter.fintechchatproject.domain.repository
 
+import com.holdbetter.fintechchatproject.domain.repository.IRepository.Companion.TIMEOUT_MILLIS
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toUserEntity
 import com.holdbetter.fintechchatproject.model.User
@@ -80,9 +81,9 @@ class PeopleRepository @Inject constructor(
         return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
-            .delay(2000, TimeUnit.MILLISECONDS)
             .flatMap { it.getUsers() }
             .map { it.members.map { member -> member.toUserEntity() } }
+            .timeout(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
             .flatMapCompletable { cacheUsers(it) }
     }
 }
