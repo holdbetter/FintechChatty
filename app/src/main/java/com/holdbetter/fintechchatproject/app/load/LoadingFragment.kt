@@ -118,11 +118,7 @@ class LoadingFragment :
     override fun createStore(): Store<DataPrefetchEvent, DataPrefetchEffect, DataPrefetchState> =
         prefetchElmProvider.provide()
 
-    override fun render(state: DataPrefetchState) {
-        if (state.error != null) {
-            Log.d("error", "handle")
-        }
-    }
+    override fun render(state: DataPrefetchState) {}
 
     override fun handleEffect(effect: DataPrefetchEffect) {
         with(binding.internetOn) {
@@ -141,9 +137,11 @@ class LoadingFragment :
     }
 
     private fun runAnimations() {
+        val uiBlockInterval = 1000L
+
         Observable.fromIterable(viewsToAnimate)
             .subscribeOn(Schedulers.io())
-            .delayEach(1000, TimeUnit.MILLISECONDS)
+            .delayEach(uiBlockInterval, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .doOnComplete { initAnimationHandler() }
             .subscribe { runFadeInAnimation(it, emptyAnimatorListenerAdapter) }

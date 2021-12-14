@@ -5,6 +5,10 @@ import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
 import io.reactivex.rxjava3.core.Single
 
 interface IRepository {
+    companion object {
+        const val TIMEOUT_MILLIS = 5000L
+    }
+
     val api: TinkoffZulipApi
 
     fun getApi(isConnected: Boolean): Single<TinkoffZulipApi> {

@@ -1,5 +1,10 @@
 package com.holdbetter.fintechchatproject.domain.repository
 
+import android.app.Application
+import android.content.Context
+import android.graphics.drawable.Drawable
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.holdbetter.fintechchatproject.di.ApplicationScope
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toPersonalEntity
@@ -17,6 +22,7 @@ import javax.inject.Inject
 @ApplicationScope
 class PersonalRepository @Inject constructor(
     private val personalDao: PersonalDao,
+    private val app: Application,
     private val connectivityManager: MyConnectivityManager,
     override val api: TinkoffZulipApi
 ) : IPersonalRepository {
@@ -31,7 +37,16 @@ class PersonalRepository @Inject constructor(
             .flatMap { getApi(it) }
             .flatMap { it.getMyself() }
             .map { it.toPersonalEntity() }
+            .doOnSuccess { preloadPersonalAvatar(it.avatarUrl, app.applicationContext) }
             .flatMapCompletable { cacheMyself(it) }
+    }
+
+    private fun preloadPersonalAvatar(avatarUrl: String, applicationContext: Context): Drawable {
+        return Glide.with(applicationContext)
+            .load(avatarUrl)
+            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            .submit()
+            .get()
     }
 
     override fun getCachedMyself(): Maybe<User> {
