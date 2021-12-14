@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:background="@color/activity_background">
+    tools:background="@color/activity_background"
+    tools:ignore="MergeRootFrame">
 
     <TextView
         android:id="@+id/error_text"
