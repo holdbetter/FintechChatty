@@ -132,7 +132,14 @@ class PeopleFragment :
         shimming(state.isLoading)
         state.users?.let {
             setUsers(it)
-            enableSearch()
+
+            if (it.isNotEmpty()) {
+                binding.usersList.isVisible = true
+                enableSearch()
+            } else {
+                binding.noPeople.root.isVisible = true
+            }
+
             enableRefreshing()
         }
     }
@@ -143,7 +150,10 @@ class PeopleFragment :
             listShimmer.isVisible = turnOn
 
             if (turnOn) {
-                swipeToRefresh.isRefreshing = false
+                swipeToRefresh.isRefreshing = !turnOn
+                usersList.isVisible = !turnOn
+                noPeople.root.isVisible = !turnOn
+
 
                 listShimmer.startShimmer()
                 listShimmer.showShimmer(turnOn)
@@ -157,8 +167,6 @@ class PeopleFragment :
                 userSearchShimmer.stopShimmer()
                 userSearchShimmer.hideShimmer()
             }
-
-            usersList.isVisible = !turnOn
         }
     }
 

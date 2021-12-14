@@ -17,6 +17,7 @@
     <string name="try_again">Повторить</string>
     <string name="try_again_longer">Попробуй еще раз</string>
     <string name="no_stream">We couldn\'t find \n any stream</string>
+    <string name="no_people">you have no one.</string>
     <string name="emoji_loading">Загружаем смайлы</string>
     <string name="finding_bugs">Ищем жуков</string>
     <string name="discover_you">Узнаем кто вы</string>
