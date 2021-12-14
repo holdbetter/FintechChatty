@@ -73,6 +73,16 @@ class PeopleFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
+            with(swipeToRefresh) {
+                isEnabled = false
+                setColorSchemeResources(R.color.white)
+                setProgressBackgroundColorSchemeResource(R.color.green_accent)
+                setOnRefreshListener {
+                    swipeToRefresh.isEnabled = false
+                    store.accept(PeopleEvent.Ui.Retry)
+                }
+            }
+
             shimmerContent.apply {
                 adapter = ShimmerPlaceholderUserListAdapter(this.context)
             }
@@ -123,14 +133,18 @@ class PeopleFragment :
         state.users?.let {
             setUsers(it)
             enableSearch()
+            enableRefreshing()
         }
     }
+
 
     override fun shimming(turnOn: Boolean) {
         with(binding) {
             listShimmer.isVisible = turnOn
 
             if (turnOn) {
+                swipeToRefresh.isRefreshing = false
+
                 listShimmer.startShimmer()
                 listShimmer.showShimmer(turnOn)
 
@@ -166,6 +180,10 @@ class PeopleFragment :
                 peopleRepository.lastSearchRequest = null
             }
         }
+    }
+
+    private fun enableRefreshing() {
+        binding.swipeToRefresh.isEnabled = true
     }
 
     private fun handleError(error: Throwable) {

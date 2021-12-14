@@ -3,7 +3,6 @@ package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.profil
 import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.children
 import androidx.core.view.isVisible
@@ -66,12 +65,20 @@ class ProfileFragment :
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.logOut.setOnClickListener {
-            Toast.makeText(it.context, "No action yet!", Toast.LENGTH_SHORT).show()
-        }
+        with(binding) {
+            with(swipeToRefresh) {
+                isEnabled = false
+                setColorSchemeResources(com.holdbetter.fintechchatproject.R.color.white)
+                setProgressBackgroundColorSchemeResource(com.holdbetter.fintechchatproject.R.color.green_accent)
+                setOnRefreshListener {
+                    swipeToRefresh.isEnabled = false
+                    store.accept(ProfileEvent.Ui.Retry)
+                }
+            }
 
-        if (store.currentState.user == null) {
-            store.accept(ProfileEvent.Ui.Started)
+            if (store.currentState.user == null) {
+                store.accept(ProfileEvent.Ui.Started)
+            }
         }
     }
 
@@ -84,6 +91,7 @@ class ProfileFragment :
 
     override fun render(state: ProfileState) {
         shimming(state.isLoading)
+        if (!state.isLoading) binding.swipeToRefresh.isRefreshing = false
         bindUser(state.user)
         cacheEmptyUi(state.isCacheEmpty)
     }
@@ -115,6 +123,7 @@ class ProfileFragment :
                     .into(binding.userImage)
 
                 profileContent.isVisible = true
+                swipeToRefresh.isEnabled = true
             } else {
                 profileContent.isVisible = false
             }
