@@ -1,5 +1,7 @@
 package com.holdbetter.fintechchatproject.model
 
+import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
+
 
 data class User(
     val id: Long,
@@ -11,9 +13,9 @@ data class User(
     companion object {
         fun statusFromString(status: String): UserStatus {
             return when (status) {
-                "offline" -> UserStatus.OFFLINE
-                "idle" -> UserStatus.IDLE
-                "active" -> UserStatus.ACTIVE
+                TinkoffZulipApi.ZulipStatus.OFFLINE -> UserStatus.OFFLINE
+                TinkoffZulipApi.ZulipStatus.IDLE -> UserStatus.IDLE
+                TinkoffZulipApi.ZulipStatus.ACTIVE -> UserStatus.ACTIVE
                 else -> UserStatus.OFFLINE
             }
         }

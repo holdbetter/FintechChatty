@@ -117,13 +117,13 @@ class PeopleRepository @Inject constructor(
         val idleLimitSeconds = 200
         return when {
             threshold > offlineLimitSeconds -> {
-                "offline"
+                TinkoffZulipApi.ZulipStatus.OFFLINE
             }
             threshold > idleLimitSeconds -> {
-                "idle"
+                TinkoffZulipApi.ZulipStatus.IDLE
             }
             else -> {
-                "active"
+                TinkoffZulipApi.ZulipStatus.ACTIVE
             }
         }
     }

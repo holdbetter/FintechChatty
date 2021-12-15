@@ -6,6 +6,12 @@ import okhttp3.ResponseBody
 import retrofit2.http.*
 
 interface TinkoffZulipApi {
+    object ZulipStatus {
+        const val OFFLINE = "offline"
+        const val ACTIVE = "active"
+        const val IDLE = "idle"
+    }
+
     @GET("streams")
     fun getStreams(): Single<StreamResponse>
 
