@@ -26,4 +26,8 @@
     <color name="invisible">#00FFFFFF</color>
     <color name="green_accent">#219653</color>
     <color name="green_accent_alpha">#40219653</color>
+
+    <color name="user_offline_color">#616161</color>
+    <color name="user_idle_color">#FF9426</color>
+    <color name="user_active_color">#4AB54D</color>
 </resources>

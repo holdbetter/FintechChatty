@@ -11,6 +11,7 @@ sealed class PeopleCommand {
     object LoadPeople : PeopleCommand()
     object GetCachedPeople : PeopleCommand()
     object ObserveSearching : PeopleCommand()
+    object GetCachedPeopleWithoutPresence : PeopleCommand()
 
     class RunSearch(val request: String) : PeopleCommand()
 }

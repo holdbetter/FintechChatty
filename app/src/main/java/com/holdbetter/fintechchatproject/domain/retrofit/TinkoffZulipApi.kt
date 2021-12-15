@@ -54,6 +54,12 @@ interface TinkoffZulipApi {
         @Field("reaction_type") reactionType: String = "unicode_emoji"
     ): Single<ResponseBody>
 
+    @FormUrlEncoded
+    @POST("users/me/presence")
+    fun sendStatus(
+        @Field("status") status: String = "active"
+    ): Single<PresenceResponse>
+
     @GET("users")
     fun getUsers(): Single<AllUsersResponse>
 

@@ -62,6 +62,10 @@ object NetworkMapper {
         )
     }
 
+    fun List<Member>.toUserEntity(): List<UserEntity> {
+        return map { it.toUserEntity() }
+    }
+
     fun Member.toUserEntity(): UserEntity {
         return UserEntity(
             this.userID,

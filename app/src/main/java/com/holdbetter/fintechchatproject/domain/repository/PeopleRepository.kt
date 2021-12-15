@@ -1,5 +1,6 @@
 package com.holdbetter.fintechchatproject.domain.repository
 
+import com.holdbetter.fintechchatproject.domain.entity.PresenceResponse
 import com.holdbetter.fintechchatproject.domain.repository.IRepository.Companion.TIMEOUT_MILLIS
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toUserEntity
@@ -28,9 +29,9 @@ class PeopleRepository @Inject constructor(
 
     private val searchRequest: PublishSubject<String> = PublishSubject.create()
 
-    override fun getCachedUsers(): Single<List<User>> {
+    override fun getCachedUsers(ignorePresence: Boolean): Single<List<User>> {
         return peopleDao.getUsers()
-            .map { it.toUserList() }
+            .map { it.toUserList(ignorePresence) }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSuccess { saveLocally(it) }
             .observeOn(Schedulers.io())
@@ -82,8 +83,52 @@ class PeopleRepository @Inject constructor(
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
             .flatMap { it.getUsers() }
-            .map { it.members.map { member -> member.toUserEntity() } }
+            .map { it.members.toUserEntity() }
+            .flatMap { addPresenceInfo(it) }
             .timeout(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
             .flatMapCompletable { cacheUsers(it) }
+    }
+
+    private fun addPresenceInfo(users: List<UserEntity>): Single<List<UserEntity>> {
+        return api.sendStatus()
+            .flatMap { applyPresence(it, users) }
+    }
+
+    private fun applyPresence(
+        presenceResponse: PresenceResponse,
+        users: List<UserEntity>
+    ): Single<List<UserEntity>> {
+        return Observable.fromIterable(presenceResponse.presences.entries)
+            .map { entry ->
+                users.getUserByMail(entry.key)
+                    .also {
+                        it.status = getStatusByThreshold(
+                            presenceResponse.serverTimestamp,
+                            entry.value.aggregated.timestamp
+                        )
+                    }
+            }
+            .toList()
+    }
+
+    private fun getStatusByThreshold(serverTimestamp: Double, userTimestamp: Long): String {
+        val threshold = serverTimestamp - userTimestamp
+        val offlineLimitSeconds = 400
+        val idleLimitSeconds = 200
+        return when {
+            threshold > offlineLimitSeconds -> {
+                "offline"
+            }
+            threshold > idleLimitSeconds -> {
+                "idle"
+            }
+            else -> {
+                "active"
+            }
+        }
+    }
+
+    private fun List<UserEntity>.getUserByMail(mail: String): UserEntity {
+        return this.first { user -> user.mail == mail }
     }
 }

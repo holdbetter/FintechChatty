@@ -10,5 +10,7 @@ class UserEntity(
     @PrimaryKey val id: Long,
     val name: String,
     val mail: String,
-    @ColumnInfo(name = "avatar_url") val avatarUrl: String
+    @ColumnInfo(name = "avatar_url") val avatarUrl: String,
+    @ColumnInfo(defaultValue = "idle") var status: String = "idle",
+    @ColumnInfo(defaultValue = "0") val timestamp: Long = 0
 )

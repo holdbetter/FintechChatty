@@ -16,7 +16,7 @@ class PeopleReducer @Inject constructor() :
                 commands { +PeopleCommand.LoadPeople }
             }
             is PeopleEvent.Internal.OnlineDataError -> {
-                commands { +PeopleCommand.GetCachedPeople }
+                commands { +PeopleCommand.GetCachedPeopleWithoutPresence }
                 effects { +PeopleEffect.ShowError(event.error) }
             }
             is PeopleEvent.Internal.DataLoaded -> {

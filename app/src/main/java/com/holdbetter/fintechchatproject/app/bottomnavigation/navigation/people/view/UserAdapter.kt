@@ -1,14 +1,20 @@
 package com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.people.view
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.databinding.UserListInstanceBinding
 import com.holdbetter.fintechchatproject.model.User
+import com.holdbetter.fintechchatproject.model.UserStatus
+import com.holdbetter.fintechchatproject.model.UserStatus.*
 
 class UserAdapter(val onUserClicked: (User) -> Unit) :
     RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
@@ -59,11 +65,26 @@ class UserAdapter(val onUserClicked: (User) -> Unit) :
 
                 userName.text = user.name
                 userMail.text = user.mail
+                userOnlineStatus.imageTintList = getStatusColor(user.status)
 
                 root.setOnClickListener {
                     onUserClicked(user)
                 }
             }
+        }
+
+        private fun getStatusColor(status: UserStatus): ColorStateList {
+            val context = binding.root.context
+            val resources = context.resources
+            val theme = context.theme
+
+            val colorInt =  when(status) {
+                OFFLINE -> resources.getColor(R.color.user_offline_color, theme)
+                IDLE -> resources.getColor(R.color.user_idle_color, theme)
+                ACTIVE -> resources.getColor(R.color.user_active_color, theme)
+            }
+
+            return ColorStateList.valueOf(colorInt)
         }
     }
 }

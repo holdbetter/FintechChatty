@@ -1,10 +1,7 @@
 package com.holdbetter.fintechchatproject.room.services
 
 import com.holdbetter.fintechchatproject.domain.entity.EmojiApi
-import com.holdbetter.fintechchatproject.model.Reaction
-import com.holdbetter.fintechchatproject.model.Stream
-import com.holdbetter.fintechchatproject.model.Topic
-import com.holdbetter.fintechchatproject.model.User
+import com.holdbetter.fintechchatproject.model.*
 import com.holdbetter.fintechchatproject.room.entity.*
 
 object DatabaseMapper {
@@ -49,8 +46,12 @@ object DatabaseMapper {
         }
     }
 
-    fun List<UserEntity>.toUserList(): List<User> {
-        return map { it.toUser() }
+    fun List<UserEntity>.toUserList(ignorePresence: Boolean = false): List<User> {
+        return if (ignorePresence) {
+            map { User(it.id, it.name, it.mail, it.avatarUrl, UserStatus.OFFLINE) }
+        } else {
+            map { it.toUser() }
+        }
     }
 
     fun PersonalEntity.toUser(): User {
@@ -58,7 +59,8 @@ object DatabaseMapper {
             this.id,
             this.name,
             this.mail,
-            this.avatarUrl
+            this.avatarUrl,
+            UserStatus.OFFLINE
         )
     }
 
@@ -67,7 +69,8 @@ object DatabaseMapper {
             this.id,
             this.name,
             this.mail,
-            this.avatarUrl
+            this.avatarUrl,
+            User.statusFromString(this.status)
         )
     }
 }

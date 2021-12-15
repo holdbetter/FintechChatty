@@ -18,13 +18,22 @@ class PeopleActor @Inject constructor(private val peopleRepository: IPeopleRepos
                     )
                 }
             )
+            PeopleCommand.GetCachedPeopleWithoutPresence -> peopleRepository.getCachedUsers(ignorePresence = true).mapEvents(
+                successEventMapper = { users -> PeopleEvent.Internal.DataLoaded(users) },
+                failureEventMapper = { error ->
+                    PeopleEvent.Internal.DbDataError(
+                        UnexpectedRoomException(error)
+                    )
+                }
+            )
             PeopleCommand.LoadPeople -> peopleRepository.getUsersOnline().mapEvents(
                 successEvent = PeopleEvent.Internal.DataReady,
                 failureEventMapper = { error -> PeopleEvent.Internal.OnlineDataError(error) }
             )
-            PeopleCommand.ObserveSearching -> peopleRepository.startHandleSearchResults().mapSuccessEvent {
-                PeopleEvent.Internal.Searched(it)
-            }
+            PeopleCommand.ObserveSearching -> peopleRepository.startHandleSearchResults()
+                .mapSuccessEvent {
+                    PeopleEvent.Internal.Searched(it)
+                }
             is PeopleCommand.RunSearch -> {
                 peopleRepository.search(command.request)
                 Observable.empty()
