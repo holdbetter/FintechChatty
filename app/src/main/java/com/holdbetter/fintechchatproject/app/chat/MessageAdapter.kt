@@ -5,13 +5,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.findFragment
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.chat.view.EmojiBottomModalFragment
 import com.holdbetter.fintechchatproject.model.Message
 import com.holdbetter.fintechchatproject.ui.FlexBoxLayout
 import com.holdbetter.fintechchatproject.ui.ForeignMessageLayout
@@ -19,20 +16,15 @@ import com.holdbetter.fintechchatproject.ui.IMessageLayout
 import com.holdbetter.fintechchatproject.ui.ReactionView
 
 class MessageAdapter(
-    val reactionPressedUpdater: (
+    private val currentUserId: Long,
+    private val reactionListener: (
         isReactionSelectedNow: Boolean,
         messageId: Long,
         emojiName: String,
-        emojiCode: String,
     ) -> Unit,
+    private val emojiDialogShower: (messageId: Long) -> Boolean
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    companion object {
-        const val DEFAULT_USER_ID_VALUE = -1L
-    }
-
     private val asyncDiffer = AsyncListDiffer(this, MessageDiffUtilCallback())
-    private var currentUserId: Long = DEFAULT_USER_ID_VALUE
 
     val messages: List<Message>
         get() = asyncDiffer.currentList
@@ -48,11 +40,11 @@ class MessageAdapter(
             }
             MessageType.MYSELF.ordinal -> {
                 root = i.inflate(R.layout.myself_message_instance, parent, false)
-                MessageViewHolder(root)
+                MessageViewHolder(root, reactionListener, emojiDialogShower)
             }
             else -> {
                 root = i.inflate(R.layout.foreign_message_instance, parent, false)
-                MessageViewHolder(root)
+                MessageViewHolder(root, reactionListener, emojiDialogShower)
             }
         }
     }
@@ -84,15 +76,14 @@ class MessageAdapter(
         }
     }
 
-    fun submitList(messages: List<Message>, currentUserId: Long) {
-        this.currentUserId = currentUserId
+    fun submitList(messages: List<Message>) {
         asyncDiffer.submitList(messages)
     }
 
-    fun sendMessage(message: Message) {
+    fun sendMessage(message: Message, messageAddedWithLoadingUiCallback: () -> Unit) {
         val currentList = ArrayList(asyncDiffer.currentList)
         currentList.add(message)
-        asyncDiffer.submitList(currentList)
+        asyncDiffer.submitList(currentList, messageAddedWithLoadingUiCallback)
     }
 
     fun submitSentMessage(messages: List<Message>) {
@@ -103,10 +94,14 @@ class MessageAdapter(
 
         val updateMessages = ArrayList(messages)
         updateMessages.addAll(notReceivedSubList)
-        asyncDiffer.submitList(updateMessages)
+        asyncDiffer.submitList(messages)
     }
 
-    inner class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class MessageViewHolder(
+        itemView: View,
+        private val reactionListener: (isReactionSelectedNow: Boolean, messageId: Long, emojiName: String) -> Unit,
+        private val emojiDialogShower: (messageId: Long) -> Boolean
+    ) : RecyclerView.ViewHolder(itemView) {
         private val messageLayout = itemView as IMessageLayout
         private val flexbox: FlexBoxLayout = itemView.findViewById(R.id.flexbox)
         private val messageView: TextView = itemView.findViewById(R.id.message)
@@ -123,31 +118,29 @@ class MessageAdapter(
             ).removeSuffix("\n\n")
 
             messageView.setOnLongClickListener {
-                val parentFragment = it.findFragment<Fragment>().childFragmentManager
-                EmojiBottomModalFragment(message.id).show(parentFragment,
-                    EmojiBottomModalFragment.TAG)
-                true
+                return@setOnLongClickListener emojiDialogShower(message.id)
             }
 
             flexbox.removeAllViews()
             for (reactionGroup in message.reactions.groupBy { it.emojiCode }.iterator()) {
-                flexbox.addView(ReactionView(itemView.context).apply {
-                    emojiUnicode = reactionGroup.key
-                    count = reactionGroup.value.size
-                    isSelected = reactionGroup.value.any { it.userId == currentUserId }
-                    setOnClickListener {
-                        val reaction = reactionGroup.value[0]
-                        reactionPressedUpdater(isSelected, message.id, reaction.emojiName, reaction.emojiCode)
-                        isSelected = !isSelected
+                flexbox.addView(
+                    ReactionView(itemView.context).apply {
+                        val (emojiCode, userIdsOnReaction) = reactionGroup
+                        emojiUnicode = emojiCode
+                        count = userIdsOnReaction.size
+
+                        isSelected = userIdsOnReaction.any { it.userId == currentUserId }
+
+                        setOnClickListener {
+                            val reaction = userIdsOnReaction.first()
+                            reactionListener(isSelected, message.id, reaction.emojiName)
+                            isSelected = !isSelected
+                        }
                     }
-                })
+                )
             }
 
-            flexbox.plusViewOnClickListener = {
-                val parentFragment = flexbox.findFragment<Fragment>().childFragmentManager
-                EmojiBottomModalFragment(message.id).show(parentFragment,
-                    EmojiBottomModalFragment.TAG)
-            }
+            flexbox.plusViewOnClickListener = { emojiDialogShower(message.id) }
         }
     }
 

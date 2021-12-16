@@ -25,10 +25,10 @@ interface TinkoffZulipApi {
     fun getMyself(): Single<UserResponse>
 
     @GET("messages")
-    fun getMessages(
+    fun getNewestMessages(
         @Query("narrow") jsonNarrow: String,
         @Query("anchor") anchor: String = MessageAnchors.NEWEST.value,
-        @Query("num_before") numBefore: Int = 40,
+        @Query("num_before") numBefore: Int = 80,
         @Query("num_after") numAfter: Int = 0,
         @Query("apply_markdown") shouldBeHtml: Boolean = true
     ): Single<MessageResponse>

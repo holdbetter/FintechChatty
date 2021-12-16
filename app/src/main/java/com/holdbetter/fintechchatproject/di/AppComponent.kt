@@ -2,7 +2,8 @@ package com.holdbetter.fintechchatproject.di
 
 import android.app.Application
 import com.holdbetter.fintechchatproject.app.MainActivity
-import com.holdbetter.fintechchatproject.app.chat.di.ChatSubcomponent
+import com.holdbetter.fintechchatproject.app.chat.di.ChatComponent
+import com.holdbetter.fintechchatproject.app.chat.view.EmojiBottomModalFragment
 import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository
 import com.holdbetter.fintechchatproject.domain.repository.IPersonalRepository
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
@@ -17,7 +18,6 @@ import dagger.Component
 @Component(
     modules = [
         AppModule::class,
-        AppSubcomponents::class,
         DaoModule::class,
         DomainModule::class,
         RepositoryModule::class
@@ -44,8 +44,7 @@ interface AppComponent : AndroidDependencies, DomainDependencies, RepositoryDepe
     }
 
     fun inject(mainActivity: MainActivity)
-
-    fun chatComponent(): ChatSubcomponent.Factory
+    fun inject(emojiBottomModalFragment: EmojiBottomModalFragment)
 }
 
 interface RepositoryDependencies {

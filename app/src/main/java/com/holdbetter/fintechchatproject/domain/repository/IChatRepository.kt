@@ -8,8 +8,12 @@ import io.reactivex.rxjava3.core.Single
 import okhttp3.ResponseBody
 
 interface IChatRepository: IRepository {
-    fun getMessages(narrow: Narrow): Single<List<Message>>
-    fun sendMessage(streamId: Long, topicName: String, textMessage: String): Single<SentMessageResponse>
-    fun sendReaction(messageId: Long, emojiApi: EmojiApi): Single<ResponseBody>
-    fun removeReaction(messageId: Long, emojiApi: EmojiApi): Single<ResponseBody>
+    val streamId: Long
+    val topicName: String
+    val originalEmojiList: List<EmojiApi>
+
+    fun getFirstPortion(): Single<List<Message>>
+    fun sendMessage(textMessage: String): Single<List<Message>>
+    fun sendReaction(messageId: Long, emojiNameToUpdate: String): Single<List<Message>>
+    fun removeReaction(messageId: Long, emojiNameToUpdate: String): Single<List<Message>>
 }

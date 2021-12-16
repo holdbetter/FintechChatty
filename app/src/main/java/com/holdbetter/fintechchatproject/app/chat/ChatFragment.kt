@@ -4,22 +4,33 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
-import android.widget.TextView
+import android.widget.Toast
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.progressindicator.CircularProgressIndicator
+import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.app.chat.di.DaggerChatComponent
+import com.holdbetter.fintechchatproject.app.chat.elm.*
+import com.holdbetter.fintechchatproject.app.chat.services.DateOnChatDecorator
+import com.holdbetter.fintechchatproject.app.chat.services.ScrollLinearLayoutManager
+import com.holdbetter.fintechchatproject.app.chat.view.EmojiBottomModalFragment
 import com.holdbetter.fintechchatproject.app.chat.view.IChatViewer
-import com.holdbetter.fintechchatproject.app.chat.viewmodel.ChatViewModel
-import com.holdbetter.fintechchatproject.app.chat.viewmodel.ChatViewModelFactory
+import com.holdbetter.fintechchatproject.databinding.FragmentChatBinding
+import com.holdbetter.fintechchatproject.domain.repository.ChatRepositoryFactory
+import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository
+import com.holdbetter.fintechchatproject.domain.repository.IPersonalRepository
+import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toSender
+import com.holdbetter.fintechchatproject.model.Message
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
+import vivid.money.elmslie.android.base.ElmFragment
+import vivid.money.elmslie.core.store.Store
+import java.util.*
 import javax.inject.Inject
+import kotlin.properties.Delegates.notNull
 
-class ChatFragment : Fragment(R.layout.fragment_chat), IChatViewer {
+class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.fragment_chat),
+    IChatViewer {
     companion object {
         const val TOPIC_NAME_KEY = "topic"
         const val STREAM_ID_KEY = "streamId"
@@ -37,196 +48,214 @@ class ChatFragment : Fragment(R.layout.fragment_chat), IChatViewer {
     }
 
     @Inject
-    lateinit var chatViewModelFactory: ChatViewModelFactory
-    private val chatViewModel: ChatViewModel by viewModels {
-        chatViewModelFactory
-    }
+    lateinit var personalRepository: IPersonalRepository
+    @Inject
+    lateinit var emojiRepository: IEmojiRepository
+    @Inject
+    lateinit var chatRepositoryFactory: ChatRepositoryFactory
+    @Inject
+    lateinit var chatActorFactory: ChatActorFactory
+    @Inject
+    lateinit var chatStoreFactory: ChatStoreFactory
 
-//    private val personalViewModel: PersonalViewModel by activityViewModels()
+    lateinit var chatStore: ChatStore
 
-    private var streamId: Long? = null
-    private var topicName: String? = null
-    private var streamName: String? = null
+    val binding by viewBinding(FragmentChatBinding::bind)
 
-    private var messageList: RecyclerView? = null
-    private var progress: CircularProgressIndicator? = null
-    private var inputMessage: EditText? = null
-    private var chatActionButton: MaterialButton? = null
-    private var hashtagToolbarTitle: MaterialToolbar? = null
-    private var topicSubtitle: TextView? = null
+    var streamId: Long by notNull()
+    lateinit var topicName: String
+    lateinit var streamName: String
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        app.appComponent.chatComponent().create().inject(this)
+        with(requireArguments()) {
+            streamId = getLong(STREAM_ID_KEY)
+            streamName = getString(STREAM_NAME_KEY)!!
+            topicName = getString(TOPIC_NAME_KEY)!!
+        }
+
+        with(app.appComponent) {
+            DaggerChatComponent.factory().create(
+                androidDependencies = this,
+                domainDependencies = this,
+                repositoryDependencies = this
+            ).inject(this@ChatFragment)
+        }
+
+        chatStore = chatStoreFactory.create(
+            chatActorFactory.create(
+                chatRepositoryFactory.create(
+                    streamId,
+                    topicName,
+                    emojiRepository.originalEmojiList
+                )
+            )
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        streamId = requireArguments().getLong(STREAM_ID_KEY)
-//        streamName = requireArguments().getString(STREAM_NAME_KEY)
-//        topicName = requireArguments().getString(TOPIC_NAME_KEY)
+        childFragmentManager.setFragmentResultListener(
+            EmojiBottomModalFragment.RESULT_REQUEST_KEY,
+            this
+        ) { _, bundle ->
+            val emojiName = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_NAME_KEY)!!
+            val emojiCode = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_CODE_KEY)!!
+            val messageId = bundle.getLong(EmojiBottomModalFragment.MESSAGE_ID_KEY)
 
-//        childFragmentManager.setFragmentResultListener(EmojiBottomModalFragment.RESULT_REQUEST_KEY,
-//            this) { _, bundle ->
-//            val emojiName = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_NAME_KEY)
-//            val emojiCode = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_CODE_KEY)
-//            val messageId = bundle.getLong(EmojiBottomModalFragment.MESSAGE_ID_KEY)
-
-//            chatViewModel.sendReaction(
-//                emojiViewModel.originalEmojiList,
-//                messageId,
-//                Reaction(
-//                    personalViewModel.currentUserId,
-//                    emojiName!!,
-//                    emojiCode!!
-//                ),
-//                streamId!!,
-//                topicName!!
-//            )
-//        }
+            store.accept(
+                ChatEvent.Ui.ReactionSent(
+                    messageId,
+                    emojiName
+                )
+            )
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        initViewHierarchy(view)
-//        this.bind()
+        with(binding) {
+            messages.apply {
+                layoutManager = ScrollLinearLayoutManager(context)
+                adapter = MessageAdapter(
+                    personalRepository.meId,
+                    this@ChatFragment::onReactionPressed,
+                    this@ChatFragment::onMessageLongClicked
+                )
+                addItemDecoration(DateOnChatDecorator(context))
+            }
+
+            chatTitle.apply {
+                title = "#${streamName}"
+                setNavigationOnClickListener {
+                    requireActivity().supportFragmentManager.popBackStack()
+                }
+            }
+
+            topicSubtitle.text = String.format("Topic: %s", topicName)
+
+            inputMessage.apply {
+                doOnTextChanged { text, _, _, _ ->
+                    chatActionButton.isActivated = !text.isNullOrBlank()
+                }
+            }
+
+            chatActionButton.setOnClickListener(::onSendClicked)
+
+            if (store.currentState.messages == null) {
+                store.accept(ChatEvent.Ui.Started)
+            }
+        }
     }
 
-//    private fun bind() {
-//        chatViewModel.getMessages(
-//            personalViewModel::getMyself,
-//            Narrow.MessageNarrow(streamId!!, topicName!!)
-//        )
-//
-//        chatViewModel.chatViewState.observe(viewLifecycleOwner, ::handleChatViewState)
-//        hashtagToolbarTitle?.title = "#${streamName!!}"
-//        topicSubtitle?.text = String.format("Topic: %s", topicName!!)
-//    }
-//
-//    private fun initViewHierarchy(view: View) {
-//        messageList = view.findViewById<RecyclerView>(R.id.messages).apply {
-//            layoutManager = ScrollLinearLayoutManager(context)
-//            adapter = MessageAdapter(this@ChatFragment::onReactionPressed)
-//            addItemDecoration(DateOnChatDecorator(context))
-//        }
-//
-//        progress = view.findViewById(R.id.progress)
-//        inputMessage = view.findViewById(R.id.input_message)
-//        chatActionButton = view.findViewById(R.id.chat_action_button)
-//
-//        hashtagToolbarTitle = view.findViewById<MaterialToolbar>(R.id.chat_hashtag_title).apply {
-//            setNavigationOnClickListener {
-//                requireActivity().supportFragmentManager.popBackStack()
-//            }
-//        }
-//
-//        topicSubtitle = view.findViewById(R.id.topic_name)
-//
-//        val chatActionButton = view.findViewById<MaterialButton>(R.id.chat_action_button)
-//        val inputMessage = view.findViewById<EditText>(R.id.input_message).apply {
-//            doOnTextChanged { text, _, _, _ ->
-//                chatActionButton.isActivated = !text.isNullOrBlank()
-//            }
-//        }
-//
-//        chatActionButton.setOnClickListener { sendTextButton ->
-//            if (sendTextButton.isActivated) {
-//                chatViewModel.sendMessage(streamId!!, topicName!!, inputMessage.text.toString())
-//                clearTextField(inputMessage)
-//            } else {
-//                showNotSupportedFeatureNotification(view)
-//            }
-//        }
-//    }
-//
-//    private fun handleChatViewState(state: ChatViewState) {
-//        when (state) {
-//            is ChatViewState.Error -> handleError(state.error)
-//            ChatViewState.Loading -> startLoading()
-//            is ChatViewState.MessagesUpdate -> {
-//                stopLoading()
-//                setMessages(state.messages)
-//            }
-//            is ChatViewState.MessageSent -> onMessageSent(state.textMessage)
-//            is ChatViewState.MessageReceived -> onMessageReceived(state.messages)
-//            is ChatViewState.MessageSendError -> handleError(state.error)
-//        }
-//    }
-//
-//    private fun handleError(error: Throwable) {
-//        Snackbar.make(requireView(), "Problems in reaction update", Snackbar.LENGTH_SHORT).show()
-//    }
-//
-//    override fun startLoading() {
-//        inputMessage!!.isVisible = false
-//        chatActionButton!!.isVisible = false
-//        inputMessage!!.isVisible = false
-//
-//        progress!!.isVisible = true
-//    }
-//
-//    override fun stopLoading() {
-//        progress!!.isVisible = false
-//
-//        inputMessage!!.isVisible = true
-//        chatActionButton!!.isVisible = true
-//        inputMessage!!.isVisible = true
-//    }
-//
-//    private fun clearTextField(inputMessage: EditText) {
-//        inputMessage.text = null
-//    }
-//
-//    private fun showNotSupportedFeatureNotification(view: View) {
-//        Toast.makeText(view.context,
-//            "Attaching files isn't ready yet",
-//            Toast.LENGTH_SHORT).show()
-//    }
-//
-//    override fun setMessages(messages: List<Message>) {
-//        messageList?.let {
-//            (it.adapter as MessageAdapter).submitList(messages, personalViewModel.currentUserId)
-//        }
-//    }
-//
-//    private fun onMessageSent(messageText: String) {
-//        val message = Message(Message.NOT_SENT_MESSAGE,
-//            personalViewModel.currentUser.value!!.toSender(),
-//            messageText,
-//            Calendar.getInstance().timeInMillis / 1000
-//        )
-//
-//        messageList?.let {
-//            (it.adapter as MessageAdapter).sendMessage(message)
-//        }
-//    }
-//
-//    private fun onMessageReceived(messages: List<Message>) {
-//        messageList?.let {
-//            (it.adapter as MessageAdapter).submitSentMessage(messages)
-//        }
-//    }
-//
-//    private fun onReactionPressed(
-//        isReactionSelectedNow: Boolean,
-//        messageId: Long,
-//        emojiName: String,
-//        emojiCode: String,
-//    ) {
-//        val reactionToUpdate = Reaction(personalViewModel.currentUserId, emojiName, emojiCode)
-//        if (isReactionSelectedNow) {
-//            chatViewModel.removeReaction(emojiViewModel.originalEmojiList,
-//                messageId,
-//                reactionToUpdate,
-//                streamId!!,
-//                topicName!!)
-//        } else {
-//            chatViewModel.sendReaction(emojiViewModel.originalEmojiList,
-//                messageId,
-//                reactionToUpdate,
-//                streamId!!,
-//                topicName!!)
-//        }
-//    }
+    override fun createStore(): Store<ChatEvent, ChatEffect, ChatState> = chatStore.provide()
+
+    override val initEvent: ChatEvent
+        get() = ChatEvent.Ui.Init
+
+    override fun render(state: ChatState) {
+        loading(state.isLoading)
+        state.messages?.let(::setMessages)
+    }
+
+    override fun handleEffect(effect: ChatEffect): Unit {
+        return when (effect) {
+            is ChatEffect.MessageReceived -> onMessageReceived(effect.messages)
+            is ChatEffect.ShowError -> handleError(effect.error)
+        }
+    }
+
+    private fun handleError(error: Throwable) {
+        Toast.makeText(requireActivity(), "Error", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun loading(turnOn: Boolean) {
+        with(binding) {
+            progress.isVisible = turnOn
+            chatActionButton.isVisible = !turnOn
+            inputMessage.isVisible = !turnOn
+            messages.isVisible = !turnOn
+        }
+    }
+
+    private fun clearTextField() {
+        binding.inputMessage.text = null
+    }
+
+    private fun showNotSupportedFeatureNotification(view: View) {
+        Toast.makeText(
+            view.context,
+            getString(R.string.file_attaching_toast),
+            Toast.LENGTH_LONG
+        ).show()
+    }
+
+    override fun setMessages(messages: List<Message>) {
+        (binding.messages.adapter as MessageAdapter).submitList(messages)
+    }
+
+    private fun onSendClicked(view: View) {
+        with(binding) {
+            if (chatActionButton.isActivated) {
+                onMessageSent(inputMessage)
+                clearTextField()
+            } else {
+                showNotSupportedFeatureNotification(view)
+            }
+        }
+    }
+
+    private fun onMessageSent(inputMessage: EditText) {
+        val textMessage = inputMessage.text.toString()
+
+        val message = Message(
+            Message.NOT_SENT_MESSAGE,
+            personalRepository.me.toSender(),
+            textMessage,
+            Calendar.getInstance().timeInMillis / 1000
+        )
+
+        (binding.messages.adapter as MessageAdapter).sendMessage(message) {
+            store.accept(
+                ChatEvent.Ui.MessageSent(
+                    textMessage
+                )
+            )
+        }
+    }
+
+    private fun onMessageReceived(messages: List<Message>) {
+        (binding.messages.adapter as MessageAdapter).submitSentMessage(messages)
+    }
+
+    private fun onMessageLongClicked(messageId: Long): Boolean {
+        EmojiBottomModalFragment(messageId).show(
+            childFragmentManager,
+            EmojiBottomModalFragment.TAG
+        )
+        return true
+    }
+
+    private fun onReactionPressed(
+        isReactionSelectedNow: Boolean,
+        messageId: Long,
+        emojiName: String
+    ) {
+        if (isReactionSelectedNow) {
+            store.accept(
+                ChatEvent.Ui.ReactionRemoved(
+                    messageId,
+                    emojiName
+                )
+            )
+        } else {
+            store.accept(
+                ChatEvent.Ui.ReactionSent(
+                    messageId,
+                    emojiName
+                )
+            )
+        }
+    }
 }

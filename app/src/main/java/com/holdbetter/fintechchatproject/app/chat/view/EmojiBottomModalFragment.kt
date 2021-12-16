@@ -1,5 +1,6 @@
 package com.holdbetter.fintechchatproject.app.chat.view
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +10,21 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.app.chat.EmojiDialogAdapter
+import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
+import javax.inject.Inject
 
 class EmojiBottomModalFragment(private val messageId: Long) : BottomSheetDialogFragment(),
     IOnEmojiSelectedListener {
+    @Inject
+    lateinit var emojiRepository: IEmojiRepository
 
-//    private val emojiViewModel: EmojiViewModel by activityViewModels()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        app.appComponent.inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,7 +50,7 @@ class EmojiBottomModalFragment(private val messageId: Long) : BottomSheetDialogF
         // TODO: 10/19/2021 Offset btw items
         view.findViewById<RecyclerView>(R.id.emoji_list)!!.apply {
             layoutManager = GridLayoutManager(activity, 6)
-//            adapter = EmojiDialogAdapter(emojiViewModel.cleanedEmojiList, this@EmojiBottomModalFragment)
+            adapter = EmojiDialogAdapter(emojiRepository.cleanedEmojiList, this@EmojiBottomModalFragment)
             overScrollMode = View.OVER_SCROLL_NEVER
         }
     }

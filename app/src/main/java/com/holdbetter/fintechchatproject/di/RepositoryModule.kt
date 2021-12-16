@@ -13,7 +13,4 @@ interface RepositoryModule {
     @Binds
     @ApplicationScope
     fun getPersonalRepository(personalRepository: PersonalRepository): IPersonalRepository
-
-    @Binds
-    fun getChatRepository(chatRepository: ChatRepository): IChatRepository
 }

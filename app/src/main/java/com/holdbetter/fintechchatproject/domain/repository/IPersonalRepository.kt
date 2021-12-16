@@ -6,7 +6,8 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Maybe
 
 interface IPersonalRepository : IRepository {
-    val currentUserId: Long
+    val me: User
+    val meId: Long
 
     fun getMyselfOnline(): Completable
     fun getCachedMyself(): Maybe<User>

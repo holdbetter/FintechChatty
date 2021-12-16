@@ -48,7 +48,7 @@ object NetworkMapper {
                 ),
                 it.content,
                 it.timestamp,
-                it.userReactions.reversed().toReactions()
+                it.userReactions.toReactions()
             )
         }
     }

@@ -33,4 +33,5 @@
     <string name="reload">Перезагрузить</string>
     <string name="undefined_error_message">Неизвестная ошибка, перезагрузите страницу</string>
     <string name="no_connectivity_db_empty_message">Нет сети.\n\nА еще мы не смогли найти какие-либо сохраненные данные, поэтому вместо этого здесь сейчас пустой экран с длинным текстом</string>
+    <string name="file_attaching_toast">Attaching files isn\'t ready yet</string>
 </resources>

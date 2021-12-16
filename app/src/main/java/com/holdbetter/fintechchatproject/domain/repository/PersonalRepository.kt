@@ -28,10 +28,12 @@ class PersonalRepository @Inject constructor(
     private val connectivityManager: MyConnectivityManager,
     override val api: TinkoffZulipApi
 ) : IPersonalRepository {
-    private var _currentUserId: Long? = null
+    private var _me: User? = null
+    override val me: User
+        get() = _me!!
 
-    override val currentUserId: Long
-        get() = _currentUserId!!
+    override val meId: Long
+        get() = me.id
 
     override fun getMyselfOnline(): Completable {
         return connectivityManager.isConnected
@@ -57,13 +59,13 @@ class PersonalRepository @Inject constructor(
             .subscribeOn(Schedulers.io())
             .map { it.toUser() }
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSuccess { saveIdLocally(it.id) }
+            .doOnSuccess { me -> saveMeLocally(me) }
             .observeOn(Schedulers.io())
     }
 
-    private fun saveIdLocally(userId: Long) {
-        if (_currentUserId == null) {
-            _currentUserId = userId
+    private fun saveMeLocally(me: User) {
+        if (_me == null) {
+            this._me = me
         }
     }
 
@@ -71,7 +73,7 @@ class PersonalRepository @Inject constructor(
         return personalDao.applyMyself(me)
             .observeOn(AndroidSchedulers.mainThread())
             .andThen(Completable.create {
-                saveIdLocally(me.id)
+                saveMeLocally(me.toUser())
                 it.onComplete()
             })
             .observeOn(Schedulers.io())

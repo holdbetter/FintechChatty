@@ -9,7 +9,7 @@
     tools:context=".app.bottomnavigation.navigation.channels.view.TopicAdapter">
 
     <TextView
-        android:id="@+id/topic_name"
+        android:id="@+id/topic_subtitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

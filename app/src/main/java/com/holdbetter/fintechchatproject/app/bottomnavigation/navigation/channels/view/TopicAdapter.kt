@@ -42,7 +42,7 @@ class TopicAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(topic: Topic) {
             with(binding) {
-                topicName.text = topic.name
+                topicSubtitle.text = topic.name
                 root.setBackgroundColor(Color.parseColor(topic.color))
 
                 root.setOnClickListener {
