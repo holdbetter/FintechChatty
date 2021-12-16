@@ -49,6 +49,7 @@
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/collapsed_view_part"
         tools:listitem="@layout/topic_instance"
+        android:nestedScrollingEnabled="false"
         tools:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
