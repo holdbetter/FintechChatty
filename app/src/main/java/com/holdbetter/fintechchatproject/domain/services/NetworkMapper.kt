@@ -1,8 +1,10 @@
 package com.holdbetter.fintechchatproject.domain.services
 
 import com.holdbetter.fintechchatproject.domain.entity.*
-import com.holdbetter.fintechchatproject.model.*
-import com.holdbetter.fintechchatproject.model.Message
+import com.holdbetter.fintechchatproject.model.MessageItem
+import com.holdbetter.fintechchatproject.model.Reaction
+import com.holdbetter.fintechchatproject.model.Sender
+import com.holdbetter.fintechchatproject.model.User
 import com.holdbetter.fintechchatproject.room.entity.*
 
 object NetworkMapper {
@@ -36,9 +38,9 @@ object NetworkMapper {
         }
     }
 
-    fun MessageResponse.toMessage(): List<Message> {
+    fun MessageResponse.toMessage(): List<MessageItem.Message> {
         return messages.map {
-            Message(
+            MessageItem.Message(
                 it.id,
                 Sender(
                     it.senderID,

@@ -1,11 +1,10 @@
 package com.holdbetter.fintechchatproject.domain.repository
 
 import com.holdbetter.fintechchatproject.domain.entity.EmojiApi
-import com.holdbetter.fintechchatproject.domain.entity.SentMessageResponse
 import com.holdbetter.fintechchatproject.domain.retrofit.Narrow
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toMessage
-import com.holdbetter.fintechchatproject.model.Message
+import com.holdbetter.fintechchatproject.model.MessageItem
 import com.holdbetter.fintechchatproject.services.connectivity.MyConnectivityManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -23,42 +22,79 @@ class ChatRepository @AssistedInject constructor(
     @Assisted("originalEmojiList") override val originalEmojiList: List<EmojiApi>
 ) : IChatRepository {
 
-    override fun getFirstPortion(): Single<List<Message>> {
-        val jsonNarrow = Narrow.MessageNarrow(streamId, topicName).toJson()
+    private val messageNarrow = Narrow.MessageNarrow(streamId, topicName).toJson()
+
+    override fun getFirstPortion(): Single<Pair<Boolean, List<MessageItem.Message>>> {
         return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
-            .flatMap { api -> api.getNewestMessages(jsonNarrow) }
+            .flatMap { api -> api.getNewestMessages(messageNarrow) }
             .map { it.toMessage() }
+            .flatMap { isItLastPortion(it) }
+    }
+
+    private fun isItLastPortion(lastMessages: List<MessageItem.Message>): Single<Pair<Boolean, List<MessageItem.Message>>> {
+        return api.getOldestMessage(messageNarrow)
+            .map { it.messages.first().id }
+            .map { id -> isMessagesContainsOldest(lastMessages, id) to lastMessages }
+    }
+
+    private fun isMessagesContainsOldest(messages: List<MessageItem.Message>, oldestMessageId: Long): Boolean {
+        val r = messages.any { message -> message.id == oldestMessageId }
+        return r
+    }
+
+    override fun getNextPortion(messageAnchorId: Long, currentMessages: List<MessageItem.Message>): Single<Pair<Boolean, List<MessageItem.Message>>> {
+        return connectivityManager.isConnected
+            .subscribeOn(Schedulers.io())
+            .flatMap { getApi(it) }
+            .flatMap { api -> api.getNextPortion(messageNarrow, messageAnchorId) }
+            .map { it.toMessage() }
+            .map { excludeAnchorMessage(messageAnchorId, it) }
+            .map { appendWithChatMessages(it, currentMessages) }
+            .flatMap { isItLastPortion(it) }
+    }
+
+    private fun excludeAnchorMessage(messageAnchorId: Long, newPortion: List<MessageItem.Message>): List<MessageItem.Message> {
+        val mutablePortion = newPortion.toMutableList()
+        mutablePortion.removeIf { it.id == messageAnchorId }
+        return mutablePortion
+    }
+
+    private fun appendWithChatMessages(newPortion: List<MessageItem.Message>, chatMessages: List<MessageItem.Message>): List<MessageItem.Message> {
+        return listOf(
+            *newPortion.toTypedArray(),
+            *chatMessages.toTypedArray()
+        )
     }
 
     override fun sendMessage(
         textMessage: String,
-    ): Single<List<Message>> {
+    ): Single<List<MessageItem.Message>> {
         return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
             .flatMap { it.sendMessage(textMessage, streamId, topicName) }
-            .flatMap { getFirstPortion() }
+            .flatMap { TODO() }
     }
 
     override fun sendReaction(
         messageId: Long,
         emojiNameToUpdate: String
-    ): Single<List<Message>> {
+    ): Single<List<MessageItem.Message>> {
         return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
             .flatMap { sendReactionOnline(messageId, emojiNameToUpdate) }
-            .flatMap { getFirstPortion() }
+            .flatMap { TODO() }
     }
 
-    override fun removeReaction(messageId: Long, emojiNameToUpdate: String): Single<List<Message>> {
+    override fun removeReaction(messageId: Long, emojiNameToUpdate: String): Single<List<MessageItem.Message>> {
         return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
             .flatMap { removeReactionOnline(messageId, emojiNameToUpdate) }
-            .flatMap { getFirstPortion() }
+            .flatMap { TODO() }
     }
 
     private fun sendReactionOnline(

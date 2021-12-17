@@ -2,6 +2,7 @@ package com.holdbetter.fintechchatproject.app.chat
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.Toast
@@ -13,7 +14,8 @@ import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.app.chat.di.DaggerChatComponent
 import com.holdbetter.fintechchatproject.app.chat.elm.*
 import com.holdbetter.fintechchatproject.app.chat.services.DateOnChatDecorator
-import com.holdbetter.fintechchatproject.app.chat.services.ScrollLinearLayoutManager
+import com.holdbetter.fintechchatproject.app.chat.services.ReverseLayoutManager
+import com.holdbetter.fintechchatproject.app.chat.view.ChatOnScrollListener
 import com.holdbetter.fintechchatproject.app.chat.view.EmojiBottomModalFragment
 import com.holdbetter.fintechchatproject.app.chat.view.IChatViewer
 import com.holdbetter.fintechchatproject.app.chat.view.MessageAdapter
@@ -22,7 +24,7 @@ import com.holdbetter.fintechchatproject.domain.repository.ChatRepositoryFactory
 import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository
 import com.holdbetter.fintechchatproject.domain.repository.IPersonalRepository
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toSender
-import com.holdbetter.fintechchatproject.model.Message
+import com.holdbetter.fintechchatproject.model.MessageItem
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
@@ -50,12 +52,16 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
 
     @Inject
     lateinit var personalRepository: IPersonalRepository
+
     @Inject
     lateinit var emojiRepository: IEmojiRepository
+
     @Inject
     lateinit var chatRepositoryFactory: ChatRepositoryFactory
+
     @Inject
     lateinit var chatActorFactory: ChatActorFactory
+
     @Inject
     lateinit var chatStoreFactory: ChatStoreFactory
 
@@ -118,7 +124,7 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
             messages.apply {
-                layoutManager = ScrollLinearLayoutManager(context)
+                layoutManager = ReverseLayoutManager(context)
                 adapter = MessageAdapter(
                     personalRepository.meId,
                     this@ChatFragment::onReactionPressed,
@@ -157,7 +163,9 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
 
     override fun render(state: ChatState) {
         loading(state.isLoading)
-        state.messages?.let(::setMessages)
+        state.messages?.let {
+            setMessages(it, state.isLastPortion!!)
+        }
     }
 
     override fun handleEffect(effect: ChatEffect): Unit {
@@ -192,11 +200,26 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
         ).show()
     }
 
-    override fun setMessages(messages: List<Message>) {
-        (binding.messages.adapter as MessageAdapter).submitList(messages)
+    override fun setMessages(messages: List<MessageItem>, isLastPortion: Boolean) {
+        with(binding.messages) {
+            if (!isLastPortion) {
+                val messagesWithHeader = listOf(MessageItem.HeaderMessage(), *messages.toTypedArray())
+                (adapter as MessageAdapter).submitList(messagesWithHeader) {
+                    addOnScrollListener(ChatOnScrollListener(::onChatEdgeReaching))
+                }
+            } else {
+                (adapter as MessageAdapter).submitList(messages)
+            }
+        }
     }
 
-    private fun onSendClicked(view: View) {
+    override fun onChatEdgeReaching() {
+        val messages = store.currentState.messages!!
+        store.accept(ChatEvent.Ui.TopLimitEdgeReached(messages.first().id, messages))
+        Log.d("scrolled", "caused")
+    }
+
+    override fun onSendClicked(view: View) {
         with(binding) {
             if (chatActionButton.isActivated) {
                 onMessageSent(inputMessage)
@@ -207,11 +230,11 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
         }
     }
 
-    private fun onMessageSent(inputMessage: EditText) {
+    override fun onMessageSent(inputMessage: EditText) {
         val textMessage = inputMessage.text.toString()
 
-        val message = Message(
-            Message.NOT_SENT_MESSAGE,
+        val message = MessageItem.Message(
+            MessageItem.Message.NOT_SENT_MESSAGE,
             personalRepository.me.toSender(),
             textMessage,
             Calendar.getInstance().timeInMillis / 1000
@@ -226,11 +249,11 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
         }
     }
 
-    private fun onMessageReceived(messages: List<Message>) {
+    override fun onMessageReceived(messages: List<MessageItem.Message>) {
         (binding.messages.adapter as MessageAdapter).submitSentMessage(messages)
     }
 
-    private fun onMessageLongClicked(messageId: Long): Boolean {
+    override fun onMessageLongClicked(messageId: Long): Boolean {
         EmojiBottomModalFragment(messageId).show(
             childFragmentManager,
             EmojiBottomModalFragment.TAG
@@ -238,7 +261,7 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
         return true
     }
 
-    private fun onReactionPressed(
+    override fun onReactionPressed(
         isReactionSelectedNow: Boolean,
         messageId: Long,
         emojiName: String

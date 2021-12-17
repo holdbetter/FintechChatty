@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.app.chat.view.MessageAdapter
+import com.holdbetter.fintechchatproject.model.MessageItem
 import com.holdbetter.fintechchatproject.services.ContextExtensions.dpToPx
 import com.holdbetter.fintechchatproject.services.ContextExtensions.spToPx
 import java.util.*
@@ -48,32 +49,34 @@ class DateOnChatDecorator(context: Context) :
             if (position > -1) {
                 val message = adapter.messages[position]
 
-                calendar.timeInMillis = message.dateInSeconds * 1000L
-                val day = calendar.get(Calendar.DAY_OF_MONTH).toString()
-                val month = calendar.getDisplayName(Calendar.MONTH,
-                    1,
-                    Locale("ru", "RU"))
+                if (message is MessageItem.Message) {
+                    calendar.timeInMillis = message.dateInSeconds * 1000L
+                    val day = calendar.get(Calendar.DAY_OF_MONTH).toString()
+                    val month = calendar.getDisplayName(Calendar.MONTH,
+                        1,
+                        Locale("ru", "RU"))
 
-                dateText = "$day $month"
+                    dateText = "$day $month"
 
-                val textBounds = Rect()
-                textPaint.getTextBounds(dateText, 0, dateText.length, textBounds)
+                    val textBounds = Rect()
+                    textPaint.getTextBounds(dateText, 0, dateText.length, textBounds)
 
-                textBackground?.bounds = Rect(
-                    parent.width / 2 - textBounds.width() / 2 - backgroundHorizontalPadding,
-                    view.top - textBounds.height() - backgroundVerticalPadding,
-                    parent.width / 2 + textBounds.width() / 2 + backgroundHorizontalPadding,
-                    view.top
-                )
+                    textBackground?.bounds = Rect(
+                        parent.width / 2 - textBounds.width() / 2 - backgroundHorizontalPadding,
+                        view.top - textBounds.height() - backgroundVerticalPadding,
+                        parent.width / 2 + textBounds.width() / 2 + backgroundHorizontalPadding,
+                        view.top
+                    )
 
-                textBackground?.draw(c)
+                    textBackground?.draw(c)
 
-                c.drawText(dateText,
-                    parent.width / 2f,
-                    view.top - (backgroundVerticalPadding / 2f),
-                    textPaint)
+                    c.drawText(dateText,
+                        parent.width / 2f,
+                        view.top - (backgroundVerticalPadding / 2f),
+                        textPaint)
 
-                dividerHeight = textBackground!!.bounds.height()
+                    dividerHeight = textBackground!!.bounds.height()
+                }
             }
         }
     }
@@ -85,6 +88,14 @@ class DateOnChatDecorator(context: Context) :
         state: RecyclerView.State,
     ) {
         super.getItemOffsets(outRect, view, parent, state)
+
+        val adapter = parent.adapter as MessageAdapter
+        val position = parent.getChildAdapterPosition(view)
+        if (position == 0) {
+            val message = adapter.messages[position]
+            if (message is MessageItem.HeaderMessage) return
+        }
+
         val textBounds = Rect()
         textPaint.getTextBounds(dateText, 0, dateText.length, textBounds)
         val dividerHeight = textBounds.height() + backgroundVerticalPadding

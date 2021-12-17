@@ -1,11 +1,11 @@
 package com.holdbetter.fintechchatproject.app.chat.elm
 
-import com.holdbetter.fintechchatproject.domain.retrofit.Narrow
-import com.holdbetter.fintechchatproject.model.Message
+import com.holdbetter.fintechchatproject.model.MessageItem
 
 data class ChatState(
     val isLoading: Boolean = false,
-    val messages: List<Message>? = null,
+    val isLastPortion: Boolean? = null,
+    val messages: List<MessageItem.Message>? = null,
     val error: Throwable? = null
 )
 
@@ -13,7 +13,10 @@ sealed class ChatEvent {
     sealed class Ui : ChatEvent() {
         object Init : Ui()
         object Started : Ui()
-        object Scrolled : Ui()
+        class TopLimitEdgeReached(
+            val messageAnchorId: Long,
+            val currentMessages: List<MessageItem.Message>
+        ) : Ui()
 
         class MessageSent(val textMessage: String) : Ui()
 
@@ -29,11 +32,12 @@ sealed class ChatEvent {
     }
 
     sealed class Internal : ChatEvent() {
-        class NewPortionLoaded(val messages: List<Message>) : Internal()
+        class FirstPortionLoaded(val isLastPortion: Boolean, val messages: List<MessageItem.Message>): Internal()
+        class NewPortionLoaded(val isLastPortion: Boolean, val messages: List<MessageItem.Message>) : Internal()
 
         // class ReactionUpdated(val message: Message): Internal()
-        class ReactionUpdated(val messages: List<Message>) : Internal()
-        class MessageAdded(val messages: List<Message>) : Internal()
+        class ReactionUpdated(val messages: List<MessageItem.Message>) : Internal()
+        class MessageAdded(val messages: List<MessageItem.Message>) : Internal()
 
         class LoadError(val error: Throwable) : Internal()
     }
@@ -41,7 +45,7 @@ sealed class ChatEvent {
 
 sealed class ChatCommand {
     object FirstLoad : ChatCommand()
-    class NextLoad(val messageNarrow: Narrow.MessageNarrow) : ChatCommand()
+    class NextLoad(val messageAnchorId: Long, val currentMessages: List<MessageItem.Message>) : ChatCommand()
 
     class SendMessage(val messageText: String) : ChatCommand()
 
@@ -58,5 +62,5 @@ sealed class ChatCommand {
 
 sealed class ChatEffect {
     class ShowError(val error: Throwable) : ChatEffect()
-    class MessageReceived(val messages: List<Message>) : ChatEffect()
+    class MessageReceived(val messages: List<MessageItem.Message>) : ChatEffect()
 }

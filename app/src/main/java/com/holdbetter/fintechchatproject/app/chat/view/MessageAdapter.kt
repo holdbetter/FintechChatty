@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.model.Message
+import com.holdbetter.fintechchatproject.model.MessageItem
 import com.holdbetter.fintechchatproject.ui.FlexBoxLayout
 import com.holdbetter.fintechchatproject.ui.ForeignMessageLayout
 import com.holdbetter.fintechchatproject.ui.IMessageLayout
@@ -26,70 +26,78 @@ class MessageAdapter(
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val asyncDiffer = AsyncListDiffer(this, MessageDiffUtilCallback())
 
-    val messages: List<Message>
+    val messages: List<MessageItem>
         get() = asyncDiffer.currentList
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        val root: View
-        val i = LayoutInflater.from(parent.context)
+        val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            MessageType.LOADING_MYSELF.ordinal -> {
-                root = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.myself_message_loading_instance, parent, false)
-                LoadingViewHolder(root)
+            MessageType.PORTION_LOADING.ordinal -> HeaderViewHolder.from(inflater, parent)
+            MessageType.LOADING_MYSELF.ordinal -> MessageSentViewHolder.from(inflater, parent)
+            MessageType.FOREIGN.ordinal -> {
+                MessageViewHolder.from(
+                    inflater,
+                    parent,
+                    isMyselfMessage = false,
+                    reactionListener,
+                    emojiDialogShower
+                )
             }
-            MessageType.MYSELF.ordinal -> {
-                root = i.inflate(R.layout.myself_message_instance, parent, false)
-                MessageViewHolder(root, reactionListener, emojiDialogShower)
-            }
-            else -> {
-                root = i.inflate(R.layout.foreign_message_instance, parent, false)
-                MessageViewHolder(root, reactionListener, emojiDialogShower)
-            }
+            else -> MessageViewHolder.from(
+                inflater,
+                parent,
+                isMyselfMessage = true,
+                reactionListener,
+                emojiDialogShower
+            )
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val message = asyncDiffer.currentList[position]
-        when (holder) {
-            is MessageViewHolder -> holder.bind(message, currentUserId)
-            is LoadingViewHolder -> holder.bind(message)
+        when (val message = asyncDiffer.currentList[position]) {
+            is MessageItem.Message -> when (holder) {
+                is MessageViewHolder -> holder.bind(message, currentUserId)
+                is MessageSentViewHolder -> holder.bind(message)
+            }
         }
     }
 
     override fun getItemCount(): Int = asyncDiffer.currentList.size
 
     override fun getItemViewType(position: Int): Int {
-        val message = asyncDiffer.currentList[position]
-        return when (message.sender.id) {
-            currentUserId -> {
-                when (message.id) {
-                    Message.NOT_SENT_MESSAGE -> {
-                        MessageType.LOADING_MYSELF.ordinal
+        return when (val message = asyncDiffer.currentList[position]) {
+            is MessageItem.HeaderMessage -> {
+                if (position == 0) MessageType.PORTION_LOADING.ordinal
+                else throw Exception("Loading element should be at start of list. Wrong position $position")
+            }
+            is MessageItem.Message -> {
+                when (message.sender.id) {
+                    currentUserId -> {
+                        when (message.id) {
+                            MessageItem.Message.NOT_SENT_MESSAGE -> MessageType.LOADING_MYSELF.ordinal
+                            else -> MessageType.MYSELF.ordinal
+                        }
                     }
-                    else -> {
-                        MessageType.MYSELF.ordinal
-                    }
+                    else -> MessageType.FOREIGN.ordinal
                 }
             }
-            else -> MessageType.FOREIGN.ordinal
         }
     }
 
-    fun submitList(messages: List<Message>) {
-        asyncDiffer.submitList(messages)
+    fun submitList(messages: List<MessageItem>, messagesSetCallback: () -> Unit = {}) {
+        asyncDiffer.submitList(messages, messagesSetCallback)
     }
 
-    fun sendMessage(message: Message, messageAddedWithLoadingUiCallback: () -> Unit) {
+    fun sendMessage(message: MessageItem.Message, messageAddedWithLoadingUiCallback: () -> Unit) {
         val currentList = ArrayList(asyncDiffer.currentList)
         currentList.add(message)
         asyncDiffer.submitList(currentList, messageAddedWithLoadingUiCallback)
     }
 
-    fun submitSentMessage(messages: List<Message>) {
+    fun submitSentMessage(messages: List<MessageItem>) {
         val currentList = asyncDiffer.currentList
         val firstNotSentMessageIndex =
-            currentList.indexOfFirst { m -> m.id == Message.NOT_SENT_MESSAGE }
+            currentList.indexOfFirst { m -> m.id == MessageItem.Message.NOT_SENT_MESSAGE }
         val notReceivedSubList = currentList.subList(firstNotSentMessageIndex + 1, currentList.size)
 
         val updateMessages = ArrayList(messages)
@@ -102,12 +110,28 @@ class MessageAdapter(
         private val reactionListener: (isReactionSelectedNow: Boolean, messageId: Long, emojiName: String) -> Unit,
         private val emojiDialogShower: (messageId: Long) -> Boolean
     ) : RecyclerView.ViewHolder(itemView) {
+        companion object {
+            fun from(
+                inflater: LayoutInflater,
+                parent: ViewGroup,
+                isMyselfMessage: Boolean,
+                reactionListener: (isReactionSelectedNow: Boolean, messageId: Long, emojiName: String) -> Unit,
+                emojiDialogShower: (messageId: Long) -> Boolean
+            ): MessageViewHolder {
+                val view = if (isMyselfMessage) {
+                    inflater.inflate(R.layout.myself_message_instance, parent, false)
+                } else {
+                    inflater.inflate(R.layout.foreign_message_instance, parent, false)
+                }
+                return MessageViewHolder(view, reactionListener, emojiDialogShower)
+            }
+        }
 
         private val messageLayout = itemView as IMessageLayout
         private val flexbox: FlexBoxLayout = itemView.findViewById(R.id.flexbox)
         private val messageView: TextView = itemView.findViewById(R.id.message)
 
-        fun bind(message: Message, currentUserId: Long) {
+        fun bind(message: MessageItem.Message, currentUserId: Long) {
             if (messageLayout is ForeignMessageLayout) {
                 messageLayout.avatar = message.sender.avatarUrl
                 messageLayout.name = message.sender.name
@@ -128,7 +152,7 @@ class MessageAdapter(
         }
 
         private fun addReactions(
-            message: Message,
+            message: MessageItem.Message,
             currentUserId: Long
         ) {
             flexbox.removeAllViews()
@@ -152,27 +176,44 @@ class MessageAdapter(
         }
     }
 
-    class LoadingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class HeaderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        companion object {
+            fun from(inflater: LayoutInflater, parent: ViewGroup): HeaderViewHolder {
+                val view = inflater.inflate(R.layout.message_loading_header, parent, false)
+                return HeaderViewHolder(view)
+            }
+        }
+    }
+
+    class MessageSentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        companion object {
+            fun from(inflater: LayoutInflater, parent: ViewGroup): MessageSentViewHolder {
+                val view = inflater.inflate(R.layout.myself_message_loading_instance, parent, false)
+                return MessageSentViewHolder(view)
+            }
+        }
+
         private val messageLayout = itemView.findViewById(R.id.myself_message) as IMessageLayout
 
-        fun bind(message: Message) {
+        fun bind(message: MessageItem.Message) {
             messageLayout.message =
                 HtmlCompat.fromHtml(message.messageContent, HtmlCompat.FROM_HTML_MODE_LEGACY)
                     .removeSuffix("\n\n")
         }
     }
 
-    class MessageDiffUtilCallback : DiffUtil.ItemCallback<Message>() {
-        override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
+    class MessageDiffUtilCallback : DiffUtil.ItemCallback<MessageItem>() {
+        override fun areItemsTheSame(oldItem: MessageItem, newItem: MessageItem): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
+        override fun areContentsTheSame(oldItem: MessageItem, newItem: MessageItem): Boolean {
             return oldItem == newItem
         }
     }
 
     enum class MessageType {
+        PORTION_LOADING,
         FOREIGN,
         MYSELF,
         LOADING_MYSELF

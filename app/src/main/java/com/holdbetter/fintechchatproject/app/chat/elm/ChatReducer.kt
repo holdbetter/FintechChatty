@@ -13,27 +13,18 @@ class ChatReducer @Inject constructor() :
                 commands { +ChatCommand.FirstLoad }
             }
             is ChatEvent.Ui.ReactionSent -> {
-                commands {
-                    +ChatCommand.SendReaction(
-                        event.messageId,
-                        event.reaction
-                    )
-                }
+                commands { +ChatCommand.SendReaction(event.messageId, event.reaction) }
             }
             is ChatEvent.Ui.ReactionRemoved -> {
-                commands {
-                    +ChatCommand.RemoveReaction(
-                        event.messageId,
-                        event.reaction
-                    )
-                }
+                commands { +ChatCommand.RemoveReaction(event.messageId, event.reaction) }
             }
             is ChatEvent.Ui.MessageSent -> commands { +ChatCommand.SendMessage(event.textMessage) }
-            ChatEvent.Ui.Scrolled -> { }
+            is ChatEvent.Ui.TopLimitEdgeReached -> commands { +ChatCommand.NextLoad(event.messageAnchorId, event.currentMessages) }
             is ChatEvent.Internal.LoadError -> effects { +ChatEffect.ShowError(event.error) }
             is ChatEvent.Internal.MessageAdded -> effects { +ChatEffect.MessageReceived(event.messages) }
-            is ChatEvent.Internal.NewPortionLoaded -> state { copy(isLoading = false, messages = event.messages) }
             is ChatEvent.Internal.ReactionUpdated -> state { copy(messages = event.messages) }
+            is ChatEvent.Internal.FirstPortionLoaded -> state { copy(isLoading = false, isLastPortion = event.isLastPortion, messages = event.messages) }
+            is ChatEvent.Internal.NewPortionLoaded -> state { copy(isLoading = false, isLastPortion = event.isLastPortion, messages = event.messages) }
         }
     }
 }

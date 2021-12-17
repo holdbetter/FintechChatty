@@ -1,7 +1,6 @@
 package com.holdbetter.fintechchatproject.app.chat.elm
 
 import com.holdbetter.fintechchatproject.domain.repository.IChatRepository
-import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -14,17 +13,30 @@ class ChatActor @AssistedInject constructor(
     override fun execute(command: ChatCommand): Observable<ChatEvent> {
         return when (command) {
             is ChatCommand.FirstLoad -> chatRepository.getFirstPortion().mapEvents(
-                successEventMapper = { messages -> ChatEvent.Internal.NewPortionLoaded(messages) },
+                successEventMapper = { lastPortionAndMessages ->
+                    val (isLastPortion, messages) = lastPortionAndMessages
+                    ChatEvent.Internal.FirstPortionLoaded(isLastPortion, messages)
+                },
                 failureEventMapper = { error -> ChatEvent.Internal.LoadError(error) }
             )
-            is ChatCommand.NextLoad -> {
-                Observable.empty()
-            }
-            is ChatCommand.SendReaction -> chatRepository.sendReaction(command.messageId, command.emojiNameToUpdate).mapEvents(
+            is ChatCommand.NextLoad -> chatRepository.getNextPortion(command.messageAnchorId, command.currentMessages).mapEvents(
+                successEventMapper = { lastPortionAndMessages ->
+                    val (isLastPortion, messages) = lastPortionAndMessages
+                    ChatEvent.Internal.NewPortionLoaded(isLastPortion, messages)
+                },
+                failureEventMapper = { error -> ChatEvent.Internal.LoadError(error) }
+            )
+            is ChatCommand.SendReaction -> chatRepository.sendReaction(
+                command.messageId,
+                command.emojiNameToUpdate
+            ).mapEvents(
                 successEventMapper = { messages -> ChatEvent.Internal.ReactionUpdated(messages) },
                 failureEventMapper = { error -> ChatEvent.Internal.LoadError(error) }
             )
-            is ChatCommand.RemoveReaction -> chatRepository.removeReaction(command.messageId, command.emojiNameToUpdate).mapEvents(
+            is ChatCommand.RemoveReaction -> chatRepository.removeReaction(
+                command.messageId,
+                command.emojiNameToUpdate
+            ).mapEvents(
                 successEventMapper = { messages -> ChatEvent.Internal.ReactionUpdated(messages) },
                 failureEventMapper = { error -> ChatEvent.Internal.LoadError(error) }
             )
