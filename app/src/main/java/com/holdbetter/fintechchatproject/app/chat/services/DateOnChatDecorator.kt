@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.chat.MessageAdapter
+import com.holdbetter.fintechchatproject.app.chat.view.MessageAdapter
 import com.holdbetter.fintechchatproject.services.ContextExtensions.dpToPx
 import com.holdbetter.fintechchatproject.services.ContextExtensions.spToPx
 import java.util.*

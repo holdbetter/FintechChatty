@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.app.chat
+package com.holdbetter.fintechchatproject.app.chat.view
 
 import android.view.LayoutInflater
 import android.view.View
@@ -102,6 +102,7 @@ class MessageAdapter(
         private val reactionListener: (isReactionSelectedNow: Boolean, messageId: Long, emojiName: String) -> Unit,
         private val emojiDialogShower: (messageId: Long) -> Boolean
     ) : RecyclerView.ViewHolder(itemView) {
+
         private val messageLayout = itemView as IMessageLayout
         private val flexbox: FlexBoxLayout = itemView.findViewById(R.id.flexbox)
         private val messageView: TextView = itemView.findViewById(R.id.message)
@@ -121,6 +122,15 @@ class MessageAdapter(
                 return@setOnLongClickListener emojiDialogShower(message.id)
             }
 
+            addReactions(message, currentUserId)
+
+            flexbox.plusViewOnClickListener = { emojiDialogShower(message.id) }
+        }
+
+        private fun addReactions(
+            message: Message,
+            currentUserId: Long
+        ) {
             flexbox.removeAllViews()
             for (reactionGroup in message.reactions.groupBy { it.emojiCode }.iterator()) {
                 flexbox.addView(
@@ -139,8 +149,6 @@ class MessageAdapter(
                     }
                 )
             }
-
-            flexbox.plusViewOnClickListener = { emojiDialogShower(message.id) }
         }
     }
 

@@ -16,6 +16,7 @@ import com.holdbetter.fintechchatproject.app.chat.services.DateOnChatDecorator
 import com.holdbetter.fintechchatproject.app.chat.services.ScrollLinearLayoutManager
 import com.holdbetter.fintechchatproject.app.chat.view.EmojiBottomModalFragment
 import com.holdbetter.fintechchatproject.app.chat.view.IChatViewer
+import com.holdbetter.fintechchatproject.app.chat.view.MessageAdapter
 import com.holdbetter.fintechchatproject.databinding.FragmentChatBinding
 import com.holdbetter.fintechchatproject.domain.repository.ChatRepositoryFactory
 import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository

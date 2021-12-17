@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.app.chat
+package com.holdbetter.fintechchatproject.app.chat.view
 
 import android.view.LayoutInflater
 import android.view.View
