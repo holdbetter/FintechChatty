@@ -28,20 +28,23 @@ class ChatActor @AssistedInject constructor(
             )
             is ChatCommand.SendReaction -> chatRepository.sendReaction(
                 command.messageId,
-                command.emojiNameToUpdate
+                command.emojiNameToUpdate,
+                command.currentMessages
             ).mapEvents(
                 successEventMapper = { messages -> ChatEvent.Internal.ReactionUpdated(messages) },
+                completionEvent = ChatEvent.Internal.ReactionAlreadyAdded,
                 failureEventMapper = { error -> ChatEvent.Internal.LoadError(error) }
             )
             is ChatCommand.RemoveReaction -> chatRepository.removeReaction(
                 command.messageId,
-                command.emojiNameToUpdate
+                command.emojiNameToUpdate,
+                command.currentMessages
             ).mapEvents(
                 successEventMapper = { messages -> ChatEvent.Internal.ReactionUpdated(messages) },
                 failureEventMapper = { error -> ChatEvent.Internal.LoadError(error) }
             )
             is ChatCommand.SendMessage -> chatRepository.sendMessage(command.messageText).mapEvents(
-                successEventMapper = { messages -> ChatEvent.Internal.MessageAdded(messages) },
+                successEvent = ChatEvent.Internal.MessageAdded,
                 failureEventMapper = { error -> ChatEvent.Internal.LoadError(error) }
             )
         }

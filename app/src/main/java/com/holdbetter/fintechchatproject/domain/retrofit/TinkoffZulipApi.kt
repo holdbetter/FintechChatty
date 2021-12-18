@@ -34,6 +34,15 @@ interface TinkoffZulipApi {
     ): Single<MessageResponse>
 
     @GET("messages")
+    fun getMessage(
+        @Query("narrow") jsonNarrow: String,
+        @Query("anchor") messageId: Long,
+        @Query("num_before") numBefore: Int = 0,
+        @Query("num_after") numAfter: Int = 0,
+        @Query("apply_markdown") shouldBeHtml: Boolean = true
+    ): Single<MessageResponse>
+
+    @GET("messages")
     fun getNewestMessages(
         @Query("narrow") jsonNarrow: String,
         @Query("anchor") anchor: String = MessageAnchors.NEWEST.value,

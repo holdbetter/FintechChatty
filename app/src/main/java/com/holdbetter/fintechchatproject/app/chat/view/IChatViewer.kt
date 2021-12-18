@@ -10,7 +10,6 @@ interface IChatViewer {
     fun onChatEdgeReaching()
     fun onSendClicked(view: View)
     fun onMessageSent(inputMessage: EditText)
-    fun onMessageReceived(messages: List<MessageItem.Message>)
     fun onMessageLongClicked(messageId: Long): Boolean
     fun onReactionPressed(isReactionSelectedNow: Boolean, messageId: Long, emojiName: String)
 }

@@ -73,6 +73,9 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
     lateinit var topicName: String
     lateinit var streamName: String
 
+    val messages: List<MessageItem.Message>
+        get() = store.currentState.messages!!
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
@@ -95,7 +98,8 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
                 chatRepositoryFactory.create(
                     streamId,
                     topicName,
-                    emojiRepository.originalEmojiList
+                    emojiRepository.originalEmojiList,
+                    personalRepository.meId
                 )
             )
         )
@@ -115,7 +119,8 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
             store.accept(
                 ChatEvent.Ui.ReactionSent(
                     messageId,
-                    emojiName
+                    emojiName,
+                    store.currentState.messages!!
                 )
             )
         }
@@ -170,7 +175,6 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
 
     override fun handleEffect(effect: ChatEffect): Unit {
         return when (effect) {
-            is ChatEffect.MessageReceived -> onMessageReceived(effect.messages)
             is ChatEffect.ShowError -> handleError(effect.error)
         }
     }
@@ -203,7 +207,8 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
     override fun setMessages(messages: List<MessageItem>, isLastPortion: Boolean) {
         with(binding.messages) {
             if (!isLastPortion) {
-                val messagesWithHeader = listOf(MessageItem.HeaderMessage(), *messages.toTypedArray())
+                val messagesWithHeader =
+                    listOf(MessageItem.HeaderMessage(), *messages.toTypedArray())
                 (adapter as MessageAdapter).submitList(messagesWithHeader) {
                     addOnScrollListener(ChatOnScrollListener(::onChatEdgeReaching))
                 }
@@ -214,7 +219,6 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
     }
 
     override fun onChatEdgeReaching() {
-        val messages = store.currentState.messages!!
         store.accept(ChatEvent.Ui.TopLimitEdgeReached(messages.first().id, messages))
         Log.d("scrolled", "caused")
     }
@@ -240,17 +244,18 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
             Calendar.getInstance().timeInMillis / 1000
         )
 
-        (binding.messages.adapter as MessageAdapter).sendMessage(message) {
-            store.accept(
-                ChatEvent.Ui.MessageSent(
-                    textMessage
-                )
-            )
-        }
-    }
+        with(binding.messages) {
+            val messageAdapter = (adapter as MessageAdapter)
 
-    override fun onMessageReceived(messages: List<MessageItem.Message>) {
-        (binding.messages.adapter as MessageAdapter).submitSentMessage(messages)
+            messageAdapter.sendMessage(message) {
+                scrollToPosition(messageAdapter.itemCount - 1)
+                store.accept(
+                    ChatEvent.Ui.MessageSent(
+                        textMessage
+                    )
+                )
+            }
+        }
     }
 
     override fun onMessageLongClicked(messageId: Long): Boolean {
@@ -270,14 +275,16 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
             store.accept(
                 ChatEvent.Ui.ReactionRemoved(
                     messageId,
-                    emojiName
+                    emojiName,
+                    messages
                 )
             )
         } else {
             store.accept(
                 ChatEvent.Ui.ReactionSent(
                     messageId,
-                    emojiName
+                    emojiName,
+                    messages
                 )
             )
         }

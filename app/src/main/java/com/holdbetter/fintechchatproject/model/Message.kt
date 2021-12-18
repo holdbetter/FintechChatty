@@ -13,6 +13,7 @@ sealed class MessageItem {
     ): MessageItem() {
         companion object {
             const val NOT_SENT_MESSAGE = -1L
+            const val RECEIVED_MESSAGE = 0L
         }
     }
 

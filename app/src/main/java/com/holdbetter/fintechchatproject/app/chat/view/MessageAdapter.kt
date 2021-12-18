@@ -53,13 +53,28 @@ class MessageAdapter(
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val message = asyncDiffer.currentList[position]) {
-            is MessageItem.Message -> when (holder) {
-                is MessageViewHolder -> holder.bind(message, currentUserId)
-                is MessageSentViewHolder -> holder.bind(message)
+    override fun onBindViewHolder(
+        holder: RecyclerView.ViewHolder,
+        position: Int,
+        payloads: MutableList<Any>
+    ) {
+        when(payloads.isEmpty()) {
+            true -> when (val message = asyncDiffer.currentList[position]) {
+                is MessageItem.Message -> when (holder) {
+                    is MessageViewHolder -> holder.bind(message, currentUserId)
+                    is MessageSentViewHolder -> holder.bind(message)
+                }
+            }
+            false -> when (val message = asyncDiffer.currentList[position]) {
+                is MessageItem.Message -> when (holder) {
+                    is MessageViewHolder -> holder.update(message, currentUserId)
+                }
             }
         }
+    }
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        onBindViewHolder(holder, position, mutableListOf())
     }
 
     override fun getItemCount(): Int = asyncDiffer.currentList.size
@@ -94,15 +109,20 @@ class MessageAdapter(
         asyncDiffer.submitList(currentList, messageAddedWithLoadingUiCallback)
     }
 
-    fun submitSentMessage(messages: List<MessageItem>) {
+    fun submitSentMessage(messageAddedCallback: () -> Unit = {}) {
         val currentList = asyncDiffer.currentList
-        val firstNotSentMessageIndex =
-            currentList.indexOfFirst { m -> m.id == MessageItem.Message.NOT_SENT_MESSAGE }
-        val notReceivedSubList = currentList.subList(firstNotSentMessageIndex + 1, currentList.size)
+        val firstNotSentMessage =
+            currentList.first { m -> m.id == MessageItem.Message.NOT_SENT_MESSAGE } as MessageItem.Message
+        val notReceivedSubList =
+            currentList.subList(currentList.indexOf(firstNotSentMessage) + 1, currentList.size)
 
-        val updateMessages = ArrayList(messages)
-        updateMessages.addAll(notReceivedSubList)
-        asyncDiffer.submitList(messages)
+        val updatedList = listOf(
+            *currentList.toTypedArray(),
+            firstNotSentMessage.copy(id = MessageItem.Message.RECEIVED_MESSAGE),
+            *notReceivedSubList.toTypedArray()
+        )
+
+        asyncDiffer.submitList(updatedList, messageAddedCallback)
     }
 
     class MessageViewHolder(
@@ -151,6 +171,10 @@ class MessageAdapter(
             flexbox.plusViewOnClickListener = { emojiDialogShower(message.id) }
         }
 
+        fun update(message: MessageItem.Message, currentUserId: Long) {
+            addReactions(message, currentUserId)
+        }
+
         private fun addReactions(
             message: MessageItem.Message,
             currentUserId: Long
@@ -173,6 +197,8 @@ class MessageAdapter(
                     }
                 )
             }
+
+            flexbox.addPlusView()
         }
     }
 
@@ -209,6 +235,23 @@ class MessageAdapter(
 
         override fun areContentsTheSame(oldItem: MessageItem, newItem: MessageItem): Boolean {
             return oldItem == newItem
+        }
+
+        override fun getChangePayload(oldItem: MessageItem, newItem: MessageItem): Any? {
+            return when {
+                oldItem is MessageItem.HeaderMessage || newItem is MessageItem.HeaderMessage -> {
+                    super.getChangePayload(oldItem, newItem)
+                }
+                else -> {
+                    val oldMessage = oldItem as MessageItem.Message
+                    val newMessage = newItem as MessageItem.Message
+                    if (oldMessage.reactions != newMessage.reactions) {
+                        return "Reactions has changed"
+                    } else {
+                        super.getChangePayload(oldItem, newItem)
+                    }
+                }
+            }
         }
     }
 

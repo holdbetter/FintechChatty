@@ -4,7 +4,7 @@ data class Reaction(
     val userId: Long,
     val emojiName: String,
     val emojiCode: String,
-    var reactionType: String = SUPPORTED_REACTION_TYPE
+    val reactionType: String = SUPPORTED_REACTION_TYPE
 ) {
     companion object {
         const val SUPPORTED_REACTION_TYPE = "unicode_emoji"

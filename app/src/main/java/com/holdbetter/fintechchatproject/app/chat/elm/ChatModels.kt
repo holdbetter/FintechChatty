@@ -13,6 +13,7 @@ sealed class ChatEvent {
     sealed class Ui : ChatEvent() {
         object Init : Ui()
         object Started : Ui()
+
         class TopLimitEdgeReached(
             val messageAnchorId: Long,
             val currentMessages: List<MessageItem.Message>
@@ -23,11 +24,13 @@ sealed class ChatEvent {
         class ReactionSent(
             val messageId: Long,
             val reaction: String,
+            val currentMessages: List<MessageItem.Message>
         ) : Ui()
 
         class ReactionRemoved(
             val messageId: Long,
             val reaction: String,
+            val currentMessages: List<MessageItem.Message>
         ) : Ui()
     }
 
@@ -35,9 +38,9 @@ sealed class ChatEvent {
         class FirstPortionLoaded(val isLastPortion: Boolean, val messages: List<MessageItem.Message>): Internal()
         class NewPortionLoaded(val isLastPortion: Boolean, val messages: List<MessageItem.Message>) : Internal()
 
-        // class ReactionUpdated(val message: Message): Internal()
         class ReactionUpdated(val messages: List<MessageItem.Message>) : Internal()
-        class MessageAdded(val messages: List<MessageItem.Message>) : Internal()
+        object MessageAdded : Internal()
+        object ReactionAlreadyAdded : ChatEvent()
 
         class LoadError(val error: Throwable) : Internal()
     }
@@ -52,15 +55,16 @@ sealed class ChatCommand {
     class SendReaction(
         val messageId: Long,
         val emojiNameToUpdate: String,
+        val currentMessages: List<MessageItem.Message>
     ) : ChatCommand()
 
     class RemoveReaction(
         val messageId: Long,
-        val emojiNameToUpdate: String
+        val emojiNameToUpdate: String,
+        val currentMessages: List<MessageItem.Message>
     ) : ChatCommand()
 }
 
 sealed class ChatEffect {
     class ShowError(val error: Throwable) : ChatEffect()
-    class MessageReceived(val messages: List<MessageItem.Message>) : ChatEffect()
 }

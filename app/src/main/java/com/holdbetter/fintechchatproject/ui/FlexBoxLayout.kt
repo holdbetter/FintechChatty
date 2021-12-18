@@ -114,17 +114,7 @@ class FlexBoxLayout @JvmOverloads constructor(
         return p is MarginLayoutParams
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        addImageView()
-    }
-
-    override fun onDetachedFromWindow() {
-        deleteImageView()
-        super.onDetachedFromWindow()
-    }
-
-    private fun addImageView() {
+    fun addPlusView() {
         addView(ImageView(context).apply {
             layoutParams = FrameLayout.LayoutParams(
                 context.dpToPx(46f),
@@ -138,9 +128,5 @@ class FlexBoxLayout @JvmOverloads constructor(
                 plusViewOnClickListener?.invoke()
             }
         })
-    }
-
-    private fun deleteImageView() {
-        removeViewAt(childCount - 1)
     }
 }
