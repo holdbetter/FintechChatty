@@ -22,6 +22,7 @@ class FlexBoxLayout @JvmOverloads constructor(
     private val marginBtwItemsHorizontal = context?.dpToPx(10f) ?: 0
     private val marginBtwItemsVertical = context?.dpToPx(7f) ?: 0
     private var amountOfElementsInRow = ArrayList<Int>(childCount)
+    private var maxRowHeight = 0
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         amountOfElementsInRow.clear()
@@ -38,6 +39,7 @@ class FlexBoxLayout @JvmOverloads constructor(
             var currentRow = 0
             val maxHeightsOfEachRow = arrayListOf(0)
             val maxPossibleWidth = MeasureSpec.getSize(widthMeasureSpec)
+
             children.forEach { child ->
                 measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, usedHeight)
 
@@ -60,8 +62,9 @@ class FlexBoxLayout @JvmOverloads constructor(
             }
 
 
+            maxRowHeight = maxHeightsOfEachRow.maxOf { it }
             usedHeight =
-                maxHeightsOfEachRow.sum() + (maxHeightsOfEachRow.size - 1) * marginBtwItemsVertical
+                 maxHeightsOfEachRow.size * maxRowHeight + (maxHeightsOfEachRow.size) * marginBtwItemsVertical
         }
 
         val summaryWidth = resolveSize(maxRowWidth, widthMeasureSpec)
@@ -74,7 +77,6 @@ class FlexBoxLayout @JvmOverloads constructor(
         if (childCount > 1) {
             var startX = 0
             var startY = 0
-            var maxHeight = 0
 
             var currentRow = 0
 
@@ -83,7 +85,7 @@ class FlexBoxLayout @JvmOverloads constructor(
                 if (elementsInRowToLayout == 0) {
                     currentRow += 1
                     startX = 0
-                    startY += maxHeight + marginBtwItemsVertical
+                    startY += maxRowHeight + marginBtwItemsVertical
 
                     elementsInRowToLayout = amountOfElementsInRow[currentRow]
                 }
@@ -92,7 +94,6 @@ class FlexBoxLayout @JvmOverloads constructor(
                     startY + paddingTop,
                     startX + child.measuredWidth,
                     startY + child.measuredHeight)
-                maxHeight = max(maxHeight, child.measuredHeight)
 
                 startX += child.width + marginBtwItemsHorizontal
 
