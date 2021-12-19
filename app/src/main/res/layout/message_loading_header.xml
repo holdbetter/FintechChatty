@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="4dp"
-    tools:background="@color/activity_background">
+    tools:background="@color/activity_background"
+    tools:viewBindingIgnore="true">
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         style="@style/Widget.MaterialComponents.CircularProgressIndicator"
@@ -18,7 +19,6 @@
         app:indicatorSize="12dp"
         app:trackThickness="1.25dp"
         tools:indeterminate="false"
-        tools:progress="45"
-        tools:viewBindingIgnore="true"/>
+        tools:progress="45"/>
 
 </FrameLayout>

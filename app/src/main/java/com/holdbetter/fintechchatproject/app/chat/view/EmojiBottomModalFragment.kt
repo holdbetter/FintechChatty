@@ -45,8 +45,6 @@ class EmojiBottomModalFragment(private val messageId: Long) : BottomSheetDialogF
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // TODO: 10/19/2021 Auto span count
-        // TODO: 10/19/2021 Offset btw items
         view.findViewById<RecyclerView>(R.id.emoji_list)!!.apply {
             layoutManager = GridLayoutManager(activity, 6)
             adapter = EmojiDialogAdapter(emojiRepository.cleanedEmojiList, this@EmojiBottomModalFragment)

@@ -54,9 +54,9 @@ class StreamRepository @Inject constructor(
             .map { message -> message.toStreamEntity() }
             .filter { streamList -> streamList.isNotEmpty() }
             .flatMapObservable { streams -> Observable.fromIterable(streams) }
-            .flatMapSingle { stream -> getTopicsOnline(stream) }
+            .concatMapEager { stream -> getTopicsOnline(stream) }
             .toList()
-            .timeout(TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
+            .timeout(TIMEOUT_MILLIS * 2, TimeUnit.MILLISECONDS)
             .observeOn(Schedulers.computation())
             .flatMap { applySubbedInfoTo(it) }
             .observeOn(Schedulers.io())
@@ -64,13 +64,14 @@ class StreamRepository @Inject constructor(
             .andThen(Maybe.just("success"))
     }
 
-    override fun getTopicsOnline(stream: StreamEntity): Single<StreamWithTopics> {
+    override fun getTopicsOnline(stream: StreamEntity): Observable<StreamWithTopics> {
         return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
             .flatMap { api -> api.getStreamTopics(stream.id) }
             .map { topicResponse -> topicResponse.toTopicEntity(stream.id, stream.name) }
             .map { topicEntityList -> StreamWithTopics(stream, topicEntityList) }
+            .toObservable()
     }
 
     override fun cacheStreamsAndTopics(streamsToCache: List<StreamWithTopics>): Completable {

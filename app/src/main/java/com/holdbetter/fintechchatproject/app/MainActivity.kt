@@ -33,4 +33,15 @@ class MainActivity : AppCompatActivity() {
 
         connectivityManager.unregisterNetworkCallback(networkCallback)
     }
+
+    fun addNetworkCallback(callback: (Boolean) -> Unit) {
+        networkCallback.addCallback(callback)
+    }
+
+    fun removeNetworkCallback(callback: (Boolean) -> Unit) {
+        networkCallback.removeCallback(callback)
+    }
+
+    val isNetworkAvailable: Boolean
+        get() = networkCallback.isAvailable()
 }

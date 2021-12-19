@@ -2,15 +2,15 @@ package com.holdbetter.fintechchatproject.app.chat
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.EditText
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.app.MainActivity
 import com.holdbetter.fintechchatproject.app.chat.di.DaggerChatComponent
 import com.holdbetter.fintechchatproject.app.chat.elm.*
 import com.holdbetter.fintechchatproject.app.chat.services.DateOnChatDecorator
@@ -20,14 +20,18 @@ import com.holdbetter.fintechchatproject.app.chat.view.EmojiBottomModalFragment
 import com.holdbetter.fintechchatproject.app.chat.view.IChatViewer
 import com.holdbetter.fintechchatproject.app.chat.view.MessageAdapter
 import com.holdbetter.fintechchatproject.databinding.FragmentChatBinding
+import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
 import com.holdbetter.fintechchatproject.domain.repository.ChatRepositoryFactory
 import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository
 import com.holdbetter.fintechchatproject.domain.repository.IPersonalRepository
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toSender
 import com.holdbetter.fintechchatproject.model.MessageItem
+import com.holdbetter.fintechchatproject.room.services.UnexpectedRoomException
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
+import com.holdbetter.fintechchatproject.services.FragmentExtensions.createStyledSnackbar
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
+import java.io.IOException
 import java.util.*
 import javax.inject.Inject
 import kotlin.properties.Delegates.notNull
@@ -67,13 +71,26 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
 
     lateinit var chatStore: ChatStore
 
-    val binding by viewBinding(FragmentChatBinding::bind)
+    private val binding by viewBinding(FragmentChatBinding::bind)
 
     var streamId: Long by notNull()
     lateinit var topicName: String
     lateinit var streamName: String
 
-    val messages: List<MessageItem.Message>
+    private val mainActivity
+        get() = (requireActivity() as MainActivity)
+
+    private val connectionStateText
+        get() = if (mainActivity.isNetworkAvailable) {
+            resources.getString(R.string.online)
+        } else {
+            resources.getString(R.string.offline)
+        }
+
+    private val isConnectionAvailable: Boolean
+        get() = mainActivity.isNetworkAvailable
+
+    private val messages: List<MessageItem.Message>
         get() = store.currentState.messages!!
 
     override fun onAttach(context: Context) {
@@ -113,7 +130,6 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
             this
         ) { _, bundle ->
             val emojiName = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_NAME_KEY)!!
-            val emojiCode = bundle.getString(EmojiBottomModalFragment.EMOJI_SELECTED_CODE_KEY)!!
             val messageId = bundle.getLong(EmojiBottomModalFragment.MESSAGE_ID_KEY)
 
             store.accept(
@@ -145,7 +161,7 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
                 }
             }
 
-            topicSubtitle.text = String.format("Topic: %s", topicName)
+            topicSubtitle.text = String.format(getString(R.string.topic_format), topicName)
 
             inputMessage.apply {
                 doOnTextChanged { text, _, _, _ ->
@@ -155,10 +171,19 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
 
             chatActionButton.setOnClickListener(::onSendClicked)
 
+            update.setOnClickListener { store.accept(ChatEvent.Ui.Retry) }
+
             if (store.currentState.messages == null) {
                 store.accept(ChatEvent.Ui.Started)
             }
         }
+
+        mainActivity.addNetworkCallback(this::onNetworkStateChanged)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mainActivity.removeNetworkCallback(this::onNetworkStateChanged)
     }
 
     override fun createStore(): Store<ChatEvent, ChatEffect, ChatState> = chatStore.provide()
@@ -168,27 +193,71 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
 
     override fun render(state: ChatState) {
         loading(state.isLoading)
+
         state.messages?.let {
-            setMessages(it, state.isLastPortion!!)
+            binding.emptyData.isVisible = it.isEmpty() && state.isCachedData!!
+            setMessages(it, state.isLastPortion!!, state.isCachedData!!)
+        }
+
+        state.isCachedData?.let {
+            cacheShowing(state.isCachedData)
+        }
+    }
+
+    private fun cacheShowing(isCache: Boolean) {
+        with(binding) {
+            connectionState.isVisible = isCache
+            if (isCache) {
+                connectionState.isEnabled = isConnectionAvailable
+                connectionState.text = connectionStateText
+            }
+
+            update.isVisible = isCache
+            chatActionButton.isVisible = !isCache
+            inputMessage.isVisible = !isCache
         }
     }
 
     override fun handleEffect(effect: ChatEffect): Unit {
         return when (effect) {
-            is ChatEffect.ShowError -> handleError(effect.error)
+            is ChatEffect.CacheError -> handleDatabaseError(effect.error)
+            is ChatEffect.ReactionError -> handleReactionError(effect.error)
         }
     }
 
-    private fun handleError(error: Throwable) {
-        Toast.makeText(requireActivity(), "Error", Toast.LENGTH_SHORT).show()
+    private fun handleReactionError(error: Throwable) {
+        val snackbar = createStyledSnackbar()
+        when (error) {
+            is NotConnectedException, is IOException -> {
+                snackbar.setText(R.string.no_connection)
+                snackbar.duration = Snackbar.LENGTH_SHORT
+                snackbar.show()
+            }
+        }
+    }
+
+    private fun handleDatabaseError(error: Throwable) {
+        when(error) {
+            is UnexpectedRoomException -> {
+                createStyledSnackbar(R.string.unexpected_room_exception).show()
+            }
+        }
     }
 
     override fun loading(turnOn: Boolean) {
         with(binding) {
-            progress.isVisible = turnOn
-            chatActionButton.isVisible = !turnOn
-            inputMessage.isVisible = !turnOn
-            messages.isVisible = !turnOn
+            if (turnOn) {
+                progress.isVisible = true
+                messages.isVisible = false
+                connectionState.isVisible = false
+                update.isVisible = false
+                chatActionButton.isVisible = false
+                inputMessage.isVisible = false
+                emptyData.isVisible = false
+            } else {
+                progress.isVisible = false
+                messages.isVisible = true
+            }
         }
     }
 
@@ -196,31 +265,33 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
         binding.inputMessage.text = null
     }
 
-    private fun showNotSupportedFeatureNotification(view: View) {
-        Toast.makeText(
-            view.context,
-            getString(R.string.file_attaching_toast),
-            Toast.LENGTH_LONG
-        ).show()
+    private fun showNotSupportedFeatureNotification() {
+        createStyledSnackbar(R.string.file_attaching_toast).show()
     }
 
-    override fun setMessages(messages: List<MessageItem>, isLastPortion: Boolean) {
+    override fun setMessages(
+        messages: List<MessageItem>,
+        isLastPortion: Boolean,
+        isShowingCachedData: Boolean
+    ) {
         with(binding.messages) {
-            if (!isLastPortion) {
+            isVisible = messages.isNotEmpty()
+
+            val adapter = (adapter as MessageAdapter)
+            if (!isLastPortion && !isShowingCachedData) {
                 val messagesWithHeader =
-                    listOf(MessageItem.HeaderMessage(), *messages.toTypedArray())
-                (adapter as MessageAdapter).submitList(messagesWithHeader) {
+                    listOf(MessageItem.HeaderLoading(), *messages.toTypedArray())
+                adapter.submitList(messagesWithHeader) {
                     addOnScrollListener(ChatOnScrollListener(::onChatEdgeReaching))
                 }
             } else {
-                (adapter as MessageAdapter).submitList(messages)
+                adapter.submitList(messages)
             }
         }
     }
 
     override fun onChatEdgeReaching() {
         store.accept(ChatEvent.Ui.TopLimitEdgeReached(messages.first().id, messages))
-        Log.d("scrolled", "caused")
     }
 
     override fun onSendClicked(view: View) {
@@ -229,7 +300,7 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
                 onMessageSent(inputMessage)
                 clearTextField()
             } else {
-                showNotSupportedFeatureNotification(view)
+                showNotSupportedFeatureNotification()
             }
         }
     }
@@ -287,6 +358,21 @@ class ChatFragment : ElmFragment<ChatEvent, ChatEffect, ChatState>(R.layout.frag
                     messages
                 )
             )
+        }
+    }
+
+    override fun onNetworkStateChanged(isAvailable: Boolean) {
+        store.currentState.isCachedData?.let { isCachedData ->
+            if (isCachedData) {
+                with(binding) {
+                    connectionState.isEnabled = isAvailable
+                    connectionState.text = if (isAvailable) {
+                        resources.getString(R.string.online)
+                    } else {
+                        resources.getString(R.string.offline)
+                    }
+                }
+            }
         }
     }
 }

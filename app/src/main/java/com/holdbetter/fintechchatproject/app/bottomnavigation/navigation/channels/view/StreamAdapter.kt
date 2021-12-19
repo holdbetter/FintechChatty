@@ -37,7 +37,6 @@ class StreamAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
     }
 
     override fun onBindViewHolder(holder: StreamViewHolder, position: Int) {
-        // TODO: 10/25/2021 Restoring expand state
         val stream = asyncDiffer.currentList[position]
         holder.bind(stream)
     }
@@ -53,8 +52,6 @@ class StreamAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
         onTopicClicked: (Context, Topic) -> Unit
     ) :
         RecyclerView.ViewHolder(binding.root) {
-        // TODO: 11/2/2021 Animations support
-
         init {
             with(binding) {
                 topicNestedList.apply {

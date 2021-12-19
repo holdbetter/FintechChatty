@@ -6,17 +6,24 @@ import com.holdbetter.fintechchatproject.domain.retrofit.Narrow
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
 import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toMessage
 import com.holdbetter.fintechchatproject.model.MessageItem
+import com.holdbetter.fintechchatproject.room.dao.MessageDao
+import com.holdbetter.fintechchatproject.room.entity.MessageWithReactions
+import com.holdbetter.fintechchatproject.room.services.DatabaseMapper.toMessage
+import com.holdbetter.fintechchatproject.room.services.DatabaseMapper.toSender
 import com.holdbetter.fintechchatproject.services.connectivity.MyConnectivityManager
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import io.reactivex.rxjava3.core.Flowable
 import io.reactivex.rxjava3.core.Maybe
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
 import okhttp3.ResponseBody
+import java.util.concurrent.TimeUnit
 
 class ChatRepository @AssistedInject constructor(
-    // TODO dao will be here
+    private val messageDao: MessageDao,
     private val connectivityManager: MyConnectivityManager,
     override val api: TinkoffZulipApi,
     @Assisted("streamId") override val streamId: Long,
@@ -26,6 +33,21 @@ class ChatRepository @AssistedInject constructor(
 ) : IChatRepository {
     private val messageNarrow = Narrow.MessageNarrow(streamId, topicName).toJson()
 
+    override fun getCachedMessages(): Maybe<List<MessageItem.Message>> {
+        return messageDao.getTopicMessages(streamId, topicName)
+            .flatMapObservable { Observable.fromIterable(it) }
+            .concatMapEager { appendSender(it) }
+            .toList()
+            .toMaybe()
+    }
+
+    private fun appendSender(messageWithReactions: MessageWithReactions): Observable<MessageItem.Message> {
+        return messageDao.getSender(messageWithReactions.message.senderId)
+            .observeOn(Schedulers.computation())
+            .map { messageWithReactions.toMessage(it.toSender()) }
+            .toObservable()
+    }
+
     override fun getFirstPortion(): Single<Pair<Boolean, List<MessageItem.Message>>> {
         return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
@@ -33,19 +55,15 @@ class ChatRepository @AssistedInject constructor(
             .flatMap { api -> api.getNewestMessages(messageNarrow) }
             .map { it.toMessage() }
             .flatMap { isItLastPortion(it) }
+            .doOnSuccess { cacheMessages(streamId, topicName, it.second) }
     }
 
-    private fun isItLastPortion(lastMessages: List<MessageItem.Message>): Single<Pair<Boolean, List<MessageItem.Message>>> {
-        return api.getOldestMessage(messageNarrow)
-            .map { it.messages.first().id }
-            .map { id -> isMessagesContainsOldest(lastMessages, id) to lastMessages }
-    }
-
-    private fun isMessagesContainsOldest(
-        messages: List<MessageItem.Message>,
-        oldestMessageId: Long
-    ): Boolean {
-        return messages.any { message -> message.id == oldestMessageId }
+    override fun cacheMessages(
+        streamId: Long,
+        topicName: String,
+        messagesToCache: List<MessageItem.Message>
+    ) {
+        messageDao.applyTopicMessages(streamId, topicName, messagesToCache)
     }
 
     override fun getNextPortion(
@@ -60,6 +78,20 @@ class ChatRepository @AssistedInject constructor(
             .map { excludeAnchorMessage(messageAnchorId, it) }
             .map { appendWithChatMessages(it, currentMessages) }
             .flatMap { isItLastPortion(it) }
+            .retryWhen { errors -> errors.flatMap { Flowable.timer(5000, TimeUnit.MILLISECONDS) } }
+    }
+
+    private fun isItLastPortion(lastMessages: List<MessageItem.Message>): Single<Pair<Boolean, List<MessageItem.Message>>> {
+        return api.getOldestMessage(messageNarrow)
+            .map { it.messages.first().id }
+            .map { id -> isMessagesContainsOldest(lastMessages, id) to lastMessages }
+    }
+
+    private fun isMessagesContainsOldest(
+        messages: List<MessageItem.Message>,
+        oldestMessageId: Long
+    ): Boolean {
+        return messages.any { message -> message.id == oldestMessageId }
     }
 
     private fun excludeAnchorMessage(
@@ -88,6 +120,7 @@ class ChatRepository @AssistedInject constructor(
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
             .flatMap { it.sendMessage(textMessage, streamId, topicName) }
+            .retryWhen { errors -> errors.flatMap { Flowable.timer(1000, TimeUnit.MILLISECONDS) } }
     }
 
     override fun sendReaction(
@@ -161,7 +194,10 @@ class ChatRepository @AssistedInject constructor(
             ?: throw Exception("Couldn't exchange reaction to api emoji")
     }
 
-    private fun List<MessageItem.Message>.containsReaction(messageId: Long, emojiNameToUpdate: String) : Boolean {
+    private fun List<MessageItem.Message>.containsReaction(
+        messageId: Long,
+        emojiNameToUpdate: String
+    ): Boolean {
         return this.first { it.id == messageId }.reactions.any { it.userId == meId && it.emojiName == emojiNameToUpdate }
     }
 }

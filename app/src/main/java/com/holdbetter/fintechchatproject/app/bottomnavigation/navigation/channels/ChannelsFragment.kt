@@ -19,6 +19,7 @@ import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
 import com.holdbetter.fintechchatproject.room.services.UnexpectedRoomException
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.createStyledSnackbar
+import retrofit2.HttpException
 import vivid.money.elmslie.android.base.ElmFragment
 import vivid.money.elmslie.core.store.Store
 import java.io.IOException
@@ -136,6 +137,11 @@ class ChannelsFragment :
             }
             is IOException, is NotConnectedException -> {
                 snackbar.setText(R.string.no_connection)
+                snackbar.duration = Snackbar.LENGTH_LONG
+                snackbar.setAction(R.string.try_again) { refreshPage() }
+            }
+            is HttpException -> {
+                snackbar.setText(R.string.not_so_fast)
                 snackbar.duration = Snackbar.LENGTH_LONG
                 snackbar.setAction(R.string.try_again) { refreshPage() }
             }

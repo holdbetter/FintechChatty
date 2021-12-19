@@ -2,12 +2,12 @@ package com.holdbetter.fintechchatproject.di
 
 import android.app.Application
 import com.holdbetter.fintechchatproject.app.MainActivity
-import com.holdbetter.fintechchatproject.app.chat.di.ChatComponent
 import com.holdbetter.fintechchatproject.app.chat.view.EmojiBottomModalFragment
 import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository
 import com.holdbetter.fintechchatproject.domain.repository.IPersonalRepository
 import com.holdbetter.fintechchatproject.domain.retrofit.TinkoffZulipApi
 import com.holdbetter.fintechchatproject.room.ChatDatabase
+import com.holdbetter.fintechchatproject.room.dao.MessageDao
 import com.holdbetter.fintechchatproject.room.dao.PeopleDao
 import com.holdbetter.fintechchatproject.room.dao.StreamDao
 import com.holdbetter.fintechchatproject.services.connectivity.MyConnectivityManager
@@ -38,6 +38,8 @@ interface AppComponent : AndroidDependencies, DomainDependencies, RepositoryDepe
 
     override fun getPeopleDao(): PeopleDao
 
+    override fun getMessageDao(): MessageDao
+
     @Component.Factory
     interface Factory {
         fun create(@BindsInstance app: Application): AppComponent
@@ -57,6 +59,7 @@ interface AndroidDependencies {
     fun getDatabase(): ChatDatabase
     fun getStreamDao(): StreamDao
     fun getPeopleDao(): PeopleDao
+    fun getMessageDao(): MessageDao
 }
 
 interface DomainDependencies {

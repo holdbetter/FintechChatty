@@ -24,7 +24,6 @@ import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.createStyledSnackbar
 import vivid.money.elmslie.android.base.ElmFragment
 import java.io.IOException
-import javax.inject.Inject
 
 abstract class StreamFragment<Effect : Any, State : Any>(
     private val onErrorRetryEvent: StreamEvent

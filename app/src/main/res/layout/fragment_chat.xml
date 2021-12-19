@@ -1,109 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipChildren="false"
-    android:clipToPadding="false"
-    android:paddingBottom="16dp"
     tools:background="@color/activity_background"
     tools:context=".app.chat.ChatFragment">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/chat_toolbar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/chat_title"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="@color/blue_and_green"
-            app:navigationIcon="?attr/homeAsUpIndicator"
-            app:navigationIconTint="@color/white"
-            app:titleMarginStart="22dp"
-            app:titleTextAppearance="@style/TitleAppearance"
-            app:titleTextColor="@color/white"
-            tools:title="#general" />
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/chat_toolbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/chat_title"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@color/blue_and_green"
+                app:navigationIcon="?attr/homeAsUpIndicator"
+                app:navigationIconTint="@color/white"
+                app:titleMarginStart="22dp"
+                app:titleTextAppearance="@style/TitleAppearance"
+                app:titleTextColor="@color/white"
+                tools:title="#general" />
+
+            <TextView
+                android:id="@+id/topic_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_regular"
+                android:gravity="center"
+                android:paddingVertical="6dp"
+                android:textColor="#CCCCCC"
+                android:textSize="18sp"
+                tools:text="Topic: Fintech Contest" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress"
+            style="@style/Widget.MaterialComponents.CircularProgressIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:indicatorColor="@color/white"
+            app:indicatorDirectionCircular="clockwise"
+            app:indicatorSize="36dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chat_toolbar"
+            app:layout_constraintVertical_bias="0.47"
+            app:trackThickness="1.25dp"
+            tools:indeterminate="false"
+            tools:progress="45"
+            tools:visibility="gone" />
 
         <TextView
-            android:id="@+id/topic_subtitle"
+            android:id="@+id/empty_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cache_empty"
+            android:textAlignment="center"
+            android:textColor="@color/chat_text_color"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chat_toolbar"
+            app:layout_constraintVertical_bias="0.47"
+            tools:visibility="visible" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/messages"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:fontFamily="@font/inter_regular"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            android:clipToPadding="false"
+            android:paddingBottom="68dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chat_toolbar"
+            tools:itemCount="5"
+            tools:listitem="@layout/foreign_message_instance"
+            tools:visibility="gone" />
+
+        <TextView
+            android:id="@+id/connection_state"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/background_connection_state_shape"
+            android:backgroundTint="@color/background_connection_state_selector"
+            android:enabled="true"
+            android:fontFamily="@font/inter_medium"
             android:gravity="center"
-            android:textColor="#CCCCCC"
-            android:textSize="18sp"
-            tools:text="Topic: Fintech Contest" />
+            android:paddingVertical="4dp"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/chat_toolbar"
+            tools:text="online"
+            tools:visibility="visible" />
 
-    </com.google.android.material.appbar.AppBarLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/progress"
-        style="@style/Widget.MaterialComponents.CircularProgressIndicator"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
+        app:layout_behavior="com.holdbetter.fintechchatproject.app.chat.view.InputBoxBehaviour">
+
+        <EditText
+            android:id="@+id/input_message"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:background="@drawable/input_message_background"
+            android:fontFamily="@font/inter_regular"
+            android:hint="@string/input_message_hint"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:paddingHorizontal="21dp"
+            android:textColor="@color/chat_text_color"
+            android:textColorHint="@color/text_gray"
+            android:textSize="20sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/chat_action_button"
+            tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/chat_action_button"
+            style="@style/Widget.MaterialComponents.Button.TextButton.Icon.Circle"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:layout_marginEnd="16dp"
+            android:paddingTop="8dp"
+            android:visibility="gone"
+            app:cornerRadius="20dp"
+            app:icon="@drawable/chat_action_button_selector"
+            tools:visibility="visible" />
+
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/update"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:indeterminate="true"
-        app:indicatorColor="@color/blue_and_green"
-        app:indicatorDirectionCircular="clockwise"
-        app:indicatorSize="75dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_toolbar"
-        app:layout_constraintVertical_bias="0.47"
-        app:trackThickness="14dp"
-        tools:indeterminate="false"
-        tools:progress="45"
-        tools:visibility="gone" />
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="@string/retry_button"
+        android:visibility="gone"
+        app:backgroundTint="@color/blue_and_green"
+        app:fabCustomSize="50dp"
+        app:maxImageSize="30dp"
+        app:srcCompat="@drawable/ic_retry"
+        app:tint="@color/white"
+        tools:visibility="visible"
+        app:layout_behavior="com.google.android.material.floatingactionbutton.FloatingActionButton$Behavior"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/messages"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:clipToPadding="false"
-        android:paddingBottom="62dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chat_toolbar"
-        tools:itemCount="5"
-        tools:listitem="@layout/foreign_message_instance"
-        tools:visibility="visible" />
-
-    <EditText
-        android:id="@+id/input_message"
-        android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="12dp"
-        android:background="@drawable/input_message_background"
-        android:fontFamily="@font/inter_regular"
-        android:hint="@string/input_message_hint"
-        android:importantForAutofill="no"
-        android:inputType="text"
-        android:paddingHorizontal="21dp"
-        android:textColor="@color/chat_text_color"
-        android:textColorHint="@color/text_gray"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@id/chat_action_button" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/chat_action_button"
-        style="@style/Widget.MaterialComponents.Button.TextButton.Icon.Circle"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="16dp"
-        app:icon="@drawable/chat_action_button_selector"
-        app:layout_constraintBottom_toBottomOf="@id/input_message"
-        app:layout_constraintLeft_toRightOf="@id/input_message"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/input_message" />
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

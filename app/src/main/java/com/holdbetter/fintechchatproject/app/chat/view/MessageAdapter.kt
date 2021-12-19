@@ -81,7 +81,7 @@ class MessageAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (val message = asyncDiffer.currentList[position]) {
-            is MessageItem.HeaderMessage -> {
+            is MessageItem.HeaderLoading -> {
                 if (position == 0) MessageType.PORTION_LOADING.ordinal
                 else throw Exception("Loading element should be at start of list. Wrong position $position")
             }
@@ -109,20 +109,8 @@ class MessageAdapter(
         asyncDiffer.submitList(currentList, messageAddedWithLoadingUiCallback)
     }
 
-    fun submitSentMessage(messageAddedCallback: () -> Unit = {}) {
-        val currentList = asyncDiffer.currentList
-        val firstNotSentMessage =
-            currentList.first { m -> m.id == MessageItem.Message.NOT_SENT_MESSAGE } as MessageItem.Message
-        val notReceivedSubList =
-            currentList.subList(currentList.indexOf(firstNotSentMessage) + 1, currentList.size)
-
-        val updatedList = listOf(
-            *currentList.toTypedArray(),
-            firstNotSentMessage.copy(id = MessageItem.Message.RECEIVED_MESSAGE),
-            *notReceivedSubList.toTypedArray()
-        )
-
-        asyncDiffer.submitList(updatedList, messageAddedCallback)
+    fun clear() {
+        asyncDiffer.submitList(emptyList())
     }
 
     class MessageViewHolder(
@@ -154,7 +142,7 @@ class MessageAdapter(
         fun bind(message: MessageItem.Message, currentUserId: Long) {
             if (messageLayout is ForeignMessageLayout) {
                 messageLayout.avatar = message.sender.avatarUrl
-                messageLayout.name = message.sender.name
+                messageLayout.name = message.sender.fullName
             }
 
             messageLayout.message = HtmlCompat.fromHtml(
@@ -239,7 +227,7 @@ class MessageAdapter(
 
         override fun getChangePayload(oldItem: MessageItem, newItem: MessageItem): Any? {
             return when {
-                oldItem is MessageItem.HeaderMessage || newItem is MessageItem.HeaderMessage -> {
+                oldItem is MessageItem.HeaderLoading || newItem is MessageItem.HeaderLoading -> {
                     super.getChangePayload(oldItem, newItem)
                 }
                 else -> {

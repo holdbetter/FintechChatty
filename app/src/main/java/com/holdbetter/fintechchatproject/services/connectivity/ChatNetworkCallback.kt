@@ -4,33 +4,46 @@ import android.net.ConnectivityManager
 import android.net.LinkProperties
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.util.Log
 import javax.inject.Inject
 
 class ChatNetworkCallback @Inject constructor(private val networkState: NetworkState): ConnectivityManager.NetworkCallback()  {
+    private val callbacks: MutableList<(Boolean) -> Unit> = mutableListOf()
+
     override fun onAvailable(network: Network) {
         networkState.network = network
         networkState.isNetworkConnected = true
 
-        Log.d("NETWORK", "available")
+        for (callback in callbacks) {
+            callback(true)
+        }
     }
 
     override fun onLost(network: Network) {
         networkState.network = network
         networkState.isNetworkConnected = false
 
-        Log.d("NETWORK", "lost")
+        for (callback in callbacks) {
+            callback(false)
+        }
     }
 
     override fun onCapabilitiesChanged(network: Network, networkCapabilities: NetworkCapabilities) {
         networkState.networkCapabilities = networkCapabilities
-
-        Log.d("NETWORK", "onCapabilitiesChanged")
     }
 
     override fun onLinkPropertiesChanged(network: Network, linkProperties: LinkProperties) {
         networkState.linkProperties = linkProperties
+    }
 
-        Log.d("NETWORK", "onLinkPropertiesChanged")
+    fun addCallback(callback: (Boolean) -> Unit) {
+        callbacks.add(callback)
+    }
+
+    fun removeCallback(callback: (Boolean) -> Unit) {
+        callbacks.remove(callback)
+    }
+
+    fun isAvailable(): Boolean {
+        return networkState.isNetworkConnected
     }
 }

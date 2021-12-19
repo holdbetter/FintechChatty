@@ -4,10 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.holdbetter.fintechchatproject.room.dao.EmojiDao
-import com.holdbetter.fintechchatproject.room.dao.PeopleDao
-import com.holdbetter.fintechchatproject.room.dao.PersonalDao
-import com.holdbetter.fintechchatproject.room.dao.StreamDao
+import com.holdbetter.fintechchatproject.room.dao.*
 import com.holdbetter.fintechchatproject.room.entity.*
 
 @Database(
@@ -17,7 +14,10 @@ import com.holdbetter.fintechchatproject.room.entity.*
         EmojiEntity::class,
         ApiEmojiEntity::class,
         UserEntity::class,
-        PersonalEntity::class],
+        PersonalEntity::class,
+        MessageEntity::class,
+        ReactionEntity::class,
+        SenderEntity::class],
     version = 1,
     exportSchema = false
 )
@@ -27,6 +27,7 @@ abstract class ChatDatabase : RoomDatabase() {
     abstract fun emojiDao(): EmojiDao
     abstract fun peopleDao(): PeopleDao
     abstract fun personalDao(): PersonalDao
+    abstract fun messageDao(): MessageDao
 
     companion object {
         const val STREAM_TABLE_NAME = "streams"
@@ -35,6 +36,9 @@ abstract class ChatDatabase : RoomDatabase() {
         const val API_EMOJI_TABLE_NAME = "api_emoji"
         const val USERS_TABLE_NAME = "users"
         const val PERSONAL_TABLE_NAME = "personal"
+        const val MESSAGE_TABLE_NAME = "messages"
+        const val REACTION_TABLE_NAME = "reactions"
+        const val SENDERS_TABLE_NAME = "senders"
 
         @Volatile
         private var instance: ChatDatabase? = null

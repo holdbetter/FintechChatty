@@ -5,6 +5,31 @@ import com.holdbetter.fintechchatproject.model.*
 import com.holdbetter.fintechchatproject.room.entity.*
 
 object DatabaseMapper {
+    fun MessageWithReactions.toMessage(sender: Sender): MessageItem.Message {
+        return MessageItem.Message(
+            this.message.id,
+            sender,
+            this.message.content,
+            this.message.dateInSeconds,
+            this.reactions.toReaction()
+        )
+    }
+
+    fun SenderEntity.toSender(): Sender {
+        return Sender(id, fullName, email, avatarUrl)
+    }
+
+    fun List<ReactionEntity>.toReaction(): List<Reaction> {
+        return map {
+            Reaction(
+                it.userId,
+                it.emojiName,
+                it.emojiCode,
+                it.reactionType
+            )
+        }
+    }
+
     fun List<StreamWithTopics>.toStream(): List<Stream> {
         return map {
             Stream(

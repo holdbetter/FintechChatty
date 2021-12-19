@@ -6,13 +6,15 @@ data class ChatState(
     val isLoading: Boolean = false,
     val isLastPortion: Boolean? = null,
     val messages: List<MessageItem.Message>? = null,
-    val error: Throwable? = null
+    val error: Throwable? = null,
+    val isCachedData: Boolean? = null
 )
 
 sealed class ChatEvent {
     sealed class Ui : ChatEvent() {
         object Init : Ui()
         object Started : Ui()
+        object Retry : Ui()
 
         class TopLimitEdgeReached(
             val messageAnchorId: Long,
@@ -35,20 +37,36 @@ sealed class ChatEvent {
     }
 
     sealed class Internal : ChatEvent() {
-        class FirstPortionLoaded(val isLastPortion: Boolean, val messages: List<MessageItem.Message>): Internal()
-        class NewPortionLoaded(val isLastPortion: Boolean, val messages: List<MessageItem.Message>) : Internal()
+        class FirstPortionLoaded(
+            val isLastPortion: Boolean,
+            val messages: List<MessageItem.Message>
+        ) : Internal()
+
+        class NewPortionLoaded(
+            val isLastPortion: Boolean,
+            val messages: List<MessageItem.Message>
+        ) : Internal()
+
+        class CacheLoaded(val messages: List<MessageItem.Message>) : Internal()
+        object CacheEmpty : Internal()
+        class CacheError(val error: Throwable) : Internal()
 
         class ReactionUpdated(val messages: List<MessageItem.Message>) : Internal()
         object MessageAdded : Internal()
         object ReactionAlreadyAdded : ChatEvent()
 
-        class LoadError(val error: Throwable) : Internal()
+        class ReactionError(val error: Throwable) : Internal()
+        class FirstPortionLoadError(val error: Throwable) : Internal()
+        class OnlineLoadError(val error: Throwable) : ChatEvent()
     }
 }
 
 sealed class ChatCommand {
     object FirstLoad : ChatCommand()
-    class NextLoad(val messageAnchorId: Long, val currentMessages: List<MessageItem.Message>) : ChatCommand()
+    class NextLoad(val messageAnchorId: Long, val currentMessages: List<MessageItem.Message>) :
+        ChatCommand()
+
+    object GetCached : ChatCommand()
 
     class SendMessage(val messageText: String) : ChatCommand()
 
@@ -66,5 +84,6 @@ sealed class ChatCommand {
 }
 
 sealed class ChatEffect {
-    class ShowError(val error: Throwable) : ChatEffect()
+    class CacheError(val error: Throwable) : ChatEffect()
+    class ReactionError(val error: Throwable) : ChatEffect()
 }

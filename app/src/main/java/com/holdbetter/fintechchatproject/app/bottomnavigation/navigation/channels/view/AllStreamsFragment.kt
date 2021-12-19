@@ -7,7 +7,6 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.ChannelsFragment
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.stream.*
-import com.holdbetter.fintechchatproject.databinding.NoStreamInstanceBinding
 import vivid.money.elmslie.core.store.Store
 import javax.inject.Inject
 

@@ -11,12 +11,12 @@ class MyConnectivityManager @Inject constructor(
 ) {
     val isConnected: Single<Boolean>
         get() {
-            return Single.just(
+            return Single.create {
                 if (networkState.network != null) {
-                    networkState.isNetworkConnected
+                    it.onSuccess(networkState.isNetworkConnected)
                 } else {
-                    connectivityManager.checkConnectionStatusSynchronously()
+                    it.onSuccess(connectivityManager.checkConnectionStatusSynchronously())
                 }
-            )
+            }
         }
 }

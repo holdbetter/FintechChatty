@@ -1,6 +1,5 @@
 package com.holdbetter.fintechchatproject.app.chat.elm
 
-import com.holdbetter.fintechchatproject.domain.entity.EmojiApi
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.services.ContextExtensions.dpToPx
-import com.holdbetter.fintechchatproject.services.ContextExtensions.spToPx
 import com.holdbetter.fintechchatproject.services.InvalidateNotNullEmoji
 import com.holdbetter.fintechchatproject.services.RequestLayoutNotNullCount
 
@@ -44,7 +43,7 @@ class ReactionView @JvmOverloads constructor(
     private val defaultTypeface: Typeface = if (!isInEditMode) ResourcesCompat.getFont(context,
         R.font.inter_light)!! else Typeface.DEFAULT
     private val textPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        textSize = context.spToPx(DEFAULT_TEXT_SIZE).toFloat()
+        textSize = context.dpToPx(DEFAULT_TEXT_SIZE).toFloat()
         color = ContextCompat.getColor(this@ReactionView.context, DEFAULT_TEXT_COLOR)
         textAlign = Paint.Align.CENTER
         typeface = defaultTypeface

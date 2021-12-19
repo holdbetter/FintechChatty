@@ -68,8 +68,8 @@ class ProfileFragment :
         with(binding) {
             with(swipeToRefresh) {
                 isEnabled = false
-                setColorSchemeResources(com.holdbetter.fintechchatproject.R.color.white)
-                setProgressBackgroundColorSchemeResource(com.holdbetter.fintechchatproject.R.color.green_accent)
+                setColorSchemeResources(R.color.white)
+                setProgressBackgroundColorSchemeResource(R.color.green_accent)
                 setOnRefreshListener {
                     swipeToRefresh.isEnabled = false
                     store.accept(ProfileEvent.Ui.Retry)

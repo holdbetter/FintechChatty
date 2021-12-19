@@ -93,7 +93,7 @@ class DateOnChatDecorator(context: Context) :
         val position = parent.getChildAdapterPosition(view)
         if (position == 0) {
             val message = adapter.messages[position]
-            if (message is MessageItem.HeaderMessage) return
+            if (message is MessageItem.HeaderLoading) return
         }
 
         val textBounds = Rect()

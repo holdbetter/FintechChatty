@@ -9,10 +9,8 @@
     <string name="search_input_hint">Search…</string>
     <string name="users_input_hint">Search…</string>
     <string name="dropdown_description">expand_stream</string>
-    <string name="no_topic_in_stream">There is no any topics yet</string>
     <string name="profile_image">profile_image</string>
     <string name="user_status">user_status</string>
-    <string name="log_out">Log out</string>
     <string name="something_went_wrong">Something went wrong,\n we can\'t find this user</string>
     <string name="try_again">Повторить</string>
     <string name="try_again_longer">Попробуй еще раз</string>
@@ -27,6 +25,7 @@
     <string name="subscribed">Subscribed</string>
     <string name="all_streams">All streams</string>
     <string name="no_connection">Работает без интернета</string>
+    <string name="not_so_fast">Уоу, уоу, не так быстро, ковбой. Это 429</string>
     <string name="timeout_connection">Нестабильное соединение, ничего не получилось</string>
     <string name="default_error">Error</string>
     <string name="unexpected_room_exception">Произошло что-то страшное с базой данных</string>
@@ -34,4 +33,9 @@
     <string name="undefined_error_message">Неизвестная ошибка, перезагрузите страницу</string>
     <string name="no_connectivity_db_empty_message">Нет сети.\n\nА еще мы не смогли найти какие-либо сохраненные данные, поэтому вместо этого здесь сейчас пустой экран с длинным текстом</string>
     <string name="file_attaching_toast">Attaching files isn\'t ready yet</string>
+    <string name="retry_button">retry_load_chat_button</string>
+    <string name="offline">offline</string>
+    <string name="online">online</string>
+    <string name="topic_format">Topic: %s</string>
+    <string name="cache_empty">Нет сохранненых сообщений</string>
 </resources>

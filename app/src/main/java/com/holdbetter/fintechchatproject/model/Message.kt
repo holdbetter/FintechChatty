@@ -8,8 +8,7 @@ sealed class MessageItem {
         val sender: Sender,
         val messageContent: String,
         val dateInSeconds: Long,
-        val reactions: List<Reaction> = listOf(),
-        val topic: Topic? = null
+        val reactions: List<Reaction> = listOf()
     ): MessageItem() {
         companion object {
             const val NOT_SENT_MESSAGE = -1L
@@ -17,7 +16,7 @@ sealed class MessageItem {
         }
     }
 
-    data class HeaderMessage(
+    data class HeaderLoading(
         override val id: Long = Long.MIN_VALUE
     ) : MessageItem()
 }

@@ -18,7 +18,7 @@ interface IStreamRepository : IRepository {
     fun getCachedStreams(): Maybe<List<Stream>>
 
     fun getStreamsOnline(): Maybe<Any>
-    fun getTopicsOnline(stream: StreamEntity): Single<StreamWithTopics>
+    fun getTopicsOnline(stream: StreamEntity): Observable<StreamWithTopics>
     fun startObservingStreams(): Observable<List<Stream>>
 
     fun startHandleSearchResults() : Observable<List<Stream>>
