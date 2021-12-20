@@ -54,6 +54,7 @@ interface MessageDao {
         messagesToCache: List<MessageItem.Message>
     ) {
         for (message in messagesToCache) {
+            cleanReactions(message.id)
             applySender(message.toSender())
             val messageWithReactions = message.toMessageWithReactions(streamId)
             insertMessage(messageWithReactions.message, messageWithReactions.reactions)
@@ -65,4 +66,7 @@ interface MessageDao {
 
     @Query("delete from messages where stream_id = :streamId and topic_name = :topicName")
     fun cleanTopicMessages(streamId: Long, topicName: String)
+
+    @Query("delete from reactions where message_id = :messageId")
+    fun cleanReactions(messageId: Long)
 }
