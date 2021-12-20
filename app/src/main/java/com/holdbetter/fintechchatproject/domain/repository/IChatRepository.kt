@@ -8,15 +8,15 @@ import io.reactivex.rxjava3.core.Single
 
 interface IChatRepository: IRepository {
     val streamId: Long
-    val topicName: String
     val originalEmojiList: List<EmojiApi>
     val meId: Long
+
+    val jsonNarrow: String
 
     fun getFirstPortion(): Single<Pair<Boolean, List<MessageItem.Message>>>
     fun getNextPortion(messageAnchorId: Long, currentMessages: List<MessageItem.Message>): Single<Pair<Boolean, List<MessageItem.Message>>>
 
     fun getCachedMessages(): Maybe<List<MessageItem.Message>>
-    fun cacheMessages(streamId: Long, topicName: String, messagesToCache: List<MessageItem.Message>)
 
     fun sendMessage(textMessage: String): Single<SentMessageResponse>
     fun sendReaction(messageId: Long, emojiNameToUpdate: String, currentMessages: List<MessageItem.Message>): Maybe<List<MessageItem.Message>>

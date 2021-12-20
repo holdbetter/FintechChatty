@@ -15,10 +15,14 @@ sealed class Narrow(vararg operators: Pair<Operator, Operand>) {
     @JvmInline
     value class Operator(val value: String)
 
-    class MessageNarrow(streamId: Long, topicName: String) : Narrow(
-        Operator("stream") to Operand.IntOperand(streamId),
-        Operator("topic") to Operand.StringOperand(topicName)
-    )
+    class MessageNarrow : Narrow {
+        constructor(streamId: Long) : super(Operator("stream") to Operand.IntOperand(streamId))
+
+        constructor(streamId: Long, topicName: String) : super(
+            Operator("stream") to Operand.IntOperand(streamId),
+            Operator("topic") to Operand.StringOperand(topicName)
+        )
+    }
 }
 
 sealed class Operand {

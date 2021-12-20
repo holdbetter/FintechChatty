@@ -11,7 +11,10 @@ import com.holdbetter.fintechchatproject.databinding.HashtagStreamInstanceBindin
 import com.holdbetter.fintechchatproject.model.Stream
 import com.holdbetter.fintechchatproject.model.Topic
 
-class StreamAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
+class StreamAdapter(
+    private val onTopicClicked: (Context, Topic) -> Unit,
+    private val onStreamClicked: (Context, Stream) -> Unit,
+) :
     RecyclerView.Adapter<StreamAdapter.StreamViewHolder>() {
     object DropdownAngle {
         const val TO_COLLAPSE = 0f
@@ -32,6 +35,7 @@ class StreamAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
                 parent,
                 false
             ),
+            onStreamClicked,
             onTopicClicked
         )
     }
@@ -49,6 +53,7 @@ class StreamAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
 
     class StreamViewHolder(
         private val binding: HashtagStreamInstanceBinding,
+        private val onStreamClicked: (Context, Stream) -> Unit,
         onTopicClicked: (Context, Topic) -> Unit
     ) :
         RecyclerView.ViewHolder(binding.root) {
@@ -88,7 +93,7 @@ class StreamAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
 
         private fun setOnStreamClickListener(stream: Stream) {
             with(binding) {
-                root.setOnClickListener { recyclerItem ->
+                dropdown.setOnClickListener { recyclerItem ->
                     if (!recyclerItem.isSelected) {
                         topicNestedList.isVisible = true
                         animateDropdownIcon(expand = true)
@@ -99,6 +104,10 @@ class StreamAdapter(private val onTopicClicked: (Context, Topic) -> Unit) :
                         animateDropdownIcon(expand = false)
                         recyclerItem.isSelected = false
                     }
+                }
+
+                root.setOnClickListener {
+                    onStreamClicked(it.context, stream)
                 }
             }
         }

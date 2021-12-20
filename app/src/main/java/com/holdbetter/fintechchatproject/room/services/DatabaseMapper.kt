@@ -10,6 +10,7 @@ object DatabaseMapper {
             this.message.id,
             sender,
             this.message.content,
+            this.message.topicName,
             this.message.dateInSeconds,
             this.reactions.toReaction()
         )
@@ -19,7 +20,7 @@ object DatabaseMapper {
         return Sender(id, fullName, email, avatarUrl)
     }
 
-    fun List<ReactionEntity>.toReaction(): List<Reaction> {
+    private fun List<ReactionEntity>.toReaction(): List<Reaction> {
         return map {
             Reaction(
                 it.userId,
@@ -41,7 +42,7 @@ object DatabaseMapper {
         }
     }
 
-    fun List<TopicEntity>.toTopics(): List<Topic> {
+    private fun List<TopicEntity>.toTopics(): List<Topic> {
         return map {
             Topic(
                 it.maxId,

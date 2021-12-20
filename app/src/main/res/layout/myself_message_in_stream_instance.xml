@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:background="@color/activity_background"
+    tools:ignore="RtlHardcoded,RtlSymmetry"
+    android:orientation="vertical"
+    tools:viewBindingIgnore="true">
+
+    <TextView
+        android:id="@+id/message_topic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="Topic"
+        android:maxLines="1"
+        android:maxWidth="200dp"
+        android:ellipsize="end"
+        android:layout_marginRight="18dp"
+        android:layout_gravity="right"
+        android:layout_marginTop="12dp"
+        android:paddingVertical="4dp"
+        android:paddingHorizontal="12dp"
+        android:textSize="@dimen/message_topic_text"
+        android:background="@drawable/message_topic_stroke"
+        android:backgroundTint="@color/green_accent"
+        android:textColor="@color/white"
+        android:textAllCaps="true"
+        android:fontFamily="@font/inter_bold"/>
+
+    <com.holdbetter.fintechchatproject.ui.MySelfMessageLayout
+        style="@style/MessageLayout.ViewGroup"
+        android:id="@+id/message_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="50dp"
+        android:paddingRight="18dp">
+
+        <TextView
+            android:id="@+id/message"
+            style="@style/MessageLayout.Text.Message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="ok" />
+
+        <include
+            layout="@layout/flexbox_with_reactions_instance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+    </com.holdbetter.fintechchatproject.ui.MySelfMessageLayout>
+
+
+</LinearLayout>

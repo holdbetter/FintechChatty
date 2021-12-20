@@ -12,12 +12,12 @@
         android:layout_height="?listPreferredItemHeight"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="21dp"
+        android:paddingStart="21dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:background="@color/activity_background"
-        tools:ignore="UseCompoundDrawables">
+        tools:ignore="RtlSymmetry,UseCompoundDrawables">
 
         <TextView
             android:id="@+id/stream_name"
@@ -35,7 +35,9 @@
         <ImageView
             android:id="@+id/dropdown"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingEnd="21dp"
+            android:paddingStart="31dp"
             android:contentDescription="@string/dropdown_description"
             android:src="@drawable/ic_dropdown"
             app:tint="@color/ic_dropdown_color_selector" />

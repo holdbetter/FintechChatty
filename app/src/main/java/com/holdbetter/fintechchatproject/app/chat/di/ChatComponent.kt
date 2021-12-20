@@ -1,6 +1,7 @@
 package com.holdbetter.fintechchatproject.app.chat.di
 
-import com.holdbetter.fintechchatproject.app.chat.ChatFragment
+import com.holdbetter.fintechchatproject.app.chat.StreamChatFragment
+import com.holdbetter.fintechchatproject.app.chat.TopicChatFragment
 import com.holdbetter.fintechchatproject.di.AndroidDependencies
 import com.holdbetter.fintechchatproject.di.DomainDependencies
 import com.holdbetter.fintechchatproject.di.RepositoryDependencies
@@ -19,5 +20,6 @@ interface ChatComponent {
         ): ChatComponent
     }
 
-    fun inject(chatFragment: ChatFragment)
+    fun inject(topicChatFragment: TopicChatFragment)
+    fun inject(topicChatFragment: StreamChatFragment)
 }

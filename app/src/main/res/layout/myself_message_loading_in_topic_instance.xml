@@ -8,7 +8,7 @@
     tools:viewBindingIgnore="true">
 
     <com.holdbetter.fintechchatproject.ui.MySelfMessageLayout
-        android:id="@+id/myself_message"
+        android:id="@+id/message_layout"
         style="@style/MessageLayout.ViewGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,9 +42,9 @@
         app:indicatorColor="@color/white"
         app:indicatorDirectionCircular="clockwise"
         app:indicatorSize="12dp"
-        app:layout_constraintBottom_toBottomOf="@id/myself_message"
-        app:layout_constraintRight_toLeftOf="@id/myself_message"
-        app:layout_constraintTop_toTopOf="@id/myself_message"
+        app:layout_constraintBottom_toBottomOf="@id/message_layout"
+        app:layout_constraintRight_toLeftOf="@id/message_layout"
+        app:layout_constraintTop_toTopOf="@id/message_layout"
         app:trackThickness="1.25dp"
         tools:indeterminate="false"
         tools:progress="45" />

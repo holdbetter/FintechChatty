@@ -8,7 +8,7 @@ import com.holdbetter.fintechchatproject.room.entity.ReactionEntity
 import com.holdbetter.fintechchatproject.room.entity.SenderEntity
 
 object ModelMapper {
-    fun MessageItem.Message.toMessageWithReactions(streamId: Long, topicName: String): MessageWithReactions {
+    fun MessageItem.Message.toMessageWithReactions(streamId: Long): MessageWithReactions {
         return MessageWithReactions(
             MessageEntity(
                 id,

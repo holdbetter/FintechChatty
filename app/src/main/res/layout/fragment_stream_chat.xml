@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:background="@color/activity_background"
-    tools:context=".app.chat.ChatFragment">
+    tools:context=".app.chat.StreamChatFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -32,17 +32,6 @@
                 app:titleTextAppearance="@style/TitleAppearance"
                 app:titleTextColor="@color/white"
                 tools:title="#general" />
-
-            <TextView
-                android:id="@+id/topic_subtitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_regular"
-                android:gravity="center"
-                android:paddingVertical="6dp"
-                android:textColor="#CCCCCC"
-                android:textSize="18sp"
-                tools:text="Topic: Fintech Contest" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -91,7 +80,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/chat_toolbar"
             tools:itemCount="5"
-            tools:listitem="@layout/foreign_message_instance"
+            tools:listitem="@layout/foreign_message_in_stream_instance"
             tools:visibility="gone" />
 
         <TextView
@@ -127,7 +116,7 @@
         <EditText
             android:id="@+id/input_message"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="@dimen/message_input_height"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="12dp"
             android:layout_weight="1"
@@ -170,7 +159,7 @@
         android:contentDescription="@string/retry_button"
         android:visibility="gone"
         app:backgroundTint="@color/blue_and_green"
-        app:fabCustomSize="50dp"
+        app:fabCustomSize="@dimen/message_input_height"
         app:maxImageSize="30dp"
         app:srcCompat="@drawable/ic_retry"
         app:tint="@color/white"

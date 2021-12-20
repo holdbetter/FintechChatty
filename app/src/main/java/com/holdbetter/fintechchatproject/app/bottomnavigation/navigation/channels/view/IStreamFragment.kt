@@ -8,4 +8,5 @@ interface IStreamFragment {
     fun shimming(turnOn: Boolean)
     fun setStreams(streams: List<Stream>)
     fun onTopicClicked(context: Context, topic: Topic)
+    fun onStreamClicked(context: Context, stream: Stream)
 }

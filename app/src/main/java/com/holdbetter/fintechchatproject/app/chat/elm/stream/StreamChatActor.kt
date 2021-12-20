@@ -1,5 +1,7 @@
-package com.holdbetter.fintechchatproject.app.chat.elm
+package com.holdbetter.fintechchatproject.app.chat.elm.stream
 
+import com.holdbetter.fintechchatproject.app.chat.elm.ChatCommand
+import com.holdbetter.fintechchatproject.app.chat.elm.ChatEvent
 import com.holdbetter.fintechchatproject.domain.repository.IChatRepository
 import com.holdbetter.fintechchatproject.room.services.UnexpectedRoomException
 import dagger.assisted.Assisted
@@ -8,7 +10,7 @@ import dagger.assisted.AssistedInject
 import io.reactivex.rxjava3.core.Observable
 import vivid.money.elmslie.core.store.Actor
 
-class ChatActor @AssistedInject constructor(
+class StreamChatActor @AssistedInject constructor(
     @Assisted("chatRepository") private val chatRepository: IChatRepository
 ) : Actor<ChatCommand, ChatEvent> {
     override fun execute(command: ChatCommand): Observable<ChatEvent> {
@@ -65,8 +67,8 @@ class ChatActor @AssistedInject constructor(
 }
 
 @AssistedFactory
-interface ChatActorFactory {
+interface StreamChatActorFactory {
     fun create(
         @Assisted("chatRepository") chatRepository: IChatRepository
-    ): ChatActor
+    ): StreamChatActor
 }

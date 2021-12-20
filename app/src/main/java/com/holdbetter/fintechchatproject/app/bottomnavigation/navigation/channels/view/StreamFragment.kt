@@ -14,7 +14,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.app.MainActivity
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.stream.StreamEvent
-import com.holdbetter.fintechchatproject.app.chat.ChatFragment
+import com.holdbetter.fintechchatproject.app.chat.StreamChatFragment
+import com.holdbetter.fintechchatproject.app.chat.TopicChatFragment
 import com.holdbetter.fintechchatproject.databinding.FragmentStreamsSubOrNotBinding
 import com.holdbetter.fintechchatproject.databinding.NoStreamInstanceBinding
 import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
@@ -65,7 +66,7 @@ abstract class StreamFragment<Effect : Any, State : Any>(
                     }
                 }
 
-                adapter = StreamAdapter(::onTopicClicked)
+                adapter = StreamAdapter(::onTopicClicked, ::onStreamClicked)
             }
         }
     }
@@ -99,7 +100,19 @@ abstract class StreamFragment<Effect : Any, State : Any>(
     override fun onTopicClicked(context: Context, topic: Topic) {
         val mainActivity = context as MainActivity
         val chatFragment =
-            ChatFragment.newInstance(topic.streamId, topic.streamName, topic.name)
+            TopicChatFragment.newInstance(topic.streamId, topic.streamName, topic.name)
+
+        mainActivity.supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.main_host_fragment, chatFragment)
+            .addToBackStack(null)
+            .commitAllowingStateLoss()
+    }
+
+    override fun onStreamClicked(context: Context, stream: Stream) {
+        val mainActivity = context as MainActivity
+        val chatFragment =
+            StreamChatFragment.newInstance(stream.id, stream.name)
 
         mainActivity.supportFragmentManager
             .beginTransaction()

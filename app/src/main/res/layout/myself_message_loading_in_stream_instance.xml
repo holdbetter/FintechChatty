@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:background="@color/activity_background"
+    tools:ignore="RtlHardcoded,RtlSymmetry"
+    tools:viewBindingIgnore="true">
+
+    <TextView
+        android:id="@+id/message_topic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginTop="16dp"
+        android:layout_marginRight="18dp"
+        android:background="@drawable/message_topic_stroke"
+        android:backgroundTint="#5F9C94"
+        android:ellipsize="end"
+        android:fontFamily="@font/inter_bold"
+        android:maxWidth="200dp"
+        android:maxLines="1"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="4dp"
+        android:textAllCaps="true"
+        android:textColor="@color/white"
+        android:textSize="@dimen/message_topic_text"
+        tools:text="Topic" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.holdbetter.fintechchatproject.ui.MySelfMessageLayout
+            android:id="@+id/message_layout"
+            style="@style/MessageLayout.ViewGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="18dp"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="RtlHardcoded,RtlSymmetry">
+
+            <TextView
+                android:id="@+id/message"
+                style="@style/MessageLayout.Text.Message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:longClickable="false"
+                tools:text="ok" />
+
+            <include
+                layout="@layout/flexbox_with_reactions_instance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
+
+        </com.holdbetter.fintechchatproject.ui.MySelfMessageLayout>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progress"
+            style="@style/Widget.MaterialComponents.CircularProgressIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            app:indicatorColor="@color/white"
+            app:indicatorDirectionCircular="clockwise"
+            app:indicatorSize="12dp"
+            app:layout_constraintBottom_toBottomOf="@id/message_layout"
+            app:layout_constraintRight_toLeftOf="@id/message_layout"
+            app:layout_constraintTop_toTopOf="@id/message_layout"
+            app:trackThickness="1.25dp"
+            tools:indeterminate="false"
+            tools:progress="45" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</LinearLayout>

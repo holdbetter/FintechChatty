@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.chat.view.MessageAdapter
+import com.holdbetter.fintechchatproject.app.chat.view.BaseMessageAdapter
 import com.holdbetter.fintechchatproject.model.MessageItem
 import com.holdbetter.fintechchatproject.services.ContextExtensions.dpToPx
 import com.holdbetter.fintechchatproject.services.ContextExtensions.spToPx
@@ -39,7 +39,7 @@ class DateOnChatDecorator(context: Context) :
     private var dateText: String = SAMPLE_DATA
 
     override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-        val adapter = parent.adapter as MessageAdapter
+        val adapter = parent.adapter as BaseMessageAdapter
 
         val calendar = Calendar.getInstance()
         for (childIndex in 0..parent.childCount) {
@@ -72,7 +72,7 @@ class DateOnChatDecorator(context: Context) :
 
                     c.drawText(dateText,
                         parent.width / 2f,
-                        view.top - (backgroundVerticalPadding / 2f),
+                        view.top - (backgroundVerticalPadding / 1.5f),
                         textPaint)
 
                     dividerHeight = textBackground!!.bounds.height()
@@ -89,7 +89,7 @@ class DateOnChatDecorator(context: Context) :
     ) {
         super.getItemOffsets(outRect, view, parent, state)
 
-        val adapter = parent.adapter as MessageAdapter
+        val adapter = parent.adapter as BaseMessageAdapter
         val position = parent.getChildAdapterPosition(view)
         if (position == 0) {
             val message = adapter.messages[position]

@@ -7,6 +7,7 @@ sealed class MessageItem {
         override val id: Long,
         val sender: Sender,
         val messageContent: String,
+        val topicName: String,
         val dateInSeconds: Long,
         val reactions: List<Reaction> = listOf()
     ): MessageItem() {

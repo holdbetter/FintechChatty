@@ -49,6 +49,7 @@ object NetworkMapper {
                     it.avatarURL
                 ),
                 it.content,
+                it.subject,
                 it.timestamp,
                 it.userReactions.toReactions()
             )
@@ -118,7 +119,7 @@ object NetworkMapper {
         return nameToCodepoint.map {
             EmojiApi(
                 it.key,
-                it.value.uppercase()
+                it.value
             )
         }
     }

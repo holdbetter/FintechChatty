@@ -98,7 +98,7 @@ class ChatReducer @Inject constructor() :
             is ChatEvent.Internal.ReactionError -> effects { +ChatEffect.ReactionError(event.error) }
             is ChatEvent.Internal.MessageAdded -> commands { +ChatCommand.FirstLoad }
             is ChatEvent.Internal.ReactionUpdated -> state { copy(messages = event.messages) }
-            ChatEvent.Internal.ReactionAlreadyAdded -> Any()
+            ChatEvent.Internal.ReactionAlreadyAdded -> Unit
         }
     }
 }

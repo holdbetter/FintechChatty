@@ -16,9 +16,11 @@ import io.reactivex.rxjava3.core.Single
 
 @Dao
 interface MessageDao {
+    @Transaction
     @Query("select * from messages where stream_id = :streamId order by date_in_seconds")
     fun getStreamMessages(streamId: Long): Maybe<List<MessageWithReactions>>
 
+    @Transaction
     @Query("select * from messages where stream_id = :streamId and topic_name = :topicName order by date_in_seconds")
     fun getTopicMessages(streamId: Long, topicName: String): Maybe<List<MessageWithReactions>>
 
@@ -43,18 +45,17 @@ interface MessageDao {
         messagesToCache: List<MessageItem.Message>
     ) {
         cleanTopicMessages(streamId, topicName)
-        insertMessagesAndReactions(streamId, topicName, messagesToCache)
+        insertMessagesAndReactions(streamId, messagesToCache)
     }
 
     @Transaction
     fun insertMessagesAndReactions(
         streamId: Long,
-        topicName: String,
         messagesToCache: List<MessageItem.Message>
     ) {
         for (message in messagesToCache) {
             applySender(message.toSender())
-            val messageWithReactions = message.toMessageWithReactions(streamId, topicName)
+            val messageWithReactions = message.toMessageWithReactions(streamId)
             insertMessage(messageWithReactions.message, messageWithReactions.reactions)
         }
     }
