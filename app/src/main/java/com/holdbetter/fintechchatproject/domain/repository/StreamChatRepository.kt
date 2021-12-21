@@ -75,11 +75,12 @@ class StreamChatRepository @AssistedInject constructor(
 
     override fun sendMessage(
         textMessage: String,
+        topicName: String
     ): Single<SentMessageResponse> {
         return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())
             .flatMap { getApi(it) }
-            .flatMap { it.sendMessage(textMessage, streamId, "") }
+            .flatMap { it.sendMessage(textMessage, streamId, topicName) }
             .retryWhen { errors -> errors.flatMap { Flowable.timer(1000, TimeUnit.MILLISECONDS) } }
     }
 }

@@ -38,4 +38,8 @@
     <string name="online">online</string>
     <string name="topic_format">Topic: %s</string>
     <string name="cache_empty">Нет сохранненых сообщений</string>
+    <string name="topic_chooser_or">ИЛИ</string>
+    <string name="topic_chooser_new">НОВЫЙ ТОПИК</string>
+    <string name="topic_new_hint">Название топика</string>
+    <string name="topic_chooser_title">Выбор топика</string>
 </resources>

@@ -11,14 +11,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.holdbetter.fintechchatproject.R
-import com.holdbetter.fintechchatproject.app.chat.StreamChatFragment
 import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
 import javax.inject.Inject
-import kotlin.properties.Delegates
 import kotlin.properties.Delegates.notNull
 
-class EmojiBottomModalFragment() : BottomSheetDialogFragment(),
+class EmojiBottomModalFragment : BottomSheetDialogFragment(),
     IOnEmojiSelectedListener {
     companion object {
         const val MESSAGE_ID_KEY = "messageID"

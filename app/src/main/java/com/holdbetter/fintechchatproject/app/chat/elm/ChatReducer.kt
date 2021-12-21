@@ -88,7 +88,7 @@ class ChatReducer @Inject constructor() :
                 }
                 commands { +ChatCommand.FirstLoad }
             }
-            is ChatEvent.Ui.MessageSent -> commands { +ChatCommand.SendMessage(event.textMessage) }
+            is ChatEvent.Ui.MessageSent -> commands { +ChatCommand.SendMessage(event.textMessage, event.topicName) }
             is ChatEvent.Ui.TopLimitEdgeReached -> commands {
                 +ChatCommand.NextLoad(
                     event.messageAnchorId,

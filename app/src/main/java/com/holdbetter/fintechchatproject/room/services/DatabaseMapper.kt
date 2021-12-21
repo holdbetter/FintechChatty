@@ -53,6 +53,13 @@ object DatabaseMapper {
         }
     }
 
+    fun TopicEntity.toTopicChooser(): TopicChooser {
+        return TopicChooser(
+            name,
+            isSelected = false
+        )
+    }
+
     fun List<ApiEmojiEntity>.toEmojiApiList(): List<EmojiApi> {
         return map {
             EmojiApi(

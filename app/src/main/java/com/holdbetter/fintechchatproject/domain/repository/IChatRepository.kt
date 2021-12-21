@@ -18,7 +18,7 @@ interface IChatRepository: IRepository {
 
     fun getCachedMessages(): Maybe<List<MessageItem.Message>>
 
-    fun sendMessage(textMessage: String): Single<SentMessageResponse>
+    fun sendMessage(textMessage: String, topicName: String): Single<SentMessageResponse>
     fun sendReaction(messageId: Long, emojiNameToUpdate: String, currentMessages: List<MessageItem.Message>): Maybe<List<MessageItem.Message>>
     fun removeReaction(messageId: Long, emojiNameToUpdate: String, currentMessages: List<MessageItem.Message>): Single<List<MessageItem.Message>>
 }

@@ -14,8 +14,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
 import com.holdbetter.fintechchatproject.app.MainActivity
 import com.holdbetter.fintechchatproject.app.bottomnavigation.navigation.channels.elm.stream.StreamEvent
-import com.holdbetter.fintechchatproject.app.chat.StreamChatFragment
-import com.holdbetter.fintechchatproject.app.chat.TopicChatFragment
+import com.holdbetter.fintechchatproject.app.chat.stream.StreamChatFragment
+import com.holdbetter.fintechchatproject.app.chat.topic.TopicChatFragment
 import com.holdbetter.fintechchatproject.databinding.FragmentStreamsSubOrNotBinding
 import com.holdbetter.fintechchatproject.databinding.NoStreamInstanceBinding
 import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException

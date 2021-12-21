@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.app.chat
+package com.holdbetter.fintechchatproject.app.chat.topic
 
 import android.content.Context
 import android.os.Bundle
@@ -10,6 +10,7 @@ import androidx.core.widget.doOnTextChanged
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.app.chat.BaseChatFragment
 import com.holdbetter.fintechchatproject.app.chat.di.DaggerChatComponent
 import com.holdbetter.fintechchatproject.app.chat.elm.*
 import com.holdbetter.fintechchatproject.app.chat.elm.topic.TopicChatActorFactory
@@ -282,7 +283,8 @@ class TopicChatFragment : BaseChatFragment(R.layout.fragment_topic_chat) {
                 scrollToPosition(messageAdapter.itemCount - 1)
                 store.accept(
                     ChatEvent.Ui.MessageSent(
-                        textMessage
+                        textMessage,
+                        topicName
                     )
                 )
             }

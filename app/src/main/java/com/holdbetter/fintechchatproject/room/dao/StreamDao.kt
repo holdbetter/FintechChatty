@@ -22,7 +22,10 @@ interface StreamDao {
     fun getTopic(streamId: Long, topicName: String): Single<TopicEntity>
 
     @Query("select * from topics where stream_id = :streamId and name = :topicName limit 1")
-    fun getTopicSynchoronously(streamId: Long, topicName: String): TopicEntity
+    fun getTopicSynchronously(streamId: Long, topicName: String): TopicEntity
+
+    @Query("select * from topics where stream_id = :streamId order by name")
+    fun getTopics(streamId: Long): Single<List<TopicEntity>>
 
     fun applyStreams(streams: List<StreamWithTopics>): Completable {
         return Completable.create {

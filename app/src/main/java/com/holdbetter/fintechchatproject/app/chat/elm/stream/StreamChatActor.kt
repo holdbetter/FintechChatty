@@ -49,7 +49,7 @@ class StreamChatActor @AssistedInject constructor(
                 successEventMapper = { messages -> ChatEvent.Internal.ReactionUpdated(messages) },
                 failureEventMapper = { error -> ChatEvent.Internal.ReactionError(error) }
             )
-            is ChatCommand.SendMessage -> chatRepository.sendMessage(command.messageText).mapEvents(
+            is ChatCommand.SendMessage -> chatRepository.sendMessage(command.messageText, command.topicName).mapEvents(
                 successEvent = ChatEvent.Internal.MessageAdded,
                 failureEventMapper = { error -> ChatEvent.Internal.OnlineLoadError(error) }
             )

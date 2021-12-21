@@ -21,7 +21,7 @@ sealed class ChatEvent {
             val currentMessages: List<MessageItem.Message>
         ) : Ui()
 
-        class MessageSent(val textMessage: String) : Ui()
+        class MessageSent(val textMessage: String, val topicName: String) : Ui()
 
         class ReactionSent(
             val messageId: Long,
@@ -68,7 +68,7 @@ sealed class ChatCommand {
 
     object GetCached : ChatCommand()
 
-    class SendMessage(val messageText: String) : ChatCommand()
+    class SendMessage(val messageText: String, val topicName: String) : ChatCommand()
 
     class SendReaction(
         val messageId: Long,

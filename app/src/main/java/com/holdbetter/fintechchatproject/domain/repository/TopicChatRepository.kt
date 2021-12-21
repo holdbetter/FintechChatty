@@ -85,6 +85,7 @@ class TopicChatRepository @AssistedInject constructor(
 
     override fun sendMessage(
         textMessage: String,
+        topicName: String
     ): Single<SentMessageResponse> {
         return connectivityManager.isConnected
             .subscribeOn(Schedulers.io())

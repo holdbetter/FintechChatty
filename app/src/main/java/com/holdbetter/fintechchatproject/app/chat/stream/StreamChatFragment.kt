@@ -1,4 +1,4 @@
-package com.holdbetter.fintechchatproject.app.chat
+package com.holdbetter.fintechchatproject.app.chat.stream
 
 import android.content.Context
 import android.os.Bundle
@@ -7,9 +7,11 @@ import android.widget.EditText
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.setFragmentResultListener
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.snackbar.Snackbar
 import com.holdbetter.fintechchatproject.R
+import com.holdbetter.fintechchatproject.app.chat.BaseChatFragment
 import com.holdbetter.fintechchatproject.app.chat.di.DaggerChatComponent
 import com.holdbetter.fintechchatproject.app.chat.elm.*
 import com.holdbetter.fintechchatproject.app.chat.elm.stream.StreamChatActorFactory
@@ -17,6 +19,8 @@ import com.holdbetter.fintechchatproject.app.chat.elm.stream.StreamChatStore
 import com.holdbetter.fintechchatproject.app.chat.elm.stream.StreamChatStoreFactory
 import com.holdbetter.fintechchatproject.app.chat.services.DateOnChatDecorator
 import com.holdbetter.fintechchatproject.app.chat.services.ReverseLayoutManager
+import com.holdbetter.fintechchatproject.app.chat.stream.dialog.TopicChooserDialog
+import com.holdbetter.fintechchatproject.app.chat.topic.TopicChatFragment
 import com.holdbetter.fintechchatproject.app.chat.view.BaseMessageAdapter
 import com.holdbetter.fintechchatproject.app.chat.view.ChatOnScrollListener
 import com.holdbetter.fintechchatproject.app.chat.view.stream.IStreamChatViewer
@@ -26,6 +30,7 @@ import com.holdbetter.fintechchatproject.domain.exception.NotConnectedException
 import com.holdbetter.fintechchatproject.domain.repository.IEmojiRepository
 import com.holdbetter.fintechchatproject.domain.repository.IPersonalRepository
 import com.holdbetter.fintechchatproject.domain.repository.StreamChatRepositoryFactory
+import com.holdbetter.fintechchatproject.domain.services.NetworkMapper.toSender
 import com.holdbetter.fintechchatproject.model.MessageItem
 import com.holdbetter.fintechchatproject.room.services.UnexpectedRoomException
 import com.holdbetter.fintechchatproject.services.FragmentExtensions.app
@@ -113,6 +118,18 @@ class StreamChatFragment : BaseChatFragment(R.layout.fragment_stream_chat), IStr
         )
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setFragmentResultListener(
+            TopicChooserDialog.RESULT_REQUEST_KEY,
+        ) { _, bundle ->
+            val selectedTopicName = bundle.getString(TopicChooserDialog.SELECTED_TOPIC_KEY)!!
+            binding.topicChooser.text =
+                String.format(getString(R.string.topic_format), selectedTopicName)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         with(binding) {
             messages.apply {
@@ -143,6 +160,8 @@ class StreamChatFragment : BaseChatFragment(R.layout.fragment_stream_chat), IStr
 
             update.setOnClickListener { store.accept(ChatEvent.Ui.Retry) }
 
+            topicChooser.setOnClickListener(::onTopicChoose)
+
             if (store.currentState.messages == null) {
                 store.accept(ChatEvent.Ui.Started)
             }
@@ -167,6 +186,10 @@ class StreamChatFragment : BaseChatFragment(R.layout.fragment_stream_chat), IStr
         state.messages?.let {
             binding.emptyData.isVisible = it.isEmpty() && state.isCachedData!!
             setMessages(it, state.isLastPortion!!, state.isCachedData!!)
+            if (it.isNotEmpty()) {
+                binding.topicChooser.text =
+                    String.format(getString(R.string.topic_format), it.last().topicName)
+            }
         }
 
         state.isCachedData?.let {
@@ -181,8 +204,7 @@ class StreamChatFragment : BaseChatFragment(R.layout.fragment_stream_chat), IStr
                 messages.isVisible = false
                 connectionState.isVisible = false
                 update.isVisible = false
-                chatActionButton.isVisible = false
-                inputMessage.isVisible = false
+                composer.isVisible = false
                 emptyData.isVisible = false
             } else {
                 progress.isVisible = false
@@ -224,8 +246,7 @@ class StreamChatFragment : BaseChatFragment(R.layout.fragment_stream_chat), IStr
             }
 
             update.isVisible = isCache
-            chatActionButton.isVisible = !isCache
-            inputMessage.isVisible = !isCache
+            composer.isVisible = !isCache
         }
     }
 
@@ -259,28 +280,30 @@ class StreamChatFragment : BaseChatFragment(R.layout.fragment_stream_chat), IStr
     }
 
     override fun onMessageSent(inputMessage: EditText) {
-//        val textMessage = inputMessage.text.toString()
-//
-//        val message = MessageItem.Message(
-//            MessageItem.Message.NOT_SENT_MESSAGE,
-//            personalRepository.me.toSender(),
-//            textMessage,
-//            topicName,
-//            Calendar.getInstance().timeInMillis / 1000
-//        )
-//
-//        with(binding.messages) {
-//            val messageAdapter = (adapter as BaseMessageAdapter)
-//
-//            messageAdapter.sendMessage(message) {
-//                scrollToPosition(messageAdapter.itemCount - 1)
-//                store.accept(
-//                    ChatEvent.Ui.MessageSent(
-//                        textMessage
-//                    )
-//                )
-//            }
-//        }
+        val textMessage = inputMessage.text.toString()
+        val topicName = binding.topicChooser.text.toString().substringAfter("Topic: ")
+
+        val message = MessageItem.Message(
+            MessageItem.Message.NOT_SENT_MESSAGE,
+            personalRepository.me.toSender(),
+            textMessage,
+            topicName,
+            Calendar.getInstance().timeInMillis / 1000
+        )
+
+        with(binding.messages) {
+            val messageAdapter = (adapter as BaseMessageAdapter)
+
+            messageAdapter.sendMessage(message) {
+                scrollToPosition(messageAdapter.itemCount - 1)
+                store.accept(
+                    ChatEvent.Ui.MessageSent(
+                        textMessage,
+                        topicName
+                    )
+                )
+            }
+        }
     }
 
     override fun onNetworkStateChanged(isAvailable: Boolean) {
@@ -305,6 +328,14 @@ class StreamChatFragment : BaseChatFragment(R.layout.fragment_stream_chat), IStr
         mainActivity.supportFragmentManager
             .beginTransaction()
             .replace(R.id.main_host_fragment, topicChatFragment)
+            .addToBackStack(null)
+            .commitAllowingStateLoss()
+    }
+
+    private fun onTopicChoose(view: View) {
+        mainActivity.supportFragmentManager.beginTransaction()
+            .addSharedElement(view, "topic_chooser")
+            .replace(R.id.main_host_fragment, TopicChooserDialog.newInstance(streamId))
             .addToBackStack(null)
             .commitAllowingStateLoss()
     }

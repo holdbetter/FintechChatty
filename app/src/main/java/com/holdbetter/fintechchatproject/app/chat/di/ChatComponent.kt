@@ -1,7 +1,7 @@
 package com.holdbetter.fintechchatproject.app.chat.di
 
-import com.holdbetter.fintechchatproject.app.chat.StreamChatFragment
-import com.holdbetter.fintechchatproject.app.chat.TopicChatFragment
+import com.holdbetter.fintechchatproject.app.chat.stream.StreamChatFragment
+import com.holdbetter.fintechchatproject.app.chat.topic.TopicChatFragment
 import com.holdbetter.fintechchatproject.di.AndroidDependencies
 import com.holdbetter.fintechchatproject.di.DomainDependencies
 import com.holdbetter.fintechchatproject.di.RepositoryDependencies
