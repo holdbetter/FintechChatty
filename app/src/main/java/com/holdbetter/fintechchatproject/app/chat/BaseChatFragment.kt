@@ -52,7 +52,7 @@ abstract class BaseChatFragment(
     }
 
     override fun onMessageLongClicked(messageId: Long): Boolean {
-        EmojiBottomModalFragment(messageId).show(
+        EmojiBottomModalFragment.newInstance(messageId).show(
             childFragmentManager,
             EmojiBottomModalFragment.TAG
         )
